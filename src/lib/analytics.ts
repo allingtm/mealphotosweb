@@ -1,0 +1,14 @@
+export const ANALYTICS_EVENTS = {
+  MEAL_UPLOADED: 'meal_uploaded',
+  MEAL_RATED: 'meal_rated',
+  RECIPE_REQUESTED: 'recipe_requested',
+  RECIPE_UNLOCKED: 'recipe_unlocked',
+  RECIPE_ADDED: 'recipe_added',
+  SCORECARD_SHARED: 'scorecard_shared',
+  FEED_SCROLLED: 'feed_scrolled',
+  MAP_PIN_TAPPED: 'map_pin_tapped',
+  AUTH_COMPLETED: 'auth_completed',
+  STREAK_MILESTONE: 'streak_milestone',
+  RESTAURANT_SUBSCRIBED: 'restaurant_subscribed',
+  RESTAURANT_REVEALED: 'restaurant_revealed',
+} as const;

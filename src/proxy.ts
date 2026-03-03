@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
 
 const ALLOWED_ORIGINS = [
   'https://meal.photos',
@@ -10,12 +11,11 @@ if (process.env.NODE_ENV === 'development') {
   ALLOWED_ORIGINS.push('http://localhost:3000');
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // CSRF protection: validate Origin header on state-changing requests
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
     const origin = request.headers.get('origin');
 
-    // Allow requests with no origin (same-origin browser requests, server-to-server)
     if (origin && !ALLOWED_ORIGINS.includes(origin)) {
       return NextResponse.json(
         { error: 'Invalid origin' },
@@ -24,9 +24,12 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Refresh Supabase auth session cookies
+  return updateSession(request);
 }
 
 export const config = {
-  matcher: ['/api/:path*'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };

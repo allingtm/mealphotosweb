@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #121212;
+  --bg-surface: #1E1E1E;
+  --bg-elevated: #2A2A2A;
+
+  /* Brand */
+  --accent-primary: #E8A838;
+
+  /* Text */
+  --text-primary: #F5F0E8;
+  --text-secondary: #888888;
+  --text-emphasis: #FFFFFF;
+
+  /* Status */
+  --status-error: #D4553A;
+  --status-success: #4CAF50;
+
+  /* Gradient */
+  --gradient-overlay: linear-gradient(to bottom, rgba(18, 18, 18, 0), rgba(18, 18, 18, 0.95));
+
+  /* Border radius */
+  --radius-card: 16px;
+  --radius-modal: 24px;
+  --radius-full: 999px;
+
+  /* Spacing base */
+  --space-unit: 8px;
+
+  /* Fonts (set by next/font in layout.tsx) */
+  --font-display: var(--font-instrument-serif);
+  --font-body: var(--font-dm-sans);
+}
+
+/* Light mode theme toggle */
+.light {
+  --bg-primary: #FAFAFA;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F0F0F0;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+}
+
+html,
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), sans-serif;
+}
+
+/* Score colour utilities */
+.score-low {
+  color: var(--status-error);
+}
+
+.score-mid {
+  color: var(--accent-primary);
+}
+
+.score-good {
+  color: var(--text-primary);
+}
+
+.score-high {
+  color: var(--status-success);
+}
+
+/* Scroll snap utility */
+.snap-y-mandatory {
+  scroll-snap-type: y mandatory;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}

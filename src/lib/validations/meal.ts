@@ -1,0 +1,33 @@
+import { z } from 'zod';
+
+export const CUISINE_OPTIONS = [
+  'italian', 'asian', 'mexican', 'british', 'indian',
+  'middle_eastern', 'american', 'french', 'other',
+] as const;
+
+export const mealUploadSchema = z.object({
+  title: z.string()
+    .min(2, 'Title must be at least 2 characters')
+    .max(120, 'Title must be under 120 characters')
+    .trim(),
+  cuisine: z.enum(CUISINE_OPTIONS).nullable().optional(),
+  location: z.object({
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
+    city: z.string().max(100).optional(),
+    country: z.string().max(100).optional(),
+  }).nullable().optional(),
+  tags: z.array(
+    z.string().max(30, 'Each tag must be under 30 characters').regex(/^[a-zA-Z0-9]+$/, 'Tags must be alphanumeric')
+  ).max(10, 'Maximum 10 tags').optional().default([]),
+});
+
+export const ratingSchema = z.object({
+  meal_id: z.string().uuid('Invalid meal ID'),
+  score: z.number().int().min(1, 'Score must be 1–10').max(10, 'Score must be 1–10'),
+  turnstile_token: z.string().min(1, 'Bot verification required'),
+});
+
+export const recipeRequestSchema = z.object({
+  meal_id: z.string().uuid('Invalid meal ID'),
+});
