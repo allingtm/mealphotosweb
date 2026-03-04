@@ -160,6 +160,7 @@ export interface FeedItem {
   avg_rating: number;
   rating_count: number;
   recipe_request_count: number;
+  recipe_unlock_threshold: number;
   recipe_unlocked: boolean;
   created_at: string;
   username: string;
@@ -168,6 +169,7 @@ export interface FeedItem {
   user_has_rated: boolean;
   user_rating: number | null;
   feed_score: number;
+  comment_count: number;
 }
 
 export interface MapPin {
