@@ -1,7 +1,7 @@
 {
   "name": "meal.photos",
   "short_name": "meal.photos",
-  "start_url": "/feed",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#121212",
   "background_color": "#121212",

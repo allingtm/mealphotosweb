@@ -3,19 +3,19 @@
 import { AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-export default function GlobalError({
+export default function FeedError({
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = useTranslations('errors');
+  const t = useTranslations('feed');
   const tCommon = useTranslations('common');
 
   return (
     <div
       className="flex flex-col items-center justify-center gap-4 text-center px-8"
-      style={{ height: '100dvh', backgroundColor: 'var(--bg-primary)' }}
+      style={{ height: 'calc(100dvh - 56px)', backgroundColor: 'var(--bg-primary)' }}
     >
       <AlertTriangle size={48} strokeWidth={1.5} style={{ color: 'var(--status-error)' }} />
       <h2
@@ -25,7 +25,7 @@ export default function GlobalError({
           color: 'var(--text-primary)',
         }}
       >
-        {t('somethingWentWrong')}
+        {t('failedToLoad')}
       </h2>
       <p
         style={{
@@ -34,7 +34,7 @@ export default function GlobalError({
           color: 'var(--text-secondary)',
         }}
       >
-        {t('unexpectedError')}
+        {t('failedToLoadDesc')}
       </p>
       <button
         onClick={reset}

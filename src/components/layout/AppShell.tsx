@@ -11,7 +11,7 @@ import { DesktopSidebar } from './DesktopSidebar';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
-  { href: '/feed', icon: Home, label: 'feed' },
+  { href: '/', icon: Home, label: 'feed' },
   { href: '/map', icon: Globe, label: 'map' },
   { href: '/upload', icon: Camera, label: 'upload' },
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + '/');
+    href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
 
   // Full-bleed pages (map) don't get the sidebar
   const isFullBleed = pathname === '/map';

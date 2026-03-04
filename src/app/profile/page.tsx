@@ -12,7 +12,7 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/feed');
+    redirect('/');
   }
 
   // Fetch own profile, meals, and saved meals in parallel

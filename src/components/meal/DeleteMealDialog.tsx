@@ -51,7 +51,7 @@ export function DeleteMealDialog({ mealId, isOpen, onClose }: DeleteMealDialogPr
       posthog.capture(ANALYTICS_EVENTS.MEAL_DELETED, { meal_id: mealId });
       showToast('Meal deleted', 'success');
       onClose();
-      router.push('/feed');
+      router.push('/');
     } catch {
       showToast('Something went wrong. Please try again.', 'error');
       setDeleting(false);

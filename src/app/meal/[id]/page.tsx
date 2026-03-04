@@ -223,7 +223,7 @@ export default async function MealDetailPage({
           }}
         >
           <Link
-            href="/feed"
+            href="/"
             className="flex items-center justify-center"
             style={{
               width: 40,

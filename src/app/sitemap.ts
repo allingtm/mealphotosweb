@@ -8,12 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: 'https://meal.photos/', changeFrequency: 'weekly', priority: 1.0 },
-    {
-      url: 'https://meal.photos/feed',
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
+    { url: 'https://meal.photos/', changeFrequency: 'daily', priority: 1.0 },
     {
       url: 'https://meal.photos/map',
       changeFrequency: 'weekly',

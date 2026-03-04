@@ -284,7 +284,7 @@ function UploadPageContent() {
       if (isRestaurantUpload) {
         router.push('/business/dashboard?toast=Dish+uploaded+anonymously!');
       } else {
-        router.push('/feed?toast=Meal+uploaded!+Let%27s+see+what+people+think.');
+        router.push('/?toast=Meal+uploaded!+Let%27s+see+what+people+think.');
       }
     } catch (err) {
       setUploadError('Something went wrong. Please try again.');

@@ -40,7 +40,7 @@ export default async function NotFound() {
         {t('pageNotFoundDesc')}
       </p>
       <Link
-        href="/feed"
+        href="/"
         className="rounded-full px-6 py-3 transition-opacity hover:opacity-90"
         style={{
           backgroundColor: 'var(--accent-primary)',

@@ -9,7 +9,7 @@ import { useAppStore } from '@/lib/store';
 import { UploadFAB } from './UploadFAB';
 
 const tabs = [
-  { href: '/feed', icon: Home, label: 'feed' },
+  { href: '/', icon: Home, label: 'feed' },
   { href: '/map', icon: Globe, label: 'map' },
 ] as const;
 
@@ -20,7 +20,7 @@ export function BottomNav() {
   const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + '/');
+    href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
 
   return (
     <nav

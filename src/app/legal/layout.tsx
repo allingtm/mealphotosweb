@@ -15,7 +15,7 @@ export default async function LegalLayout({
       style={{ maxWidth: 720 }}
     >
       <Link
-        href="/feed"
+        href="/"
         className="inline-flex items-center gap-2 mb-8"
         style={{
           fontFamily: 'var(--font-body)',

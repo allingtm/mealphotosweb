@@ -18,7 +18,7 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/feed');
+    router.push('/');
     router.refresh();
   };
 

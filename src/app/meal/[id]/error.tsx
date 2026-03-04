@@ -52,7 +52,7 @@ export default function MealError({
           {tCommon('tryAgain')}
         </button>
         <Link
-          href="/feed"
+          href="/"
           className="rounded-full px-6 py-3 transition-opacity hover:opacity-90"
           style={{
             backgroundColor: 'var(--bg-surface)',

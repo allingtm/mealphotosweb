@@ -6,7 +6,7 @@ const MAPBOX_CACHE = `mapbox-tiles-${CACHE_VERSION}`;
 const MAPBOX_CACHE_LIMIT = 50 * 1024 * 1024; // 50MB
 
 // App shell resources to pre-cache
-const APP_SHELL_URLS = ['/feed', '/offline'];
+const APP_SHELL_URLS = ['/', '/offline'];
 
 // Install — pre-cache app shell
 self.addEventListener('install', (event) => {
