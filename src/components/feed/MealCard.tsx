@@ -3,7 +3,8 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { MapPin } from 'lucide-react';
+import Link from 'next/link';
+import { MapPin, UtensilsCrossed } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
@@ -146,6 +147,43 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
         >
           {meal.title}
         </h2>
+
+        {/* Venue pill */}
+        {meal.venue_name && meal.venue_mapbox_id && (
+          <Link
+            href={`/restaurant/${encodeURIComponent(meal.venue_mapbox_id)}`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 10px 4px 8px',
+              borderRadius: 999,
+              backgroundColor: 'rgba(232, 168, 56, 0.15)',
+              marginBottom: 8,
+              textDecoration: 'none',
+            }}
+          >
+            <UtensilsCrossed
+              size={12}
+              strokeWidth={1.5}
+              style={{ color: 'var(--accent-primary)' }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'var(--accent-primary)',
+                maxWidth: 200,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {meal.venue_name}
+            </span>
+          </Link>
+        )}
 
         {/* Author info */}
         <div

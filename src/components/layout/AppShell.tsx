@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, User, Camera, Trophy, ChefHat } from 'lucide-react';
+import { Home, Globe, User, Camera, Trophy, ChefHat, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -17,6 +17,7 @@ const sideNavItems = [
   { href: '/upload', icon: Camera, label: 'upload' },
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
   { href: '/recipes', icon: ChefHat, label: 'recipes' },
+  { href: '/business', icon: Store, label: 'business' },
   { href: '/profile', icon: User, label: 'profile' },
 ] as const;
 

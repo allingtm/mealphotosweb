@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin, UtensilsCrossed } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { timeAgo } from '@/lib/utils/time';
 import { ShareButton } from '@/components/feed/ShareButton';
@@ -332,6 +332,35 @@ export default async function MealDetailPage({
               </span>
             )}
           </div>
+
+          {/* Venue link */}
+          {meal.venue_name && meal.venue_mapbox_id && (
+            <Link
+              href={`/restaurant/${encodeURIComponent(meal.venue_mapbox_id)}`}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 4,
+                textDecoration: 'none',
+              }}
+            >
+              <UtensilsCrossed
+                size={14}
+                strokeWidth={1.5}
+                style={{ color: 'var(--accent-primary)' }}
+              />
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: 'var(--accent-primary)',
+                }}
+              >
+                {meal.venue_name}
+              </span>
+            </Link>
+          )}
 
           {/* Meta row */}
           <p

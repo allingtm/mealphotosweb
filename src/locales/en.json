@@ -25,6 +25,7 @@
     "rankings": "Rankings",
     "directory": "Directory",
     "recipes": "Recipes",
+    "business": "Business",
     "menu": "Menu",
     "uploadMealPhoto": "Upload meal photo"
   },
@@ -189,7 +190,20 @@
     "addLocation": "Add location",
     "locationHelper": "We'll use your approximate area to show your meal on the map. Your exact location is never stored.",
     "tagsOptional": "Tags (optional)",
-    "tagsPlaceholder": "#homemade, #roast, #sunday"
+    "tagsPlaceholder": "#homemade, #roast, #sunday",
+    "venueOptional": "Where did you eat? (optional)",
+    "venuePlaceholder": "Search restaurant, caf\u00e9\u2026",
+    "venueSearching": "Searching..."
+  },
+  "restaurant": {
+    "mealsTagged": "{count} meals tagged here",
+    "avgRating": "Average rating",
+    "totalRatings": "total ratings",
+    "meals": "meals",
+    "claimTitle": "Is this your restaurant?",
+    "claimDesc": "Claim your profile to see private analytics on every dish, upload your own dishes for taste-testing, and grow your audience.",
+    "claimCta": "Claim your profile \u2014 from \u00a329/month",
+    "back": "Back"
   },
   "business": {
     "restaurantTesting": "Restaurant Testing",
@@ -274,6 +288,7 @@
   },
   "menu": {
     "title": "Menu",
+    "business": "For Restaurants",
     "about": "About",
     "contactUs": "Contact Us",
     "feedback": "Feedback",

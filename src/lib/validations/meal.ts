@@ -32,6 +32,13 @@ export const mealUploadSchema = z.object({
   tags: z.array(
     z.string().max(30, 'Each tag must be under 30 characters').regex(/^[a-zA-Z0-9]+$/, 'Tags must be alphanumeric')
   ).max(10, 'Maximum 10 tags').optional().default([]),
+  venue: z.object({
+    name: z.string().max(200),
+    mapbox_id: z.string().max(200).optional(),
+    address: z.string().max(500).optional(),
+    lat: z.number().min(-90).max(90).optional(),
+    lng: z.number().min(-180).max(180).optional(),
+  }).nullable().optional(),
 });
 
 /** Server-side schema that adds turnstile token requirement */

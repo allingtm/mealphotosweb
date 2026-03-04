@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     const cuisine = (formData.get('cuisine') as string) || null;
     const locationStr = formData.get('location') as string | null;
     const tagsStr = formData.get('tags') as string | null;
+    const venueStr = formData.get('venue') as string | null;
     const turnstileToken = formData.get('turnstile_token') as string;
     const isRestaurantUpload = formData.get('is_restaurant_upload') === 'true';
 
@@ -76,12 +77,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    let venue = null;
+    if (venueStr) {
+      try {
+        venue = JSON.parse(venueStr);
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid venue format' },
+          { status: 400 }
+        );
+      }
+    }
+
     // 4. Server-side Zod validation
     const parsed = mealUploadServerSchema.safeParse({
       title,
       cuisine,
       location,
       tags,
+      venue,
       turnstile_token: turnstileToken,
     });
 
@@ -196,6 +210,11 @@ export async function POST(req: NextRequest) {
       locationPoint = `SRID=4326;POINT(${lng} ${lat})`;
       locationCity = parsed.data.location.city || null;
       locationCountry = parsed.data.location.country || null;
+    } else if (parsed.data.venue?.lat && parsed.data.venue?.lng) {
+      // Auto-fill location from venue coordinates
+      const lat = Math.round(parsed.data.venue.lat * 100) / 100;
+      const lng = Math.round(parsed.data.venue.lng * 100) / 100;
+      locationPoint = `SRID=4326;POINT(${lng} ${lat})`;
     }
 
     // 8. Insert meal row
@@ -211,6 +230,9 @@ export async function POST(req: NextRequest) {
         location_country: locationCountry,
         cuisine: parsed.data.cuisine || null,
         tags: parsed.data.tags,
+        venue_name: parsed.data.venue?.name ?? null,
+        venue_mapbox_id: parsed.data.venue?.mapbox_id ?? null,
+        venue_address: parsed.data.venue?.address ?? null,
         ...(isRestaurantUpload && {
           is_restaurant_meal: true,
           restaurant_id: user.id,

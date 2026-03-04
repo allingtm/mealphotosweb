@@ -1,0 +1,43 @@
+-- Update get_feed function to include venue fields
+-- Must drop first because return type is changing
+DROP FUNCTION IF EXISTS public.get_feed(INTEGER, TIMESTAMPTZ);
+
+CREATE FUNCTION public.get_feed(
+  p_limit INTEGER DEFAULT 20,
+  p_cursor TIMESTAMPTZ DEFAULT NULL
+)
+RETURNS TABLE (
+  id UUID, user_id UUID, title TEXT, photo_url TEXT, photo_blur_hash TEXT,
+  location_city TEXT, avg_rating NUMERIC, rating_count INTEGER,
+  recipe_request_count INTEGER, recipe_unlock_threshold INTEGER, recipe_unlocked BOOLEAN,
+  created_at TIMESTAMPTZ, username TEXT, display_name TEXT, avatar_url TEXT,
+  user_has_rated BOOLEAN, user_rating SMALLINT,
+  feed_score DOUBLE PRECISION, comment_count BIGINT,
+  venue_name TEXT, venue_mapbox_id TEXT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    m.id, m.user_id, m.title, m.photo_url, m.photo_blur_hash,
+    m.location_city, m.avg_rating, m.rating_count,
+    m.recipe_request_count, m.recipe_unlock_threshold, m.recipe_unlocked,
+    m.created_at, p.username, p.display_name, p.avatar_url,
+    CASE WHEN r.id IS NOT NULL THEN TRUE ELSE FALSE END AS user_has_rated,
+    r.score AS user_rating,
+    (m.rating_count::DOUBLE PRECISION * COALESCE(m.avg_rating, 0)::DOUBLE PRECISION)
+      / (EXTRACT(EPOCH FROM (now() - m.created_at)) / 3600 + 1) AS feed_score,
+    (SELECT COUNT(*) FROM public.comments c WHERE c.meal_id = m.id) AS comment_count,
+    m.venue_name, m.venue_mapbox_id
+  FROM public.meals m
+  JOIN public.profiles p ON m.user_id = p.id
+  JOIN public.meal_moderation mm ON mm.meal_id = m.id AND mm.status = 'approved'
+  LEFT JOIN public.ratings r ON r.meal_id = m.id AND r.user_id = auth.uid()
+  LEFT JOIN public.blocked_users b ON b.blocker_id = auth.uid() AND b.blocked_id = m.user_id
+  WHERE (m.is_restaurant_meal = FALSE OR m.restaurant_revealed = TRUE)
+    AND b.blocker_id IS NULL
+    AND m.created_at > now() - INTERVAL '7 days'
+    AND (p_cursor IS NULL OR m.created_at < p_cursor)
+  ORDER BY feed_score DESC
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';

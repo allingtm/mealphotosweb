@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { X, User, Info, Mail, MessageSquare } from 'lucide-react';
+import { X, User, Info, Mail, MessageSquare, Store } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
@@ -12,6 +12,7 @@ interface MenuDrawerProps {
 }
 
 const menuItems = [
+  { href: '/business', icon: Store, labelKey: 'business' },
   { href: '/about', icon: Info, labelKey: 'about' },
   { href: '/contact', icon: Mail, labelKey: 'contactUs' },
   { href: '/feedback', icon: MessageSquare, labelKey: 'feedback' },

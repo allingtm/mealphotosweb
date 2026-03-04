@@ -9,6 +9,8 @@ import type { Area } from 'react-easy-crop';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { useAppStore } from '@/lib/store';
 import { mealUploadSchema, CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations';
+import VenueSearch from '@/components/upload/VenueSearch';
+import type { VenueData } from '@/components/upload/VenueSearch';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import { promptForPush } from '@/components/providers/OneSignalProvider';
 import posthog from 'posthog-js';
@@ -115,6 +117,7 @@ function UploadPageContent() {
   const [locationLabel, setLocationLabel] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationPermissionShown, setLocationPermissionShown] = useState(false);
+  const [venue, setVenue] = useState<VenueData | null>(null);
 
   // Errors
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -172,6 +175,22 @@ function UploadPageContent() {
     );
   }, [locationPermissionShown]);
 
+  const handleVenueChange = useCallback(async (newVenue: VenueData | null) => {
+    setVenue(newVenue);
+    // Auto-fill location from venue coordinates if user hasn't set location
+    if (newVenue?.lat && newVenue?.lng && !location) {
+      const lat = quantise(newVenue.lat);
+      const lng = quantise(newVenue.lng);
+      const geo = await reverseGeocode(lat, lng);
+      setLocation({ lat, lng, ...geo });
+      setLocationLabel(
+        [geo.city, geo.country].filter(Boolean).join(', ') ||
+        newVenue.address ||
+        `${lat}, ${lng}`
+      );
+    }
+  }, [location]);
+
   const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
@@ -223,6 +242,13 @@ function UploadPageContent() {
       cuisine: cuisine || null,
       location: location || null,
       tags: parseTags(tags),
+      venue: venue ? {
+        name: venue.name,
+        mapbox_id: venue.mapbox_id,
+        address: venue.address,
+        lat: venue.lat,
+        lng: venue.lng,
+      } : null,
     };
 
     const parsed = mealUploadSchema.safeParse(formData);
@@ -274,6 +300,15 @@ function UploadPageContent() {
       if (parsed.data.tags.length > 0) {
         uploadForm.append('tags', JSON.stringify(parsed.data.tags));
       }
+      if (venue) {
+        uploadForm.append('venue', JSON.stringify({
+          name: venue.name,
+          mapbox_id: venue.mapbox_id,
+          address: venue.address,
+          lat: venue.lat,
+          lng: venue.lng,
+        }));
+      }
       uploadForm.append('turnstile_token', turnstileToken);
       if (isRestaurantUpload) {
         uploadForm.append('is_restaurant_upload', 'true');
@@ -297,6 +332,7 @@ function UploadPageContent() {
       posthog.capture(ANALYTICS_EVENTS.MEAL_UPLOADED, {
         cuisine: parsed.data.cuisine,
         has_location: !!parsed.data.location,
+        has_venue: !!venue,
         tags_count: parsed.data.tags.length,
         is_restaurant: isRestaurantUpload,
       });
@@ -623,6 +659,27 @@ function UploadPageContent() {
               style={{ color: 'var(--text-secondary)' }}
             />
           </div>
+        </div>
+
+        {/* Venue */}
+        <div style={{ marginBottom: 16 }}>
+          <label
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+              display: 'block',
+              marginBottom: 8,
+            }}
+          >
+            {t('venueOptional')}
+          </label>
+          <VenueSearch
+            value={venue}
+            onChange={handleVenueChange}
+            proximity={location ? { lat: location.lat, lng: location.lng } : undefined}
+          />
         </div>
 
         {/* Location */}

@@ -52,6 +52,9 @@ export interface Meal {
   is_restaurant_meal: boolean;
   restaurant_id: string | null;
   restaurant_revealed: boolean;
+  venue_name: string | null;
+  venue_mapbox_id: string | null;
+  venue_address: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -172,6 +175,8 @@ export interface FeedItem {
   user_rating: number | null;
   feed_score: number;
   comment_count: number;
+  venue_name: string | null;
+  venue_mapbox_id: string | null;
 }
 
 export interface MapPin {
