@@ -6,6 +6,7 @@ import { ArrowLeft, UtensilsCrossed, Star } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { MealGrid } from '@/components/profile/MealGrid';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface VenueMeal {
   id: string;
@@ -54,12 +55,34 @@ export default async function RestaurantVenuePage({
 }) {
   const { venueMapboxId } = await params;
   const decodedId = decodeURIComponent(venueMapboxId);
-  const meals = await getVenueMeals(decodedId);
+  const supabase = await createClient();
+
+  const [meals, claimResult] = await Promise.all([
+    getVenueMeals(decodedId),
+    supabase
+      .from('restaurant_claims')
+      .select('id, claimed_by, profiles!restaurant_claims_claimed_by_fkey(subscription_status, is_restaurant)')
+      .eq('venue_mapbox_id', decodedId)
+      .eq('outreach_status', 'claimed')
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
   const t = await getTranslations('restaurant');
 
   if (meals.length === 0) {
     notFound();
   }
+
+  const claimData = claimResult.data as {
+    id: string;
+    claimed_by: string;
+    profiles: { subscription_status: string; is_restaurant: boolean } | null;
+  } | null;
+  const venueVerified = !!(
+    claimData?.profiles?.subscription_status === 'active' &&
+    claimData?.profiles?.is_restaurant
+  );
 
   const venueName = meals[0].venue_name ?? 'Restaurant';
   const venueAddress = meals[0].venue_address;
@@ -98,22 +121,39 @@ export default async function RestaurantVenuePage({
           }}
         >
           {venueName}
+          {venueVerified && (
+            <span style={{ marginLeft: 6 }}><VerifiedBadge size={16} /></span>
+          )}
         </span>
       </div>
 
       {/* Venue info */}
       <div style={{ padding: '0 16px 16px' }}>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 24,
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            marginBottom: 4,
-          }}
-        >
-          {venueName}
-        </h1>
+        <div className="flex items-center gap-2" style={{ marginBottom: 4 }}>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 24,
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {venueName}
+          </h1>
+          {venueVerified && <VerifiedBadge size={18} />}
+        </div>
+        {venueVerified && (
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              color: 'var(--accent-primary)',
+              marginBottom: 4,
+            }}
+          >
+            Verified restaurant
+          </p>
+        )}
         {venueAddress && (
           <p
             style={{

@@ -8,12 +8,11 @@ const VISIT_COUNT_KEY = 'mp_visit_count';
 const PUSH_PROMPTED_KEY = 'mp_push_prompted';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type OneSignalDeferred = Array<(os: any) => void>;
+type OneSignalSdk = any;
 
-function getOneSignalDeferred(): OneSignalDeferred | undefined {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).OneSignalDeferred as OneSignalDeferred | undefined;
-}
+// Module-level promise that resolves with the initialized OneSignal SDK instance
+let sdkReadyPromise: Promise<OneSignalSdk> | null = null;
+let resolveSdkReady: ((os: OneSignalSdk) => void) | null = null;
 
 export function OneSignalProvider() {
   const user = useAppStore((s) => s.user);
@@ -22,39 +21,48 @@ export function OneSignalProvider() {
   useEffect(() => {
     if (!ONESIGNAL_APP_ID || initializedRef.current) return;
     if (typeof window === 'undefined') return;
+    initializedRef.current = true;
+
+    // Create the readiness promise before loading the script
+    sdkReadyPromise = new Promise<OneSignalSdk>((resolve) => {
+      resolveSdkReady = resolve;
+    });
 
     // Dynamically load OneSignal SDK
     const script = document.createElement('script');
     script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
     script.defer = true;
     script.onload = () => {
-      const OneSignal = getOneSignalDeferred();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const OneSignal = (window as any).OneSignalDeferred as Array<(os: OneSignalSdk) => void> | undefined;
       if (!OneSignal) return;
 
-      OneSignal.push(async (os) => {
+      OneSignal.push(async (os: OneSignalSdk) => {
         await os.init({
           appId: ONESIGNAL_APP_ID,
           allowLocalhostAsSecureOrigin: process.env.NODE_ENV === 'development',
           notifyButton: { enable: false },
         });
-        initializedRef.current = true;
+        resolveSdkReady?.(os);
       });
     };
     document.head.appendChild(script);
   }, []);
 
-  // Set External ID when user logs in
+  // Set External ID when user logs in — awaits SDK readiness
   useEffect(() => {
-    if (!user || !initializedRef.current) return;
+    if (!user) return;
 
-    const OneSignal = getOneSignalDeferred();
-    if (!OneSignal) return;
-
-    OneSignal.push(async (os) => {
+    let cancelled = false;
+    (async () => {
+      if (!sdkReadyPromise) return;
+      const os = await sdkReadyPromise;
+      if (cancelled) return;
       if (os.login) {
         await os.login(user.id);
       }
-    });
+    })();
+    return () => { cancelled = true; };
   }, [user]);
 
   // Track visits and prompt for push at the right time
@@ -76,17 +84,16 @@ export function OneSignalProvider() {
   return null;
 }
 
-export function promptForPush() {
+export async function promptForPush() {
   if (typeof window === 'undefined') return;
   if (localStorage.getItem(PUSH_PROMPTED_KEY) === 'true') return;
+  if (!sdkReadyPromise) return;
 
-  const OneSignal = getOneSignalDeferred();
-  if (!OneSignal) return;
-
-  OneSignal.push(async (os) => {
-    if (os.Slidedown) {
-      await os.Slidedown.promptPush();
-      localStorage.setItem(PUSH_PROMPTED_KEY, 'true');
-    }
-  });
+  try {
+    const os = await sdkReadyPromise;
+    await os.Slidedown.promptPush();
+    localStorage.setItem(PUSH_PROMPTED_KEY, 'true');
+  } catch {
+    // SDK failed or user dismissed — don't set flag so we can retry next visit
+  }
 }

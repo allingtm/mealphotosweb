@@ -15,15 +15,36 @@ export const profileUpdateSchema = z.object({
   timezone: z.string().max(50).optional(),
 });
 
+const REPORT_REASONS = [
+  'not_food', 'inappropriate', 'spam', 'harassment', 'other',
+  'stolen_photo', 'wrong_venue', 'food_safety', 'privacy', 'copyright',
+] as const;
+
+export type ReportReason = typeof REPORT_REASONS[number];
+
 export const reportSchema = z.object({
   reported_meal_id: z.string().uuid().nullable().optional(),
   reported_user_id: z.string().uuid().nullable().optional(),
-  reason: z.enum(['not_food', 'inappropriate', 'spam', 'harassment', 'other']),
+  reason: z.enum(REPORT_REASONS),
   detail: z.string().max(500).trim().optional(),
 }).refine(
   data => data.reported_meal_id || data.reported_user_id,
   'Must report either a meal or a user'
 );
+
+export function getReportPriority(
+  reason: ReportReason
+): 'urgent' | 'high' | 'standard' {
+  if (reason === 'food_safety' || reason === 'privacy') return 'urgent';
+  if (reason === 'inappropriate' || reason === 'harassment' || reason === 'copyright') return 'high';
+  return 'standard';
+}
+
+export const disputeSchema = z.object({
+  meal_id: z.string().uuid(),
+  reason: z.enum(['not_served_here', 'wrong_location', 'fake_photo', 'other']),
+  detail: z.string().max(280).trim().optional(),
+});
 
 export const commentSchema = z.object({
   meal_id: z.string().uuid(),

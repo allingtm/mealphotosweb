@@ -15,6 +15,7 @@ import { RatingBar } from './RatingBar';
 import { ScoreBadge } from './ScoreBadge';
 import { ActionColumn } from './ActionColumn';
 import { BlurHashCanvas } from './BlurHashCanvas';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface MealCardProps {
   meal: FeedItem;
@@ -168,6 +169,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
               strokeWidth={1.5}
               style={{ color: 'var(--accent-primary)' }}
             />
+            {meal.venue_verified && <VerifiedBadge size={12} />}
             <span
               style={{
                 fontFamily: 'var(--font-body)',

@@ -203,7 +203,58 @@
     "claimTitle": "Is this your restaurant?",
     "claimDesc": "Claim your profile to see private analytics on every dish, upload your own dishes for taste-testing, and grow your audience.",
     "claimCta": "Claim your profile \u2014 from \u00a329/month",
-    "back": "Back"
+    "back": "Back",
+    "verified": "Verified restaurant"
+  },
+  "report": {
+    "title": "Report this meal",
+    "submitButton": "Submit Report",
+    "submitting": "Submitting...",
+    "successMessage": "Report submitted. Thank you.",
+    "detailPlaceholder": "Additional detail (optional)",
+    "disclaimer": "Reports are reviewed within 48hrs and are always anonymous.",
+    "reasons": {
+      "not_food": "Not food",
+      "inappropriate": "Inappropriate content",
+      "spam": "Spam / promotional",
+      "stolen_photo": "Stolen photo",
+      "wrong_venue": "Wrong restaurant tagged",
+      "food_safety": "Food safety concern",
+      "privacy": "Privacy issue",
+      "copyright": "Copyright violation",
+      "harassment": "Harassment",
+      "other": "Other"
+    }
+  },
+  "dispute": {
+    "title": "Dispute venue tag",
+    "submitButton": "Submit Dispute",
+    "submitting": "Submitting...",
+    "successMessage": "Dispute submitted. We'll review this within 48 hours.",
+    "detailPlaceholder": "Additional detail (optional, max 280 chars)",
+    "reasons": {
+      "not_served_here": "Not served here",
+      "wrong_location": "Wrong location / branch",
+      "fake_photo": "Fake / stock photo",
+      "other": "Other"
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "overview": "Overview",
+    "moderationQueue": "Moderation",
+    "reports": "Reports",
+    "venueDisputes": "Disputes",
+    "approve": "Approve",
+    "reject": "Reject",
+    "action": "Action",
+    "dismiss": "Dismiss",
+    "uphold": "Uphold",
+    "noItems": "No items pending review.",
+    "pendingModeration": "Pending Moderation",
+    "pendingReports": "Pending Reports",
+    "urgentReports": "Urgent Reports",
+    "pendingDisputes": "Pending Disputes"
   },
   "business": {
     "restaurantTesting": "Restaurant Testing",

@@ -11,6 +11,7 @@ import { ScoreBadge } from '@/components/feed/ScoreBadge';
 import { BlurHashCanvas } from '@/components/feed/BlurHashCanvas';
 import { ScoreDistribution } from '@/components/meal/ScoreDistribution';
 import { MealDetailClient } from '@/components/meal/MealDetailClient';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import type { Recipe, Ingredient } from '@/types/database';
 
 // Cache the meal fetch so generateMetadata and the page share the same data
@@ -157,7 +158,7 @@ export default async function MealDetailPage({
   };
 
   // Parallel data fetches
-  const [recipeResult, distributionResult, userRatingResult, userRequestResult] =
+  const [recipeResult, distributionResult, userRatingResult, userRequestResult, venueClaimResult] =
     await Promise.all([
       supabase
         .from('recipes')
@@ -181,6 +182,15 @@ export default async function MealDetailPage({
             .eq('user_id', user.id)
             .maybeSingle()
         : Promise.resolve({ data: null }),
+      meal.venue_mapbox_id
+        ? supabase
+            .from('restaurant_claims')
+            .select('id, claimed_by, profiles!restaurant_claims_claimed_by_fkey(subscription_status, is_restaurant)')
+            .eq('venue_mapbox_id', meal.venue_mapbox_id)
+            .eq('outreach_status', 'claimed')
+            .limit(1)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
 
   const recipe = recipeResult.data as Recipe | null;
@@ -191,6 +201,17 @@ export default async function MealDetailPage({
   const userRating = userRatingResult.data as { score: number } | null;
   const hasRequested = !!userRequestResult.data;
   const isOwnMeal = user?.id === meal.user_id;
+
+  // Check if venue is verified (claimed + active subscription)
+  const claimData = venueClaimResult.data as {
+    id: string;
+    claimed_by: string;
+    profiles: { subscription_status: string; is_restaurant: boolean } | null;
+  } | null;
+  const venueVerified = !!(
+    claimData?.profiles?.subscription_status === 'active' &&
+    claimData?.profiles?.is_restaurant
+  );
 
   return (
     <>
@@ -350,6 +371,7 @@ export default async function MealDetailPage({
                 strokeWidth={1.5}
                 style={{ color: 'var(--accent-primary)' }}
               />
+              {venueVerified && <VerifiedBadge size={14} />}
               <span
                 style={{
                   fontFamily: 'var(--font-body)',

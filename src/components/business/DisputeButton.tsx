@@ -1,53 +1,36 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { MoreVertical, X, Flag } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useAppStore } from '@/lib/store';
+import { Flag, X } from 'lucide-react';
 import { showToast } from '@/components/ui/Toast';
 
-const REPORT_REASONS = [
-  { value: 'not_food', label: 'Not food' },
-  { value: 'inappropriate', label: 'Inappropriate content' },
-  { value: 'spam', label: 'Spam / promotional' },
-  { value: 'stolen_photo', label: 'Stolen photo' },
-  { value: 'wrong_venue', label: 'Wrong restaurant tagged' },
-  { value: 'food_safety', label: 'Food safety concern' },
-  { value: 'privacy', label: 'Privacy issue' },
-  { value: 'copyright', label: 'Copyright violation' },
-  { value: 'harassment', label: 'Harassment' },
+const DISPUTE_REASONS = [
+  { value: 'not_served_here', label: 'Not served here' },
+  { value: 'wrong_location', label: 'Wrong location / branch' },
+  { value: 'fake_photo', label: 'Fake / stock photo' },
   { value: 'other', label: 'Other' },
 ] as const;
 
-interface ReportButtonProps {
+interface DisputeButtonProps {
   mealId: string;
 }
 
-export function ReportButton({ mealId }: ReportButtonProps) {
-  const t = useTranslations('actions');
-  const user = useAppStore((s) => s.user);
-  const openAuthModal = useAppStore((s) => s.openAuthModal);
-
+export function DisputeButton({ mealId }: DisputeButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [detail, setDetail] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleOpen = useCallback(() => {
-    if (!user) {
-      openAuthModal();
-      return;
-    }
     setIsOpen(true);
     setSelectedReason(null);
     setDetail('');
-  }, [user, openAuthModal]);
+  }, []);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, []);
 
-  // Escape key to close
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -65,24 +48,24 @@ export function ReportButton({ mealId }: ReportButtonProps) {
     if (!selectedReason || submitting) return;
     setSubmitting(true);
     try {
-      const res = await fetch('/api/reports', {
+      const res = await fetch('/api/restaurants/disputes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reported_meal_id: mealId,
+          meal_id: mealId,
           reason: selectedReason,
           detail: detail.trim() || undefined,
         }),
       });
       if (res.ok) {
-        showToast('Report submitted. Thank you.', 'success');
+        showToast('Dispute submitted. We\'ll review this within 48 hours.', 'success');
         setIsOpen(false);
       } else {
         const data = await res.json();
-        showToast(data.error ?? 'Failed to submit report', 'error');
+        showToast(data.error ?? 'Failed to submit dispute', 'error');
       }
     } catch {
-      showToast('Failed to submit report', 'error');
+      showToast('Failed to submit dispute', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -91,21 +74,22 @@ export function ReportButton({ mealId }: ReportButtonProps) {
   return (
     <>
       <button
+        type="button"
         onClick={handleOpen}
-        className="flex items-center justify-center"
+        className="flex items-center gap-1"
         style={{
-          width: 48,
-          height: 48,
-          borderRadius: 'var(--radius-full)',
-          backgroundColor: 'rgba(18, 18, 18, 0.5)',
+          padding: '4px 8px',
+          borderRadius: 8,
+          backgroundColor: 'rgba(212, 85, 58, 0.1)',
+          border: '1px solid rgba(212, 85, 58, 0.3)',
+          fontFamily: 'var(--font-body)',
+          fontSize: 12,
+          fontWeight: 500,
+          color: 'var(--status-error)',
         }}
-        aria-label={t('moreOptions')}
       >
-        <MoreVertical
-          size={24}
-          strokeWidth={1.5}
-          color="var(--text-primary)"
-        />
+        <Flag size={12} strokeWidth={1.5} />
+        Dispute
       </button>
 
       {isOpen && (
@@ -144,10 +128,10 @@ export function ReportButton({ mealId }: ReportButtonProps) {
                     color: 'var(--text-primary)',
                   }}
                 >
-                  Report this meal
+                  Dispute venue tag
                 </span>
               </div>
-              <button onClick={handleClose} aria-label="Close">
+              <button type="button" onClick={handleClose} aria-label="Close">
                 <X
                   size={20}
                   strokeWidth={1.5}
@@ -161,9 +145,10 @@ export function ReportButton({ mealId }: ReportButtonProps) {
               className="flex flex-col gap-2"
               style={{ marginBottom: 16 }}
             >
-              {REPORT_REASONS.map(({ value, label }) => (
+              {DISPUTE_REASONS.map(({ value, label }) => (
                 <button
                   key={value}
+                  type="button"
                   onClick={() => setSelectedReason(value)}
                   style={{
                     padding: '12px 16px',
@@ -192,8 +177,8 @@ export function ReportButton({ mealId }: ReportButtonProps) {
               <textarea
                 value={detail}
                 onChange={(e) => setDetail(e.target.value)}
-                placeholder="Additional detail (optional)"
-                maxLength={500}
+                placeholder="Additional detail (optional, max 280 chars)"
+                maxLength={280}
                 rows={3}
                 style={{
                   width: '100%',
@@ -213,6 +198,7 @@ export function ReportButton({ mealId }: ReportButtonProps) {
 
             {/* Submit */}
             <button
+              type="button"
               onClick={handleSubmit}
               disabled={!selectedReason || submitting}
               style={{
@@ -230,21 +216,8 @@ export function ReportButton({ mealId }: ReportButtonProps) {
                 border: 'none',
               }}
             >
-              {submitting ? 'Submitting...' : 'Submit Report'}
+              {submitting ? 'Submitting...' : 'Submit Dispute'}
             </button>
-
-            {/* Disclaimer */}
-            <p
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 12,
-                color: 'var(--text-secondary)',
-                textAlign: 'center',
-                marginTop: 12,
-              }}
-            >
-              Reports are reviewed within 48hrs and are always anonymous.
-            </p>
           </div>
         </div>
       )}

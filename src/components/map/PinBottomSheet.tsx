@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Star, UtensilsCrossed } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { MapPin } from '@/types/database';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 function scoreColorClass(score: number): string {
   if (score < 4) return 'score-low';
@@ -124,7 +125,7 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
           {/* Restaurant badge */}
           {pin.is_restaurant && (
             <div
-              className="flex-shrink-0 px-2 py-1 rounded-full"
+              className="flex-shrink-0 flex items-center gap-1 px-2 py-1 rounded-full"
               style={{
                 backgroundColor: 'rgba(232, 168, 56, 0.15)',
                 fontFamily: 'var(--font-body)',
@@ -133,6 +134,9 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
                 color: 'var(--accent-primary)',
               }}
             >
+              {(pin as MapPin & { venue_verified?: boolean }).venue_verified && (
+                <VerifiedBadge size={11} />
+              )}
               {t('restaurant')}
             </div>
           )}

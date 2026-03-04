@@ -17,6 +17,17 @@ export interface Profile {
   subscription_tier: 'basic' | 'premium' | null;
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
+  is_admin: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RestaurantClaim {
+  id: string;
+  venue_mapbox_id: string;
+  venue_name: string;
+  claimed_by: string;
+  outreach_status: 'pending' | 'claimed' | 'verified' | 'rejected';
   created_at: string;
   updated_at: string;
 }
@@ -120,11 +131,28 @@ export interface Report {
   reporter_id: string;
   reported_meal_id: string | null;
   reported_user_id: string | null;
-  reason: 'not_food' | 'inappropriate' | 'spam' | 'harassment' | 'other';
+  reason:
+    | 'not_food' | 'inappropriate' | 'spam' | 'harassment' | 'other'
+    | 'stolen_photo' | 'wrong_venue' | 'food_safety' | 'privacy' | 'copyright';
+  priority: 'urgent' | 'high' | 'standard';
   detail: string | null;
   status: 'pending' | 'reviewed' | 'actioned' | 'dismissed';
   created_at: string;
   reviewed_at: string | null;
+}
+
+export interface VenueDispute {
+  id: string;
+  meal_id: string;
+  restaurant_profile_id: string;
+  venue_mapbox_id: string;
+  reason: 'not_served_here' | 'wrong_location' | 'fake_photo' | 'other';
+  detail: string | null;
+  status: 'pending' | 'upheld' | 'dismissed';
+  reviewed_by: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  admin_notes: string | null;
 }
 
 export interface BlockedUser {
@@ -177,6 +205,7 @@ export interface FeedItem {
   comment_count: number;
   venue_name: string | null;
   venue_mapbox_id: string | null;
+  venue_verified: boolean;
 }
 
 export interface MapPin {

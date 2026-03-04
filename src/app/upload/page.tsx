@@ -443,11 +443,12 @@ function UploadPageContent() {
         {/* 4:5 interactive crop */}
         <div className="flex-1 flex flex-col items-center justify-center px-4">
           <div
-            className="relative w-full overflow-hidden rounded-2xl"
+            className="relative w-full rounded-2xl"
             style={{
               aspectRatio: '4/5',
               maxWidth: 400,
               backgroundColor: 'var(--bg-surface)',
+              overflow: 'hidden',
             }}
           >
             {previewUrl && (
@@ -469,7 +470,7 @@ function UploadPageContent() {
                     boxShadow: 'none',
                   },
                 }}
-                objectFit="cover"
+                objectFit="horizontal-cover"
               />
             )}
           </div>
