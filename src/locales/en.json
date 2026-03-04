@@ -143,7 +143,17 @@
     "avgRating": "Avg Rating",
     "streak": "Streak",
     "unavailable": "Profile unavailable",
-    "unavailableDesc": "We couldn't load this profile. Please try again."
+    "unavailableDesc": "We couldn't load this profile. Please try again.",
+    "displayName": "Display Name",
+    "username": "Username",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about your food journey...",
+    "locationCity": "City",
+    "locationCountry": "Country",
+    "saveProfile": "Save",
+    "profileUpdated": "Profile updated",
+    "profileUpdateFailed": "Failed to update profile",
+    "usernameTaken": "Username is already taken"
   },
   "leaderboard": {
     "title": "Leaderboard",

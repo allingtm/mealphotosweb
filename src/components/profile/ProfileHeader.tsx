@@ -3,15 +3,18 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Settings, Trophy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
+import { EditProfileModal } from '@/components/profile/EditProfileModal';
 
 interface ProfileHeaderProps {
   profile: {
     username: string;
     display_name: string | null;
+    bio: string | null;
     avatar_url: string | null;
     location_city: string | null;
     location_country: string | null;
@@ -21,7 +24,9 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
   const t = useTranslations('profile');
+  const router = useRouter();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const locationParts = [profile.location_city, profile.location_country].filter(Boolean);
   const location = locationParts.join(', ');
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
@@ -141,6 +146,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
         {isOwnProfile && (
           <button
             type="button"
+            onClick={() => setIsEditOpen(true)}
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: 14,
@@ -164,6 +170,16 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
         <NotificationPanel
           isOpen={isPanelOpen}
           onClose={() => setIsPanelOpen(false)}
+        />
+      )}
+
+      {/* Edit profile modal */}
+      {isOwnProfile && (
+        <EditProfileModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          onSaved={() => router.refresh()}
+          profile={profile}
         />
       )}
     </div>

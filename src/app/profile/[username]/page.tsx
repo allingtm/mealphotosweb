@@ -76,6 +76,7 @@ export default async function PublicProfilePage({ params }: Props) {
         profile={{
           username: profile.username,
           display_name: profile.display_name,
+          bio: null,
           avatar_url: profile.avatar_url,
           location_city: profile.location_city,
           location_country: profile.location_country,
