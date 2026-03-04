@@ -3,6 +3,7 @@ import { Instrument_Serif, DM_Sans } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { AppShell } from '@/components/layout/AppShell';
+import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import '@/styles/globals.css';
 
 const instrumentSerif = Instrument_Serif({
@@ -44,6 +45,7 @@ export default function RootLayout({
       >
         <PostHogProvider>
           <AuthProvider>
+            <OneSignalProvider />
             <AppShell>{children}</AppShell>
           </AuthProvider>
         </PostHogProvider>

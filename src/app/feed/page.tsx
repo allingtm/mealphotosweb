@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { FeedContainer } from '@/components/feed/FeedContainer';
+import { FeedHeader } from '@/components/feed/FeedHeader';
 import type { FeedItem } from '@/types/database';
 
 export default async function FeedPage() {
@@ -13,5 +14,10 @@ export default async function FeedPage() {
   const nextCursor =
     meals.length === 10 ? meals[meals.length - 1].created_at : null;
 
-  return <FeedContainer initialMeals={meals} initialCursor={nextCursor} />;
+  return (
+    <>
+      <FeedHeader />
+      <FeedContainer initialMeals={meals} initialCursor={nextCursor} />
+    </>
+  );
 }

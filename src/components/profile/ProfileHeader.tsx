@@ -1,6 +1,11 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Settings, Trophy, Bell } from 'lucide-react';
+import { Settings, Trophy } from 'lucide-react';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 interface ProfileHeaderProps {
   profile: {
@@ -14,6 +19,7 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
   const locationParts = [profile.location_city, profile.location_country].filter(Boolean);
   const location = locationParts.join(', ');
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
@@ -51,18 +57,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
             >
               <Trophy size={24} strokeWidth={1.5} color="var(--text-primary)" />
             </Link>
-            <Link
-              href="/notifications"
-              className="flex items-center justify-center"
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 'var(--radius-full)',
-              }}
-              aria-label="Notifications"
-            >
-              <Bell size={24} strokeWidth={1.5} color="var(--text-primary)" />
-            </Link>
+            <NotificationBell onClick={() => setIsPanelOpen(true)} />
           </div>
         </div>
       )}
@@ -161,6 +156,14 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
           </button>
         )}
       </div>
+
+      {/* Notification panel */}
+      {isOwnProfile && (
+        <NotificationPanel
+          isOpen={isPanelOpen}
+          onClose={() => setIsPanelOpen(false)}
+        />
+      )}
     </div>
   );
 }

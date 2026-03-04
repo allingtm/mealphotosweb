@@ -7,6 +7,7 @@ import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { useAppStore } from '@/lib/store';
 import { mealUploadSchema, CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
+import { promptForPush } from '@/components/providers/OneSignalProvider';
 import posthog from 'posthog-js';
 
 type UploadStep = 'pick' | 'crop' | 'form';
@@ -255,6 +256,9 @@ export default function UploadPage() {
         has_location: !!parsed.data.location,
         tags_count: parsed.data.tags.length,
       });
+
+      // Prompt for push notifications on first upload
+      promptForPush();
 
       // Navigate to feed with success toast
       router.push('/feed?toast=Meal+uploaded!+Let%27s+see+what+people+think.');

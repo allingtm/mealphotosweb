@@ -187,7 +187,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
     return (
       <div
         className="flex flex-col items-center justify-center gap-4 text-center px-8"
-        style={{ height: 'calc(100dvh - 56px)' }}
+        style={{ height: 'calc(100dvh - 56px - 48px)' }}
       >
         <div style={{ fontSize: 64 }}>🍽️</div>
         <h2
@@ -218,7 +218,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
       <div
         ref={scrollContainerRef}
         className="snap-y-mandatory overflow-y-scroll"
-        style={{ height: 'calc(100dvh - 56px)' }}
+        style={{ height: 'calc(100dvh - 56px - 48px)' }}
       >
         {meals.map((meal, index) => (
           <div
@@ -262,7 +262,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
           <div
             className="flex flex-col items-center justify-center gap-2 text-center px-8 snap-start"
             style={{
-              height: 'calc(100dvh - 56px)',
+              height: 'calc(100dvh - 56px - 48px)',
               fontFamily: 'var(--font-body)',
             }}
           >
