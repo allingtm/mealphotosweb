@@ -2,3 +2,4 @@ export { mealUploadSchema, mealUploadServerSchema, ratingSchema, recipeRequestSc
 export { ingredientSchema, recipeSchema } from './recipe';
 export { profileUpdateSchema, reportSchema, commentSchema } from './profile';
 export { mapPinsQuerySchema } from './map';
+export { leaderboardQuerySchema } from './leaderboard';

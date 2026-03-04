@@ -197,3 +197,21 @@ export interface PublicProfile {
   is_restaurant: boolean;
   created_at: string;
 }
+
+export interface ProfileStats {
+  meal_count: number;
+  avg_rating: number;
+  streak_current: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  location_city: string | null;
+  location_country: string | null;
+  meal_count: number;
+  avg_rating: number;
+}
