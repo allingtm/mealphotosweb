@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, User } from 'lucide-react';
+import { Home, Globe, Trophy, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,9 +8,13 @@ import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { UploadFAB } from './UploadFAB';
 
-const tabs = [
+const leftTabs = [
   { href: '/', icon: Home, label: 'feed' },
   { href: '/map', icon: Globe, label: 'map' },
+] as const;
+
+const rightTabs = [
+  { href: '/leaderboard', icon: Trophy, label: 'rankings' },
 ] as const;
 
 export function BottomNav() {
@@ -31,7 +35,7 @@ export function BottomNav() {
         borderColor: 'var(--bg-elevated)',
       }}
     >
-      {tabs.map(({ href, icon: Icon, label }) => (
+      {leftTabs.map(({ href, icon: Icon, label }) => (
         <Link
           key={href}
           href={href}
@@ -57,7 +61,36 @@ export function BottomNav() {
         </Link>
       ))}
 
-      <UploadFAB />
+      {/* Spacer for FAB */}
+      <div className="relative" style={{ width: 56 }}>
+        <UploadFAB />
+      </div>
+
+      {rightTabs.map(({ href, icon: Icon, label }) => (
+        <Link
+          key={href}
+          href={href}
+          className="flex flex-col items-center justify-center gap-0.5"
+          style={{ minWidth: 48, minHeight: 48 }}
+        >
+          <Icon
+            size={24}
+            strokeWidth={1.5}
+            color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+          />
+          <span
+            className="font-medium"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
+            }}
+          >
+            {t(label)}
+          </span>
+        </Link>
+      ))}
 
       {user ? (
         <Link
