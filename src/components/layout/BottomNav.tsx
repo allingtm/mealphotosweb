@@ -33,6 +33,7 @@ export function BottomNav() {
         height: 56,
         backgroundColor: 'var(--bg-surface)',
         borderColor: 'var(--bg-elevated)',
+        overflow: 'visible',
       }}
     >
       {leftTabs.map(({ href, icon: Icon, label }) => (

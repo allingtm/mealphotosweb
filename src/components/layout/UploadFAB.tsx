@@ -22,21 +22,19 @@ export function UploadFAB() {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center justify-center rounded-full transition-transform active:scale-95"
+      className="fixed z-50 flex items-center justify-center rounded-full transition-transform active:scale-95 md:hidden"
       style={{
-        width: 56,
-        height: 56,
-        backgroundColor: 'var(--bg-surface)',
-        border: '2px solid var(--accent-primary)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
-        position: 'absolute',
-        top: -20,
+        width: 64,
+        height: 64,
+        backgroundColor: 'var(--accent-primary)',
+        boxShadow: '0 4px 16px rgba(232, 168, 56, 0.3)',
+        bottom: 24,
         left: '50%',
         transform: 'translateX(-50%)',
       }}
       aria-label={t('uploadMealPhoto')}
     >
-      <Camera size={24} strokeWidth={1.5} color="var(--accent-primary)" />
+      <Camera size={28} strokeWidth={1.5} color="var(--bg-primary)" />
     </button>
   );
 }
