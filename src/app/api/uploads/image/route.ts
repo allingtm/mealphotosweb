@@ -154,6 +154,12 @@ export async function POST(req: NextRequest) {
     // 6. Upload to Cloudflare Images
     const cfForm = new FormData();
     cfForm.append('file', file, 'meal.jpg');
+    cfForm.append('metadata', JSON.stringify({
+      app: 'meal.photos',
+      userId: user.id,
+      title: parsed.data.title,
+      uploadedAt: new Date().toISOString(),
+    }));
 
     const cfRes = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/images/v1`,
