@@ -9,6 +9,7 @@ import { AuthProvider } from '@/components/providers/AuthProvider';
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { ToastContainer } from '@/components/ui/Toast';
+import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
 import '@/styles/globals.css';
 
 const instrumentSerif = Instrument_Serif({
@@ -81,6 +82,7 @@ export default async function RootLayout({
               <OneSignalProvider />
               <AppShell>{children}</AppShell>
               <ToastContainer />
+              <CookieConsentBanner />
             </AuthProvider>
           </PostHogProvider>
         </NextIntlClientProvider>

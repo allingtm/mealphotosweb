@@ -3,6 +3,7 @@
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { useEffect } from 'react';
+import { getConsent, hasConsentBeenRecorded } from '@/lib/cookies';
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -13,7 +14,13 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       capture_pageview: true,
       capture_pageleave: true,
       loaded: (ph) => {
-        if (process.env.NODE_ENV === 'development') ph.opt_out_capturing();
+        if (process.env.NODE_ENV === 'development') {
+          ph.opt_out_capturing();
+          return;
+        }
+        if (!hasConsentBeenRecorded() || !getConsent().analytics) {
+          ph.opt_out_capturing();
+        }
       },
     });
   }, []);

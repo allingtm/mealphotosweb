@@ -11,6 +11,7 @@ type AuthMode = 'signup' | 'signin';
 export function AuthModal() {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
+  const tFooter = useTranslations('footer');
   const isOpen = useAppStore((s) => s.isAuthModalOpen);
   const closeModal = useAppStore((s) => s.closeAuthModal);
 
@@ -293,6 +294,44 @@ export function AuthModal() {
               >
                 {mode === 'signup' ? t('signIn') : t('signUp')}
               </button>
+            </p>
+
+            {/* Legal footer */}
+            <p
+              className="mt-3 text-center"
+              style={{
+                fontSize: 12,
+                fontFamily: 'var(--font-body)',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+              }}
+            >
+              {t('legalFooter')}{' '}
+              <a
+                href="/legal/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'var(--accent-primary)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 2,
+                }}
+              >
+                {tFooter('terms')}
+              </a>{' '}
+              {tCommon('and')}{' '}
+              <a
+                href="/legal/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'var(--accent-primary)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 2,
+                }}
+              >
+                {tFooter('privacy')}
+              </a>
             </p>
           </>
         )}

@@ -26,6 +26,13 @@ interface AppState {
   setMapFilters: (filters: Partial<MapFilters>) => void;
   resetMapFilters: () => void;
   setMapPosition: (center: [number, number], zoom: number) => void;
+
+  isCookieBannerVisible: boolean;
+  isCookiePreferencesOpen: boolean;
+  showCookieBanner: () => void;
+  hideCookieBanner: () => void;
+  openCookiePreferences: () => void;
+  closeCookiePreferences: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -42,4 +49,12 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({ mapFilters: { ...state.mapFilters, ...filters } })),
   resetMapFilters: () => set({ mapFilters: { ...defaultMapFilters } }),
   setMapPosition: (center, zoom) => set({ mapCenter: center, mapZoom: zoom }),
+
+  isCookieBannerVisible: false,
+  isCookiePreferencesOpen: false,
+  showCookieBanner: () => set({ isCookieBannerVisible: true }),
+  hideCookieBanner: () =>
+    set({ isCookieBannerVisible: false, isCookiePreferencesOpen: false }),
+  openCookiePreferences: () => set({ isCookiePreferencesOpen: true }),
+  closeCookiePreferences: () => set({ isCookiePreferencesOpen: false }),
 }));

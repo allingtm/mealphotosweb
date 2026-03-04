@@ -7,6 +7,7 @@
     "close": "Close",
     "remove": "Remove",
     "or": "or",
+    "and": "and",
     "optional": "Optional",
     "upload": "Upload",
     "uploading": "Uploading...",
@@ -101,7 +102,8 @@
     "magicLinkSent": "We sent a magic link to",
     "clickToSignIn": "Click it to sign in.",
     "tryDifferentMethod": "Try a different method",
-    "authError": "Something went wrong. Please try again."
+    "authError": "Something went wrong. Please try again.",
+    "legalFooter": "By continuing, you agree to our"
   },
   "notifications": {
     "title": "Notifications",
@@ -222,6 +224,49 @@
       "anon": "anon",
       "rating": "{count, plural, one {# rating} other {# ratings}}"
     }
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "lastUpdated": "Last updated: {date}",
+    "backToHome": "Back to home"
+  },
+  "cookies": {
+    "bannerTitle": "We use cookies",
+    "bannerDescription": "We use essential cookies to make the app work. We'd also like to use analytics cookies to improve your experience.",
+    "acceptAll": "Accept all",
+    "declineOptional": "Essential only",
+    "managePreferences": "Manage preferences",
+    "preferencesTitle": "Cookie Preferences",
+    "essential": "Essential",
+    "essentialDescription": "Required for authentication and core functionality. Cannot be disabled.",
+    "analytics": "Analytics",
+    "analyticsDescription": "Help us understand how you use the app so we can improve it.",
+    "savePreferences": "Save preferences",
+    "alwaysOn": "Always on",
+    "policyTitle": "Cookie Policy",
+    "policyDescription": "Learn more about how we use cookies.",
+    "manageCookieSettings": "Manage cookie settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "cookieSettings": "Cookie Settings",
+    "account": "Account",
+    "signOut": "Sign out",
+    "signIn": "Sign in to access all settings",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "exportData": "Export Your Data",
+    "comingSoon": "Coming soon"
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookieSettings": "Cookies"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",

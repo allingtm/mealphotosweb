@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { Trophy, Camera, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function DesktopSidebar() {
+  const tFooter = useTranslations('footer');
+
   return (
     <aside
       className="hidden lg:flex flex-col gap-6 fixed right-0 top-0 bottom-0 overflow-y-auto"
@@ -119,6 +122,45 @@ export function DesktopSidebar() {
         >
           Open map
         </Link>
+      </div>
+
+      {/* Legal footer */}
+      <div
+        className="mt-auto pt-6"
+        style={{ borderTop: '1px solid var(--bg-elevated)' }}
+      >
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link
+            href="/legal/privacy"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {tFooter('privacy')}
+          </Link>
+          <Link
+            href="/legal/terms"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {tFooter('terms')}
+          </Link>
+          <Link
+            href="/legal/cookies"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {tFooter('cookieSettings')}
+          </Link>
+        </div>
       </div>
     </aside>
   );
