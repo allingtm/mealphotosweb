@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, Trophy, Store } from 'lucide-react';
+import { Home, Globe, Trophy, ChefHat } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -13,7 +13,7 @@ const leftTabs = [
 
 const rightTabs = [
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
-  { href: '/directory', icon: Store, label: 'directory' },
+  { href: '/recipes', icon: ChefHat, label: 'recipes' },
 ] as const;
 
 export function BottomNav() {

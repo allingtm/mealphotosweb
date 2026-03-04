@@ -24,6 +24,7 @@
     "profile": "Profile",
     "rankings": "Rankings",
     "directory": "Directory",
+    "recipes": "Recipes",
     "menu": "Menu",
     "uploadMealPhoto": "Upload meal photo"
   },
@@ -177,6 +178,7 @@
     "selectPhoto": "Select Photo",
     "selectMealPhoto": "Select meal photo",
     "cropPhoto": "Crop Photo",
+    "dragToReposition": "Drag to reposition, pinch or scroll to zoom",
     "addDetails": "Add Details",
     "mealTitle": "Meal title *",
     "mealTitlePlaceholder": "e.g. Sunday Roast Chicken",
@@ -282,6 +284,11 @@
     "title": "Directory",
     "comingSoon": "Coming soon",
     "comingSoonDesc": "Explore restaurants and food businesses near you."
+  },
+  "recipes": {
+    "title": "Recipes",
+    "comingSoon": "Coming soon",
+    "comingSoonDesc": "Discover and share meal recipes from the community."
   },
   "about": {
     "title": "About",

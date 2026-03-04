@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Trophy, Camera, TrendingUp, Store } from 'lucide-react';
+import { Trophy, Camera, TrendingUp, Store, ChefHat } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export function DesktopSidebar() {
   const tFooter = useTranslations('footer');
   const tDir = useTranslations('directory');
+  const tRec = useTranslations('recipes');
 
   return (
     <aside
@@ -122,6 +123,49 @@ export function DesktopSidebar() {
           }}
         >
           Open map
+        </Link>
+      </div>
+
+      {/* Recipes */}
+      <div
+        className="rounded-2xl"
+        style={{
+          backgroundColor: 'var(--bg-surface)',
+          padding: 16,
+        }}
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <ChefHat size={18} strokeWidth={1.5} style={{ color: 'var(--accent-primary)' }} />
+          <h3
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 18,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {tRec('title')}
+          </h3>
+        </div>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            marginBottom: 12,
+          }}
+        >
+          {tRec('comingSoonDesc')}
+        </p>
+        <Link
+          href="/recipes"
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            fontWeight: 600,
+            color: 'var(--accent-primary)',
+          }}
+        >
+          {tRec('comingSoon')}
         </Link>
       </div>
 

@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { X, MapPin, ChevronDown, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Cropper from 'react-easy-crop';
+import type { Area } from 'react-easy-crop';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { useAppStore } from '@/lib/store';
 import { mealUploadSchema, CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations';
@@ -25,22 +27,22 @@ function quantise(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/** Compress image to max width 2000px, 85% JPEG quality */
-async function compressImage(file: File): Promise<Blob> {
+/** Crop and compress image to 4:5, max 1600px wide, 85% JPEG quality */
+async function cropAndCompress(file: File, pixelCrop: Area): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      const MAX_WIDTH = 2000;
-      let { width, height } = img;
-      if (width > MAX_WIDTH) {
-        height = Math.round((height * MAX_WIDTH) / width);
-        width = MAX_WIDTH;
-      }
+      const OUTPUT_MAX = 1600;
+      const { x, y, width, height } = pixelCrop;
+
+      const outW = Math.min(OUTPUT_MAX, width);
+      const outH = Math.round(outW * (5 / 4));
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = outW;
+      canvas.height = outH;
       const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(img, x, y, width, height, 0, 0, outW, outH);
+
       canvas.toBlob(
         (blob) => {
           if (blob) resolve(blob);
@@ -98,6 +100,12 @@ function UploadPageContent() {
   const [step, setStep] = useState<UploadStep>('pick');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [croppedPreviewUrl, setCroppedPreviewUrl] = useState<string | null>(null);
+
+  // Crop state for react-easy-crop
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -164,20 +172,35 @@ function UploadPageContent() {
     );
   }, [locationPermissionShown]);
 
+  const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
     setStep('crop');
   };
 
-  const handleConfirmCrop = () => {
+  const handleConfirmCrop = useCallback(async () => {
+    if (!selectedFile || !croppedAreaPixels) return;
+    try {
+      const blob = await cropAndCompress(selectedFile, croppedAreaPixels);
+      if (croppedPreviewUrl) URL.revokeObjectURL(croppedPreviewUrl);
+      setCroppedPreviewUrl(URL.createObjectURL(blob));
+    } catch {
+      // If crop preview fails, form step will fall back to original preview
+    }
     setStep('form');
-  };
+  }, [selectedFile, croppedAreaPixels, croppedPreviewUrl]);
 
   const handleCancel = () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (croppedPreviewUrl) URL.revokeObjectURL(croppedPreviewUrl);
     router.back();
   };
 
@@ -236,8 +259,9 @@ function UploadPageContent() {
         turnstileToken = 'dev-bypass';
       }
 
-      // Compress image
-      const compressedBlob = await compressImage(selectedFile);
+      // Compress image with crop applied
+      if (!croppedAreaPixels) throw new Error('No crop data');
+      const compressedBlob = await cropAndCompress(selectedFile, croppedAreaPixels);
 
       // Build upload form data
       const uploadForm = new FormData();
@@ -380,8 +404,8 @@ function UploadPageContent() {
           <div style={{ width: 24 }} />
         </div>
 
-        {/* 4:5 crop preview */}
-        <div className="flex-1 flex items-center justify-center px-4">
+        {/* 4:5 interactive crop */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4">
           <div
             className="relative w-full overflow-hidden rounded-2xl"
             style={{
@@ -391,15 +415,39 @@ function UploadPageContent() {
             }}
           >
             {previewUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-full h-full object-cover"
-                draggable={false}
+              <Cropper
+                image={previewUrl}
+                crop={crop}
+                zoom={zoom}
+                aspect={4 / 5}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                showGrid={false}
+                style={{
+                  containerStyle: {
+                    borderRadius: 16,
+                  },
+                  cropAreaStyle: {
+                    border: 'none',
+                    boxShadow: 'none',
+                  },
+                }}
+                objectFit="cover"
               />
             )}
           </div>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              color: 'var(--text-secondary)',
+              marginTop: 12,
+              textAlign: 'center',
+            }}
+          >
+            {t('dragToReposition')}
+          </p>
         </div>
 
         {/* Confirm button */}
@@ -465,7 +513,7 @@ function UploadPageContent() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-8">
-        {/* Photo preview (small) */}
+        {/* Photo preview (small, cropped) */}
         <div className="flex justify-center" style={{ marginBottom: 24 }}>
           <div
             className="relative overflow-hidden rounded-2xl"
@@ -475,10 +523,10 @@ function UploadPageContent() {
               backgroundColor: 'var(--bg-surface)',
             }}
           >
-            {previewUrl && (
+            {(croppedPreviewUrl || previewUrl) && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={previewUrl}
+                src={croppedPreviewUrl || previewUrl!}
                 alt="Preview"
                 className="w-full h-full object-cover"
               />
