@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, DM_Sans } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import '@/styles/globals.css';
 
@@ -42,7 +43,9 @@ export default function RootLayout({
         }}
       >
         <PostHogProvider>
-          <AppShell>{children}</AppShell>
+          <AuthProvider>
+            <AppShell>{children}</AppShell>
+          </AuthProvider>
         </PostHogProvider>
       </body>
     </html>

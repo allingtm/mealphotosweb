@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      { protocol: 'https', hostname: 'imagedelivery.net' },
+    ],
+  },
   async headers() {
     return [
       {
@@ -16,7 +23,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.onesignal.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https://imagedelivery.net https://api.mapbox.com data: blob:",
+              "img-src 'self' https://imagedelivery.net https://api.mapbox.com https://lh3.googleusercontent.com https://*.googleusercontent.com data: blob:",
               "connect-src 'self' https://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://app.posthog.com",
               "font-src 'self'",
               "frame-src https://challenges.cloudflare.com https://js.stripe.com",

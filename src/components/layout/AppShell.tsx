@@ -1,9 +1,12 @@
 'use client';
 
 import { Home, Globe, User, Camera } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
   { href: '/feed', icon: Home, label: 'Feed' },
@@ -14,6 +17,7 @@ const sideNavItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const user = useAppStore((s) => s.user);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + '/');
@@ -36,11 +40,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="flex flex-col items-center justify-center gap-1 py-2"
             style={{ minWidth: 48, minHeight: 48 }}
           >
-            <Icon
-              size={24}
-              strokeWidth={1.5}
-              color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
-            />
+            {label === 'Profile' && user?.user_metadata?.avatar_url ? (
+              <Image
+                src={user.user_metadata.avatar_url}
+                alt="Profile"
+                width={24}
+                height={24}
+                className="rounded-full"
+                style={{
+                  border: isActive(href)
+                    ? '2px solid var(--accent-primary)'
+                    : '2px solid transparent',
+                }}
+              />
+            ) : (
+              <Icon
+                size={24}
+                strokeWidth={1.5}
+                color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+              />
+            )}
             <span
               style={{
                 fontFamily: 'var(--font-body)',
@@ -62,6 +81,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile bottom nav */}
       <BottomNav />
+
+      {/* Auth modal */}
+      <AuthModal />
     </>
   );
 }

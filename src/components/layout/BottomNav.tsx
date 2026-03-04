@@ -1,8 +1,10 @@
 'use client';
 
 import { Home, Globe, User } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAppStore } from '@/lib/store';
 import { UploadFAB } from './UploadFAB';
 
 const tabs = [
@@ -12,6 +14,7 @@ const tabs = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const user = useAppStore((s) => s.user);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + '/');
@@ -58,11 +61,26 @@ export function BottomNav() {
         className="flex flex-col items-center justify-center gap-0.5"
         style={{ minWidth: 48, minHeight: 48 }}
       >
-        <User
-          size={24}
-          strokeWidth={1.5}
-          color={isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
-        />
+        {user?.user_metadata?.avatar_url ? (
+          <Image
+            src={user.user_metadata.avatar_url}
+            alt="Profile"
+            width={24}
+            height={24}
+            className="rounded-full"
+            style={{
+              border: isActive('/profile')
+                ? '2px solid var(--accent-primary)'
+                : '2px solid transparent',
+            }}
+          />
+        ) : (
+          <User
+            size={24}
+            strokeWidth={1.5}
+            color={isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+          />
+        )}
         <span
           className="font-medium"
           style={{
