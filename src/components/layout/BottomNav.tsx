@@ -17,6 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const user = useAppStore((s) => s.user);
+  const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + '/');
@@ -58,43 +59,69 @@ export function BottomNav() {
 
       <UploadFAB />
 
-      <Link
-        href="/profile"
-        className="flex flex-col items-center justify-center gap-0.5"
-        style={{ minWidth: 48, minHeight: 48 }}
-      >
-        {user?.user_metadata?.avatar_url ? (
-          <Image
-            src={user.user_metadata.avatar_url}
-            alt={t('profile')}
-            width={24}
-            height={24}
-            className="rounded-full"
+      {user ? (
+        <Link
+          href="/profile"
+          className="flex flex-col items-center justify-center gap-0.5"
+          style={{ minWidth: 48, minHeight: 48 }}
+        >
+          {user.user_metadata?.avatar_url ? (
+            <Image
+              src={user.user_metadata.avatar_url}
+              alt={t('profile')}
+              width={24}
+              height={24}
+              className="rounded-full"
+              style={{
+                border: isActive('/profile')
+                  ? '2px solid var(--accent-primary)'
+                  : '2px solid transparent',
+              }}
+            />
+          ) : (
+            <User
+              size={24}
+              strokeWidth={1.5}
+              color={isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+            />
+          )}
+          <span
+            className="font-medium"
             style={{
-              border: isActive('/profile')
-                ? '2px solid var(--accent-primary)'
-                : '2px solid transparent',
+              fontFamily: 'var(--font-body)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
-          />
-        ) : (
+          >
+            {t('profile')}
+          </span>
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={openAuthModal}
+          className="flex flex-col items-center justify-center gap-0.5"
+          style={{ minWidth: 48, minHeight: 48 }}
+        >
           <User
             size={24}
             strokeWidth={1.5}
-            color={isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+            color="var(--text-secondary)"
           />
-        )}
-        <span
-          className="font-medium"
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 11,
-            fontWeight: 500,
-            color: isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)',
-          }}
-        >
-          {t('profile')}
-        </span>
-      </Link>
+          <span
+            className="font-medium"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 11,
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {t('profile')}
+          </span>
+        </button>
+      )}
     </nav>
   );
 }

@@ -22,6 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const user = useAppStore((s) => s.user);
+  const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + '/');
@@ -41,46 +42,76 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         }}
         aria-label="Main navigation"
       >
-        {sideNavItems.map(({ href, icon: Icon, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex flex-col items-center justify-center gap-1 py-2"
-            style={{ minWidth: 48, minHeight: 48 }}
-            aria-current={isActive(href) ? 'page' : undefined}
-          >
-            {label === 'profile' && user?.user_metadata?.avatar_url ? (
-              <Image
-                src={user.user_metadata.avatar_url}
-                alt="Profile"
-                width={24}
-                height={24}
-                className="rounded-full"
-                style={{
-                  border: isActive(href)
-                    ? '2px solid var(--accent-primary)'
-                    : '2px solid transparent',
-                }}
-              />
-            ) : (
-              <Icon
-                size={24}
-                strokeWidth={1.5}
-                color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
-              />
-            )}
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 11,
-                fontWeight: 500,
-                color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
-              }}
+        {sideNavItems.map(({ href, icon: Icon, label }) => {
+          if (label === 'profile' && !user) {
+            return (
+              <button
+                key={href}
+                type="button"
+                onClick={openAuthModal}
+                className="flex flex-col items-center justify-center gap-1 py-2"
+                style={{ minWidth: 48, minHeight: 48 }}
+              >
+                <Icon
+                  size={24}
+                  strokeWidth={1.5}
+                  color="var(--text-secondary)"
+                />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {t(label)}
+                </span>
+              </button>
+            );
+          }
+
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="flex flex-col items-center justify-center gap-1 py-2"
+              style={{ minWidth: 48, minHeight: 48 }}
+              aria-current={isActive(href) ? 'page' : undefined}
             >
-              {t(label)}
-            </span>
-          </Link>
-        ))}
+              {label === 'profile' && user?.user_metadata?.avatar_url ? (
+                <Image
+                  src={user.user_metadata.avatar_url}
+                  alt="Profile"
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                  style={{
+                    border: isActive(href)
+                      ? '2px solid var(--accent-primary)'
+                      : '2px solid transparent',
+                  }}
+                />
+              ) : (
+                <Icon
+                  size={24}
+                  strokeWidth={1.5}
+                  color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+                />
+              )}
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                }}
+              >
+                {t(label)}
+              </span>
+            </Link>
+          );
+        })}
       </aside>
 
       {/* Main content — desktop gets right padding for sidebar */}
