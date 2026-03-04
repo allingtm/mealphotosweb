@@ -35,7 +35,11 @@ export function RecipeRequestProgress({
   const handleRequest = useCallback(async () => {
     if (hasRequested || unlocked || submitting) return;
 
-    await requireAuth();
+    try {
+      await requireAuth();
+    } catch {
+      return; // Auth was dismissed
+    }
     setSubmitting(true);
 
     const supabase = createClient();

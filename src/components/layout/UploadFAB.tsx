@@ -11,7 +11,11 @@ export function UploadFAB() {
   const requireAuth = useRequireAuth();
 
   const handleClick = async () => {
-    await requireAuth();
+    try {
+      await requireAuth();
+    } catch {
+      return; // Auth was dismissed
+    }
     router.push('/upload');
   };
 

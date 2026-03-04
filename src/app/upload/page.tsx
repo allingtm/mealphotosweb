@@ -117,8 +117,11 @@ function UploadPageContent() {
 
   // Auth gate on mount
   useEffect(() => {
-    requireAuth();
-  }, [requireAuth]);
+    requireAuth().catch(() => {
+      // Auth was dismissed — navigate away
+      router.back();
+    });
+  }, [requireAuth, router]);
 
   // Open file picker immediately
   useEffect(() => {
@@ -291,6 +294,22 @@ function UploadPageContent() {
 
   // Pick step — hidden file input
   if (step === 'pick') {
+    if (!user) {
+      // Auth modal is showing — show spinner instead of interactive buttons
+      return (
+        <div
+          className="flex flex-col items-center justify-center"
+          style={{ minHeight: 'calc(100dvh - 56px)' }}
+        >
+          <Loader2
+            size={32}
+            strokeWidth={1.5}
+            className="animate-spin"
+            style={{ color: 'var(--text-secondary)' }}
+          />
+        </div>
+      );
+    }
     return (
       <div
         className="flex flex-col items-center justify-center"

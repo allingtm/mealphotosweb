@@ -35,7 +35,11 @@ export function RecipeRequestButton({
   const handleRequest = useCallback(async () => {
     if (requested || unlocked) return;
 
-    await requireAuth();
+    try {
+      await requireAuth();
+    } catch {
+      return; // Auth was dismissed
+    }
 
     const supabase = createClient();
     const { data, error } = await supabase.rpc('request_recipe', {
