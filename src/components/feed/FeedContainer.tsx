@@ -6,6 +6,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
+import { Utensils } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { FeedItem } from '@/types/database';
 import { createClient } from '@/lib/supabase/client';
@@ -191,7 +192,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
         className="flex flex-col items-center justify-center gap-4 text-center px-8"
         style={{ height: 'calc(100dvh - 56px - 48px)' }}
       >
-        <div style={{ fontSize: 64 }}>🍽️</div>
+        <Utensils size={64} strokeWidth={1.5} color="var(--accent-primary)" />
         <h2
           style={{
             fontFamily: 'var(--font-display)',

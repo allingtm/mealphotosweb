@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Utensils } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
@@ -20,16 +21,19 @@ export function FeedHeader() {
           borderBottom: '1px solid var(--bg-elevated)',
         }}
       >
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 20,
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-          }}
-        >
-          {t('title')}
-        </span>
+        <div className="flex items-center gap-2">
+          <Utensils size={20} strokeWidth={1.5} color="var(--accent-primary)" />
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 20,
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {t('title')}
+          </span>
+        </div>
         <NotificationBell onClick={() => setIsPanelOpen(true)} />
       </header>
 
