@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Star, UtensilsCrossed } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { MapPin } from '@/types/database';
 
 function scoreColorClass(score: number): string {
@@ -17,6 +18,8 @@ interface PinBottomSheetProps {
 }
 
 export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
+  const t = useTranslations('map');
+  const tRecipe = useTranslations('recipe');
   const router = useRouter();
 
   if (!pin) return null;
@@ -113,7 +116,7 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
                   color: 'var(--text-secondary)',
                 }}
               >
-                {pin.recipe_request_count} want recipe
+                {tRecipe('wantRecipe', { count: pin.recipe_request_count })}
               </span>
             </div>
           </div>
@@ -130,7 +133,7 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
                 color: 'var(--accent-primary)',
               }}
             >
-              Restaurant
+              {t('restaurant')}
             </div>
           )}
         </button>

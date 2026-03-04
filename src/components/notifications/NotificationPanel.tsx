@@ -12,6 +12,7 @@ import {
   UserPlus,
   BellRing,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import posthog from 'posthog-js';
 import type { Notification } from '@/types/database';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -65,6 +66,8 @@ function getNavigationUrl(notification: Notification): string | null {
 }
 
 export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
+  const t = useTranslations('notifications');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -232,7 +235,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
               margin: 0,
             }}
           >
-            Notifications
+            {t('title')}
           </h2>
           <div className="flex items-center gap-2">
             <button
@@ -249,7 +252,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                 padding: '4px 8px',
               }}
             >
-              Mark all read
+              {t('markAllRead')}
             </button>
             <button
               type="button"
@@ -263,7 +266,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                 border: 'none',
                 cursor: 'pointer',
               }}
-              aria-label="Close notifications"
+              aria-label={t('closeNotifications')}
             >
               <X size={20} strokeWidth={1.5} color="var(--text-secondary)" />
             </button>
@@ -292,7 +295,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                   color: 'var(--text-secondary)',
                 }}
               >
-                No notifications yet
+                {t('noNotifications')}
               </p>
             </div>
           )}
@@ -408,7 +411,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                 opacity: loading ? 0.5 : 1,
               }}
             >
-              {loading ? 'Loading...' : 'Load more'}
+              {loading ? tCommon('loading') : tCommon('loadMore')}
             </button>
           )}
 

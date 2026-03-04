@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 export function FeedHeader() {
+  const t = useTranslations('feed');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
@@ -26,7 +28,7 @@ export function FeedHeader() {
             color: 'var(--text-primary)',
           }}
         >
-          meal.photos
+          {t('title')}
         </span>
         <NotificationBell onClick={() => setIsPanelOpen(true)} />
       </header>

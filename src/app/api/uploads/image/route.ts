@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
     const locationStr = formData.get('location') as string | null;
     const tagsStr = formData.get('tags') as string | null;
     const turnstileToken = formData.get('turnstile_token') as string;
+    const isRestaurantUpload = formData.get('is_restaurant_upload') === 'true';
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -118,6 +119,38 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 5b. Restaurant upload validation
+    if (isRestaurantUpload) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_status, subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile || profile.subscription_status !== 'active') {
+        return NextResponse.json(
+          { error: 'Active subscription required for restaurant uploads' },
+          { status: 403 }
+        );
+      }
+
+      // Enforce Basic tier 10-upload limit
+      if (profile.subscription_tier === 'basic') {
+        const { count } = await supabase
+          .from('meals')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_restaurant_meal', true);
+
+        if ((count ?? 0) >= 10) {
+          return NextResponse.json(
+            { error: 'Basic plan is limited to 10 dish uploads. Upgrade to Premium for unlimited uploads.' },
+            { status: 403 }
+          );
+        }
+      }
+    }
+
     // 6. Upload to Cloudflare Images
     const cfForm = new FormData();
     cfForm.append('file', file, 'meal.jpg');
@@ -172,6 +205,11 @@ export async function POST(req: NextRequest) {
         location_country: locationCountry,
         cuisine: parsed.data.cuisine || null,
         tags: parsed.data.tags,
+        ...(isRestaurantUpload && {
+          is_restaurant_meal: true,
+          restaurant_id: user.id,
+          restaurant_revealed: false,
+        }),
       })
       .select('id')
       .single();

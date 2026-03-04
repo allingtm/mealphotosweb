@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MapPin, Camera } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface MapEmptyOverlayProps {
   center: [number, number] | null;
@@ -24,6 +25,7 @@ async function reverseGeocodeCity(lng: number, lat: number): Promise<string | nu
 }
 
 export function MapEmptyOverlay({ center }: MapEmptyOverlayProps) {
+  const t = useTranslations('map');
   const [cityName, setCityName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function MapEmptyOverlay({ center }: MapEmptyOverlayProps) {
             lineHeight: 1.4,
           }}
         >
-          No meals here yet. Be the first to put {locationText} on the map!
+          {t('noMealsHere')} {locationText} {t('onTheMap')}
         </p>
         <Link
           href="/upload"
@@ -74,7 +76,7 @@ export function MapEmptyOverlay({ center }: MapEmptyOverlayProps) {
           }}
         >
           <Camera size={18} strokeWidth={1.5} />
-          Upload a Meal
+          {t('uploadAMeal')}
         </Link>
       </div>
     </div>

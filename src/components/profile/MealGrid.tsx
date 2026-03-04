@@ -1,6 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 function getScoreColor(score: number): string {
   if (score <= 3) return 'var(--status-error)';
@@ -22,6 +25,8 @@ interface MealGridProps {
 }
 
 export function MealGrid({ meals, showHeart }: MealGridProps) {
+  const t = useTranslations('profile');
+
   if (meals.length === 0) {
     return (
       <div
@@ -33,7 +38,7 @@ export function MealGrid({ meals, showHeart }: MealGridProps) {
           fontSize: 14,
         }}
       >
-        {showHeart ? 'No saved meals yet' : 'No meals uploaded yet'}
+        {showHeart ? t('noSavedMeals') : t('noMealsUploaded')}
       </div>
     );
   }

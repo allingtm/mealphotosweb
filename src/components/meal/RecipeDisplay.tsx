@@ -1,4 +1,7 @@
+'use client';
+
 import { Clock, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { Recipe, Ingredient } from '@/types/database';
 
 interface RecipeDisplayProps {
@@ -13,6 +16,8 @@ function formatIngredient(ing: Ingredient): string {
 }
 
 export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
+  const t = useTranslations('recipe');
+
   return (
     <div style={{ padding: '24px 0' }}>
       <h3
@@ -24,7 +29,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
           marginBottom: 16,
         }}
       >
-        Recipe
+        {t('heading')}
       </h3>
 
       {/* Cook time & serves */}
@@ -41,13 +46,13 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
           {recipe.cook_time_minutes && (
             <span className="flex items-center gap-1">
               <Clock size={16} strokeWidth={1.5} />
-              {recipe.cook_time_minutes} mins
+              {t('mins', { time: recipe.cook_time_minutes })}
             </span>
           )}
           {recipe.serves && (
             <span className="flex items-center gap-1">
               <Users size={16} strokeWidth={1.5} />
-              Serves {recipe.serves}
+              {t('servesCount', { count: recipe.serves })}
             </span>
           )}
         </div>
@@ -63,7 +68,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
           marginBottom: 8,
         }}
       >
-        Ingredients
+        {t('ingredients')}
       </h4>
       <ul
         style={{
@@ -97,7 +102,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
           marginBottom: 8,
         }}
       >
-        Method
+        {t('method')}
       </h4>
       <ol
         style={{

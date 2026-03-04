@@ -5,3 +5,4 @@ export { mapPinsQuerySchema } from './map';
 export { leaderboardQuerySchema } from './leaderboard';
 export { notificationQuerySchema, markReadSchema, NOTIFICATION_TYPES } from './notification';
 export type { NotificationType } from './notification';
+export { subscribeSchema, revealSchema } from './restaurant';

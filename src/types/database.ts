@@ -156,6 +156,8 @@ export interface FeedItem {
   title: string;
   photo_url: string;
   photo_blur_hash: string | null;
+  /** Server-computed base64 data URL from blurhash (first 3 cards only) */
+  blurDataURL?: string;
   location_city: string | null;
   avg_rating: number;
   rating_count: number;

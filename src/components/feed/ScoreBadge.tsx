@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface ScoreBadgeProps {
   score: number;
@@ -15,6 +16,7 @@ function getScoreColor(score: number): string {
 }
 
 export function ScoreBadge({ score, visible }: ScoreBadgeProps) {
+  const t = useTranslations('rating');
   const [displayValue, setDisplayValue] = useState(0);
   const rafRef = useRef<number>(0);
 
@@ -55,6 +57,9 @@ export function ScoreBadge({ score, visible }: ScoreBadgeProps) {
   return (
     <div
       className="flex items-center justify-center"
+      role="status"
+      aria-live="polite"
+      aria-label={t('avgScore', { score: score.toFixed(1) })}
       style={{
         width: 64,
         height: 64,

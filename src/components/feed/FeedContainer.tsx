@@ -6,6 +6,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
+import { useTranslations } from 'next-intl';
 import type { FeedItem } from '@/types/database';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -19,6 +20,7 @@ interface FeedContainerProps {
 }
 
 export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProps) {
+  const t = useTranslations('feed');
   const [meals, setMeals] = useState<FeedItem[]>(initialMeals);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [loading, setLoading] = useState(false);
@@ -197,7 +199,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
             color: 'var(--text-primary)',
           }}
         >
-          No meals yet
+          {t('noMeals')}
         </h2>
         <p
           style={{
@@ -206,7 +208,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
             color: 'var(--text-secondary)',
           }}
         >
-          Be the first to upload a meal in your area!
+          {t('beFirst')}
         </p>
       </div>
     );
@@ -228,6 +230,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
           >
             <MealCard
               meal={meal}
+              index={index}
               isVisible={visibleIndices.has(index)}
               ratingStartTime={cardTimestamps.current.get(index) ?? null}
             />
@@ -273,7 +276,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
                 color: 'var(--text-secondary)',
               }}
             >
-              You&apos;ve seen everything! Upload a meal or check back later.
+              {t('seenEverything')}
             </p>
           </div>
         )}

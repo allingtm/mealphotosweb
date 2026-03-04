@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Heart } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -22,6 +23,7 @@ export function RecipeRequestProgress({
   unlocked,
   hasRequested: initialHasRequested,
 }: RecipeRequestProgressProps) {
+  const t = useTranslations('recipe');
   const [count, setCount] = useState(initialCount);
   const [hasRequested, setHasRequested] = useState(initialHasRequested);
   const [submitting, setSubmitting] = useState(false);
@@ -96,7 +98,7 @@ export function RecipeRequestProgress({
             color="var(--accent-primary)"
             style={{ display: 'inline', verticalAlign: -2, marginRight: 6 }}
           />
-          {count} / {threshold} want this recipe
+          {t('wantThisRecipe', { count, threshold })}
         </span>
       </div>
 
@@ -133,7 +135,7 @@ export function RecipeRequestProgress({
             marginBottom: 12,
           }}
         >
-          Almost unlocked! Share to get more requests.
+          {t('almostUnlocked')}
         </p>
       )}
 
@@ -158,7 +160,7 @@ export function RecipeRequestProgress({
           transition: 'opacity 200ms',
         }}
       >
-        {hasRequested ? 'Requested' : 'Request Recipe'}
+        {hasRequested ? t('requested') : t('requestRecipe')}
       </button>
     </div>
   );

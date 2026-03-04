@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { MealGrid } from './MealGrid';
 
 interface MealGridItem {
@@ -16,13 +17,14 @@ interface ProfileTabsProps {
   showSavedTab?: boolean;
 }
 
-const tabs = ['My Meals', 'Saved'] as const;
-type Tab = typeof tabs[number];
+const TAB_KEYS = ['myMeals', 'saved'] as const;
+type TabKey = typeof TAB_KEYS[number];
 
 export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('My Meals');
+  const t = useTranslations('profile');
+  const [activeTab, setActiveTab] = useState<TabKey>('myMeals');
 
-  const visibleTabs = showSavedTab ? tabs : (['My Meals'] as const);
+  const visibleTabs = showSavedTab ? TAB_KEYS : (['myMeals'] as const);
 
   return (
     <div>
@@ -59,14 +61,14 @@ export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false }: Pr
               transition: 'color 0.2s, border-color 0.2s',
             }}
           >
-            {tab}
+            {t(tab)}
           </button>
         ))}
       </div>
 
       {/* Tab content */}
-      {activeTab === 'My Meals' && <MealGrid meals={meals} />}
-      {activeTab === 'Saved' && <MealGrid meals={savedMeals} showHeart />}
+      {activeTab === 'myMeals' && <MealGrid meals={meals} />}
+      {activeTab === 'saved' && <MealGrid meals={savedMeals} showHeart />}
     </div>
   );
 }

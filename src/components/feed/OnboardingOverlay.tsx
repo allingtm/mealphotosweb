@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChevronUp } from 'lucide-react';
 
 const STORAGE_KEY = 'meal_photos_onboarding_dismissed';
 
 export function OnboardingOverlay() {
+  const t = useTranslations('onboarding');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export function OnboardingOverlay() {
               color: 'var(--text-emphasis)',
             }}
           >
-            Tap a number to rate this meal
+            {t('tapToRate')}
           </span>
         </div>
         {/* Animated hand tap */}
@@ -100,7 +102,7 @@ export function OnboardingOverlay() {
             color: 'var(--text-secondary)',
           }}
         >
-          Swipe up to skip
+          {t('swipeToSkip')}
         </span>
       </div>
     </div>

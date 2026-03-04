@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Settings, Trophy } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
@@ -19,6 +20,7 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
+  const t = useTranslations('profile');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const locationParts = [profile.location_city, profile.location_country].filter(Boolean);
   const location = locationParts.join(', ');
@@ -40,7 +42,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
               height: 40,
               borderRadius: 'var(--radius-full)',
             }}
-            aria-label="Settings"
+            aria-label={t('settings')}
           >
             <Settings size={24} strokeWidth={1.5} color="var(--text-primary)" />
           </Link>
@@ -53,7 +55,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
                 height: 40,
                 borderRadius: 'var(--radius-full)',
               }}
-              aria-label="Leaderboard"
+              aria-label={t('leaderboard')}
             >
               <Trophy size={24} strokeWidth={1.5} color="var(--text-primary)" />
             </Link>
@@ -152,7 +154,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
               marginTop: 4,
             }}
           >
-            Edit Profile
+            {t('editProfile')}
           </button>
         )}
       </div>

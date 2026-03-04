@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Share2 } from 'lucide-react';
 
 interface ShareButtonProps {
@@ -9,6 +10,7 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ mealId, title }: ShareButtonProps) {
+  const t = useTranslations('actions');
   const handleShare = useCallback(async () => {
     const url = `${window.location.origin}/meal/${mealId}`;
 
@@ -33,7 +35,7 @@ export function ShareButton({ mealId, title }: ShareButtonProps) {
         borderRadius: 'var(--radius-full)',
         backgroundColor: 'rgba(18, 18, 18, 0.5)',
       }}
-      aria-label="Share this meal"
+      aria-label={t('shareThisMeal')}
     >
       <Share2 size={24} strokeWidth={1.5} color="var(--text-primary)" />
     </button>

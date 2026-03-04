@@ -1,13 +1,14 @@
 'use client';
 
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAppStore, type MapFilters } from '@/lib/store';
 
-const TIME_RANGE_OPTIONS: { value: MapFilters['timeRange']; label: string }[] = [
-  { value: 'today', label: 'Today' },
-  { value: 'this_week', label: 'This Week' },
-  { value: 'this_month', label: 'This Month' },
-  { value: 'all_time', label: 'All Time' },
+const TIME_RANGE_OPTIONS: { value: MapFilters['timeRange']; labelKey: 'today' | 'thisWeek' | 'thisMonth' | 'allTime' }[] = [
+  { value: 'today', labelKey: 'today' },
+  { value: 'this_week', labelKey: 'thisWeek' },
+  { value: 'this_month', labelKey: 'thisMonth' },
+  { value: 'all_time', labelKey: 'allTime' },
 ];
 
 interface MapFilterDrawerProps {
@@ -15,6 +16,7 @@ interface MapFilterDrawerProps {
 }
 
 export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
+  const t = useTranslations('map');
   const mapFilters = useAppStore((s) => s.mapFilters);
   const setMapFilters = useAppStore((s) => s.setMapFilters);
   const resetMapFilters = useAppStore((s) => s.resetMapFilters);
@@ -43,9 +45,9 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
               color: 'var(--text-primary)',
             }}
           >
-            Filters
+            {t('filters')}
           </h2>
-          <button onClick={onClose} aria-label="Close filters">
+          <button onClick={onClose} aria-label={t('closeFilters')}>
             <X size={24} strokeWidth={1.5} style={{ color: 'var(--text-primary)' }} />
           </button>
         </div>
@@ -61,10 +63,10 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
               marginBottom: 8,
             }}
           >
-            Time Range
+            {t('timeRange')}
           </p>
           <div className="flex flex-wrap gap-2">
-            {TIME_RANGE_OPTIONS.map(({ value, label }) => {
+            {TIME_RANGE_OPTIONS.map(({ value, labelKey }) => {
               const isActive = mapFilters.timeRange === value;
               return (
                 <button
@@ -79,7 +81,7 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
                     color: isActive ? '#121212' : 'var(--text-primary)',
                   }}
                 >
-                  {label}
+                  {t(labelKey)}
                 </button>
               );
             })}
@@ -97,7 +99,7 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
               marginBottom: 8,
             }}
           >
-            Minimum Rating: {mapFilters.minRating > 0 ? mapFilters.minRating : 'Any'}
+            {t('minimumRating')}{mapFilters.minRating > 0 ? mapFilters.minRating : t('any')}
           </p>
           <div className="flex gap-1">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
@@ -134,7 +136,7 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
               color: 'var(--text-secondary)',
             }}
           >
-            Recipe available only
+            {t('recipeOnly')}
           </p>
           <button
             role="switch"
@@ -174,7 +176,7 @@ export function MapFilterDrawer({ onClose }: MapFilterDrawerProps) {
             backgroundColor: 'var(--bg-elevated)',
           }}
         >
-          Reset Filters
+          {t('resetFilters')}
         </button>
       </div>
     </>

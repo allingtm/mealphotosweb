@@ -1,26 +1,33 @@
 'use client';
 
-import { Home, Globe, User, Camera } from 'lucide-react';
+import { Home, Globe, User, Camera, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
+import { DesktopSidebar } from './DesktopSidebar';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
-  { href: '/feed', icon: Home, label: 'Feed' },
-  { href: '/map', icon: Globe, label: 'Map' },
-  { href: '/upload', icon: Camera, label: 'Upload' },
-  { href: '/profile', icon: User, label: 'Profile' },
+  { href: '/feed', icon: Home, label: 'feed' },
+  { href: '/map', icon: Globe, label: 'map' },
+  { href: '/upload', icon: Camera, label: 'upload' },
+  { href: '/leaderboard', icon: Trophy, label: 'rankings' },
+  { href: '/profile', icon: User, label: 'profile' },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations('nav');
   const user = useAppStore((s) => s.user);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(href + '/');
+
+  // Full-bleed pages (map) don't get the sidebar
+  const isFullBleed = pathname === '/map';
 
   return (
     <>
@@ -32,6 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           backgroundColor: 'var(--bg-surface)',
           borderColor: 'var(--bg-elevated)',
         }}
+        aria-label="Main navigation"
       >
         {sideNavItems.map(({ href, icon: Icon, label }) => (
           <Link
@@ -39,8 +47,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             href={href}
             className="flex flex-col items-center justify-center gap-1 py-2"
             style={{ minWidth: 48, minHeight: 48 }}
+            aria-current={isActive(href) ? 'page' : undefined}
           >
-            {label === 'Profile' && user?.user_metadata?.avatar_url ? (
+            {label === 'profile' && user?.user_metadata?.avatar_url ? (
               <Image
                 src={user.user_metadata.avatar_url}
                 alt="Profile"
@@ -68,16 +77,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
               }}
             >
-              {label}
+              {t(label)}
             </span>
           </Link>
         ))}
       </aside>
 
-      {/* Main content */}
-      <main className="pb-14 md:pb-0 md:pl-[72px]">
+      {/* Main content — desktop gets right padding for sidebar */}
+      <main
+        id="main-content"
+        className={`pb-14 md:pb-0 md:pl-18 ${!isFullBleed ? 'lg:pr-80' : ''}`}
+      >
         {children}
       </main>
+
+      {/* Desktop right sidebar — hidden on map page */}
+      {!isFullBleed && <DesktopSidebar />}
 
       {/* Mobile bottom nav */}
       <BottomNav />

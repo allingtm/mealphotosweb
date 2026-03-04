@@ -4,16 +4,18 @@ import { Home, Globe, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { UploadFAB } from './UploadFAB';
 
 const tabs = [
-  { href: '/feed', icon: Home, label: 'Feed' },
-  { href: '/map', icon: Globe, label: 'Map' },
+  { href: '/feed', icon: Home, label: 'feed' },
+  { href: '/map', icon: Globe, label: 'map' },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations('nav');
   const user = useAppStore((s) => s.user);
 
   const isActive = (href: string) =>
@@ -49,7 +51,7 @@ export function BottomNav() {
               color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
           >
-            {label}
+            {t(label)}
           </span>
         </Link>
       ))}
@@ -64,7 +66,7 @@ export function BottomNav() {
         {user?.user_metadata?.avatar_url ? (
           <Image
             src={user.user_metadata.avatar_url}
-            alt="Profile"
+            alt={t('profile')}
             width={24}
             height={24}
             className="rounded-full"
@@ -90,7 +92,7 @@ export function BottomNav() {
             color: isActive('/profile') ? 'var(--accent-primary)' : 'var(--text-secondary)',
           }}
         >
-          Profile
+          {t('profile')}
         </span>
       </Link>
     </nav>

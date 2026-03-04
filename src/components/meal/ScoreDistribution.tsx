@@ -1,3 +1,7 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 interface ScoreDistributionProps {
   distribution: { score: number; count: number }[];
   totalRatings: number;
@@ -14,6 +18,8 @@ export function ScoreDistribution({
   distribution,
   totalRatings,
 }: ScoreDistributionProps) {
+  const t = useTranslations('score');
+
   if (totalRatings === 0) return null;
 
   const maxCount = Math.max(...distribution.map((d) => d.count));
@@ -32,7 +38,7 @@ export function ScoreDistribution({
           marginBottom: 16,
         }}
       >
-        Score Distribution
+        {t('distribution')}
       </h3>
       <div className="flex flex-col gap-2">
         {sorted.map(({ score, count }) => {

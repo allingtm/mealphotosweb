@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
@@ -16,11 +17,13 @@ import { BlurHashCanvas } from './BlurHashCanvas';
 
 interface MealCardProps {
   meal: FeedItem;
+  index: number;
   isVisible: boolean;
   ratingStartTime: number | null;
 }
 
-export function MealCard({ meal, isVisible, ratingStartTime }: MealCardProps) {
+export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardProps) {
+  const t = useTranslations('feed');
   const user = useAppStore((s) => s.user);
   const isOwnMeal = user?.id === meal.user_id;
 
@@ -69,26 +72,34 @@ export function MealCard({ meal, isVisible, ratingStartTime }: MealCardProps) {
     return <div className="snap-start" style={{ height: 'calc(100dvh - 56px)' }} />;
   }
 
+  const hasBlurDataURL = !!meal.blurDataURL;
+
   return (
     <div
       className="snap-start relative overflow-hidden"
       style={{ height: 'calc(100dvh - 56px)' }}
     >
-      {/* Blur-hash placeholder */}
-      {meal.photo_blur_hash && !imageLoaded && (
+      {/* Blur-hash placeholder — client canvas fallback when no server blurDataURL */}
+      {!hasBlurDataURL && meal.photo_blur_hash && !imageLoaded && (
         <BlurHashCanvas hash={meal.photo_blur_hash} />
       )}
 
       {/* Meal photo — full bleed */}
       <Image
         src={meal.photo_url}
-        alt={`Meal photo: ${meal.title} by ${meal.username}`}
+        alt={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
         fill
         className="object-cover"
         sizes="100vw"
-        priority
+        priority={index === 0}
+        {...(hasBlurDataURL
+          ? { placeholder: 'blur' as const, blurDataURL: meal.blurDataURL }
+          : {})}
         onLoad={() => setImageLoaded(true)}
-        style={{ opacity: imageLoaded ? 1 : 0, transition: 'opacity 200ms' }}
+        style={{
+          opacity: hasBlurDataURL || imageLoaded ? 1 : 0,
+          transition: 'opacity 200ms',
+        }}
       />
 
       {/* Gradient overlay — lower ~40% */}

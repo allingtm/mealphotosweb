@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { ShareButton } from './ShareButton';
 import { RecipeRequestButton } from './RecipeRequestButton';
 import { ReportButton } from './ReportButton';
@@ -22,6 +23,8 @@ export function ActionColumn({
   recipeUnlocked,
   commentCount,
 }: ActionColumnProps) {
+  const t = useTranslations('actions');
+
   return (
     <div className="flex flex-col items-center gap-3">
       <ShareButton mealId={mealId} title={title} />
@@ -35,7 +38,7 @@ export function ActionColumn({
 
       <button
         className="flex flex-col items-center gap-0.5"
-        aria-label={`${commentCount} comments`}
+        aria-label={t('viewComments', { count: commentCount })}
       >
         <div
           className="flex items-center justify-center"

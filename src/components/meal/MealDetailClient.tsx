@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
+import { useTranslations } from 'next-intl';
 import { RatingBar } from '@/components/feed/RatingBar';
 import { RecipeRequestProgress } from './RecipeRequestProgress';
 import { RecipeDisplay } from './RecipeDisplay';
@@ -40,6 +41,8 @@ export function MealDetailClient({
   ratingCount: initialRatingCount,
   authorUsername,
 }: MealDetailClientProps) {
+  const tScore = useTranslations('score');
+  const tRecipe = useTranslations('recipe');
   const [hasRated, setHasRated] = useState(initialHasRated);
   const [avgRating, setAvgRating] = useState(initialAvgRating);
   const [ratingCount, setRatingCount] = useState(initialRatingCount);
@@ -94,7 +97,7 @@ export function MealDetailClient({
             }}
           >
             <span>
-              {Number(avgRating).toFixed(1)} avg from {ratingCount} ratings
+              {tScore('avgFrom', { score: Number(avgRating).toFixed(1), count: ratingCount })}
             </span>
           </div>
         )}
@@ -125,7 +128,7 @@ export function MealDetailClient({
             textAlign: 'center',
           }}
         >
-          Recipe coming soon &mdash; @{authorUsername} has been notified!
+          {tRecipe('comingSoon', { username: authorUsername })}
         </div>
       )}
     </div>

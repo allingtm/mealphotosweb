@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Bell } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 
@@ -10,6 +11,7 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ onClick }: NotificationBellProps) {
+  const t = useTranslations('notifications');
   const user = useAppStore((s) => s.user);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -74,7 +76,7 @@ export function NotificationBell({ onClick }: NotificationBellProps) {
         border: 'none',
         cursor: 'pointer',
       }}
-      aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+      aria-label={`${t('bellLabel')}${unreadCount > 0 ? ` (${t('unreadCount', { count: unreadCount })})` : ''}`}
     >
       <Bell size={24} strokeWidth={1.5} color="var(--text-primary)" />
       {unreadCount > 0 && (

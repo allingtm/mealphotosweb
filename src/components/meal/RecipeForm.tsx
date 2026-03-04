@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Plus, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { recipeSchema } from '@/lib/validations/recipe';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -36,6 +37,7 @@ const inputStyle = {
 } as const;
 
 export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
+  const t = useTranslations('recipe');
   const [ingredients, setIngredients] = useState<IngredientRow[]>([
     { quantity: '', unit: 'g', name: '' },
   ]);
@@ -120,7 +122,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
       setSubmitting(false);
 
       if (error) {
-        setErrors({ form: 'Failed to save recipe. Please try again.' });
+        setErrors({ form: t('failedToSave') });
         return;
       }
 
@@ -146,7 +148,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
           marginBottom: 16,
         }}
       >
-        Add Recipe
+        {t('addRecipe')}
       </h3>
 
       <form onSubmit={handleSubmit}>
@@ -161,7 +163,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
               marginBottom: 12,
             }}
           >
-            Ingredients
+            {t('ingredients')}
           </legend>
 
           <div className="flex flex-col gap-3">
@@ -171,17 +173,17 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                   type="number"
                   min="0"
                   step="any"
-                  placeholder="Qty"
+                  placeholder={t('ingredientQty')}
                   value={ing.quantity}
                   onChange={(e) => updateIngredient(i, 'quantity', e.target.value)}
                   style={{ ...inputStyle, width: 72, flexShrink: 0 }}
-                  aria-label={`Ingredient ${i + 1} quantity`}
+                  aria-label={t('ingredientQtyLabel', { n: i + 1 })}
                 />
                 <select
                   value={ing.unit}
                   onChange={(e) => updateIngredient(i, 'unit', e.target.value)}
                   style={{ ...inputStyle, width: 80, flexShrink: 0 }}
-                  aria-label={`Ingredient ${i + 1} unit`}
+                  aria-label={t('ingredientUnitLabel', { n: i + 1 })}
                 >
                   {UNIT_OPTIONS.map((u) => (
                     <option key={u} value={u}>
@@ -191,11 +193,11 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                 </select>
                 <input
                   type="text"
-                  placeholder="Ingredient name"
+                  placeholder={t('ingredientName')}
                   value={ing.name}
                   onChange={(e) => updateIngredient(i, 'name', e.target.value)}
                   style={{ ...inputStyle, flex: 1 }}
-                  aria-label={`Ingredient ${i + 1} name`}
+                  aria-label={t('ingredientNameLabel', { n: i + 1 })}
                 />
                 {ingredients.length > 1 && (
                   <button
@@ -212,7 +214,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                       cursor: 'pointer',
                       flexShrink: 0,
                     }}
-                    aria-label={`Remove ingredient ${i + 1}`}
+                    aria-label={t('removeIngredient', { n: i + 1 })}
                   >
                     <X size={18} strokeWidth={1.5} />
                   </button>
@@ -245,7 +247,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
             }}
           >
             <Plus size={16} strokeWidth={1.5} />
-            Add ingredient
+            {t('addIngredient')}
           </button>
         </fieldset>
 
@@ -260,7 +262,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
               marginBottom: 12,
             }}
           >
-            Method
+            {t('method')}
           </legend>
 
           <div className="flex flex-col gap-3">
@@ -281,12 +283,12 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                   {i + 1}.
                 </span>
                 <textarea
-                  placeholder={`Step ${i + 1}`}
+                  placeholder={t('stepPlaceholder', { n: i + 1 })}
                   value={step}
                   onChange={(e) => updateStep(i, e.target.value)}
                   rows={2}
                   style={{ ...inputStyle, flex: 1, resize: 'vertical' }}
-                  aria-label={`Step ${i + 1}`}
+                  aria-label={t('stepLabel', { n: i + 1 })}
                 />
                 {steps.length > 1 && (
                   <button
@@ -303,7 +305,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                       cursor: 'pointer',
                       flexShrink: 0,
                     }}
-                    aria-label={`Remove step ${i + 1}`}
+                    aria-label={t('removeStep', { n: i + 1 })}
                   >
                     <X size={18} strokeWidth={1.5} />
                   </button>
@@ -336,7 +338,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
             }}
           >
             <Plus size={16} strokeWidth={1.5} />
-            Add step
+            {t('addStep')}
           </button>
         </fieldset>
 
@@ -353,7 +355,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                 marginBottom: 4,
               }}
             >
-              Cook time (mins)
+              {t('cookTimeMins')}
             </label>
             <input
               type="number"
@@ -376,7 +378,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
                 marginBottom: 4,
               }}
             >
-              Serves
+              {t('serves')}
             </label>
             <input
               type="number"
@@ -423,7 +425,7 @@ export function RecipeForm({ mealId, onRecipeAdded }: RecipeFormProps) {
             transition: 'opacity 200ms',
           }}
         >
-          {submitting ? 'Saving...' : 'Save Recipe'}
+          {submitting ? 'Saving...' : t('saveRecipe')}
         </button>
       </form>
     </div>

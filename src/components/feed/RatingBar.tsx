@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface RatingBarProps {
   mealId: string;
@@ -16,6 +17,7 @@ export function RatingBar({
   existingRating,
   onRate,
 }: RatingBarProps) {
+  const t = useTranslations('rating');
   const [selectedScore, setSelectedScore] = useState<number | null>(
     existingRating
   );
@@ -50,7 +52,7 @@ export function RatingBar({
           color: 'var(--text-secondary)',
         }}
       >
-        Your meal
+        {t('yourMeal')}
       </div>
     );
   }
@@ -61,7 +63,7 @@ export function RatingBar({
   return (
     <div
       role="radiogroup"
-      aria-label="Rate this meal"
+      aria-label={t('rateThisMeal')}
       className="flex flex-wrap justify-center gap-1"
       style={{ padding: '8px 0' }}
     >
@@ -121,11 +123,13 @@ function RatingNumber({
   disabled: boolean;
   onSelect: (n: number) => void;
 }) {
+  const t = useTranslations('rating');
+
   return (
     <button
       role="radio"
       aria-checked={selected}
-      aria-label={`Rate ${value} out of 10`}
+      aria-label={t('rateOutOf10', { value })}
       disabled={disabled && !selected}
       onClick={() => onSelect(value)}
       className="flex items-center justify-center transition-transform"

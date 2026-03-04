@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface MapSearchBarProps {
   onFlyTo: (lng: number, lat: number) => void;
@@ -30,6 +31,7 @@ async function forwardGeocode(query: string): Promise<{ lng: number; lat: number
 }
 
 export function MapSearchBar({ onFlyTo, onFilterToggle, hasActiveFilters }: MapSearchBarProps) {
+  const t = useTranslations('map');
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
 
@@ -73,7 +75,7 @@ export function MapSearchBar({ onFlyTo, onFilterToggle, hasActiveFilters }: MapS
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search city, cuisine..."
+            placeholder={t('searchPlaceholder')}
             disabled={searching}
             className="flex-1 bg-transparent outline-none"
             style={{
@@ -94,7 +96,7 @@ export function MapSearchBar({ onFlyTo, onFilterToggle, hasActiveFilters }: MapS
             border: '1px solid var(--bg-elevated)',
             flexShrink: 0,
           }}
-          aria-label="Filters"
+          aria-label={t('filters')}
         >
           <SlidersHorizontal
             size={20}

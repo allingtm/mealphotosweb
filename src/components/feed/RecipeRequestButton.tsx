@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Heart } from 'lucide-react';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
+import { Confetti } from '@/components/ui/Confetti';
 import posthog from 'posthog-js';
 
 interface RecipeRequestButtonProps {
@@ -20,9 +22,11 @@ export function RecipeRequestButton({
   threshold,
   unlocked,
 }: RecipeRequestButtonProps) {
+  const t = useTranslations('actions');
   const [count, setCount] = useState(initialCount);
   const [requested, setRequested] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const requireAuth = useRequireAuth();
 
   const nearThreshold = !unlocked && count >= threshold * 0.85;
@@ -46,6 +50,11 @@ export function RecipeRequestButton({
     setAnimating(true);
     setTimeout(() => setAnimating(false), 300);
 
+    // Trigger confetti if recipe just unlocked
+    if (result.unlocked) {
+      setShowConfetti(true);
+    }
+
     posthog.capture(ANALYTICS_EVENTS.RECIPE_REQUESTED, {
       meal_id: mealId,
       current_count: result.request_count,
@@ -58,8 +67,9 @@ export function RecipeRequestButton({
       onClick={handleRequest}
       disabled={requested}
       className="flex flex-col items-center gap-0.5 relative"
-      aria-label={`Request recipe (${count} requests)`}
+      aria-label={t('requestRecipe', { count })}
     >
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
       <div
         className="flex items-center justify-center"
         style={{

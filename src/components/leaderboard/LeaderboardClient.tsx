@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations/meal';
 import type { LeaderboardEntry } from '@/types/database';
 
@@ -18,16 +19,16 @@ type Scope = 'global' | 'country' | 'city';
 type TimeRange = 'week' | 'month' | 'all_time';
 type Cuisine = typeof CUISINE_OPTIONS[number] | null;
 
-const SCOPE_LABELS: Record<Scope, string> = {
-  global: 'Global',
-  country: 'Country',
-  city: 'City',
+const SCOPE_KEYS: Record<Scope, string> = {
+  global: 'global',
+  country: 'country',
+  city: 'city',
 };
 
-const TIME_LABELS: Record<TimeRange, string> = {
-  week: 'This Week',
-  month: 'This Month',
-  all_time: 'All Time',
+const TIME_KEYS: Record<TimeRange, string> = {
+  week: 'thisWeek',
+  month: 'thisMonth',
+  all_time: 'allTime',
 };
 
 const MEDAL_ICONS = ['🥇', '🥈', '🥉'];
@@ -45,6 +46,7 @@ export function LeaderboardClient({
   userCountry,
   userCity,
 }: LeaderboardClientProps) {
+  const t = useTranslations('leaderboard');
   const [entries, setEntries] = useState(initialEntries);
   const [scope, setScope] = useState<Scope>('global');
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
@@ -92,9 +94,9 @@ export function LeaderboardClient({
         <FilterSelect
           value={scope}
           onChange={(v) => setScope(v as Scope)}
-          options={Object.entries(SCOPE_LABELS).map(([value, label]) => ({
+          options={Object.entries(SCOPE_KEYS).map(([value, key]) => ({
             value,
-            label,
+            label: t(key),
           }))}
         />
 
@@ -102,9 +104,9 @@ export function LeaderboardClient({
         <FilterSelect
           value={timeRange}
           onChange={(v) => setTimeRange(v as TimeRange)}
-          options={Object.entries(TIME_LABELS).map(([value, label]) => ({
+          options={Object.entries(TIME_KEYS).map(([value, key]) => ({
             value,
-            label,
+            label: t(key),
           }))}
         />
 
@@ -113,7 +115,7 @@ export function LeaderboardClient({
           value={cuisine ?? ''}
           onChange={(v) => setCuisine(v ? (v as Cuisine) : null)}
           options={[
-            { value: '', label: 'All Cuisines' },
+            { value: '', label: t('allCuisines') },
             ...CUISINE_OPTIONS.map((c) => ({
               value: c,
               label: CUISINE_LABELS[c],
@@ -134,7 +136,7 @@ export function LeaderboardClient({
               fontSize: 14,
             }}
           >
-            No qualifying users found for these filters.
+            {t('noUsers')}
           </p>
         ) : (
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
@@ -176,6 +178,8 @@ function LeaderboardRow({
   entry: LeaderboardEntry;
   isCurrentUser: boolean;
 }) {
+  const t = useTranslations('leaderboard');
+
   return (
     <li
       style={{
@@ -261,7 +265,7 @@ function LeaderboardRow({
               margin: 0,
             }}
           >
-            {entry.meal_count} meals
+            {t('meals', { count: entry.meal_count })}
           </p>
         </div>
 

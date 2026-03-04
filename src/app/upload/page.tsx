@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { X, MapPin, ChevronDown, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { useAppStore } from '@/lib/store';
 import { mealUploadSchema, CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations';
@@ -76,9 +77,21 @@ async function reverseGeocode(lat: number, lng: number): Promise<{ city?: string
 }
 
 export default function UploadPage() {
+  return (
+    <Suspense>
+      <UploadPageContent />
+    </Suspense>
+  );
+}
+
+function UploadPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRestaurantUpload = searchParams.get('restaurant') === 'true';
   const requireAuth = useRequireAuth();
   const user = useAppStore((s) => s.user);
+  const t = useTranslations('upload');
+  const tCommon = useTranslations('common');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -235,6 +248,9 @@ export default function UploadPage() {
         uploadForm.append('tags', JSON.stringify(parsed.data.tags));
       }
       uploadForm.append('turnstile_token', turnstileToken);
+      if (isRestaurantUpload) {
+        uploadForm.append('is_restaurant_upload', 'true');
+      }
 
       // Upload to server
       const res = await fetch('/api/uploads/image', {
@@ -255,13 +271,18 @@ export default function UploadPage() {
         cuisine: parsed.data.cuisine,
         has_location: !!parsed.data.location,
         tags_count: parsed.data.tags.length,
+        is_restaurant: isRestaurantUpload,
       });
 
       // Prompt for push notifications on first upload
       promptForPush();
 
-      // Navigate to feed with success toast
-      router.push('/feed?toast=Meal+uploaded!+Let%27s+see+what+people+think.');
+      // Navigate to appropriate page
+      if (isRestaurantUpload) {
+        router.push('/business/dashboard?toast=Dish+uploaded+anonymously!');
+      } else {
+        router.push('/feed?toast=Meal+uploaded!+Let%27s+see+what+people+think.');
+      }
     } catch (err) {
       setUploadError('Something went wrong. Please try again.');
       setUploading(false);
@@ -282,7 +303,7 @@ export default function UploadPage() {
           capture="environment"
           onChange={handleFileSelect}
           className="hidden"
-          aria-label="Select meal photo"
+          aria-label={t('selectMealPhoto')}
         />
         <button
           onClick={() => fileInputRef.current?.click()}
@@ -295,7 +316,7 @@ export default function UploadPage() {
             fontWeight: 600,
           }}
         >
-          Select Photo
+          {t('selectPhoto')}
         </button>
         <button
           onClick={handleCancel}
@@ -306,7 +327,7 @@ export default function UploadPage() {
             color: 'var(--text-secondary)',
           }}
         >
-          Cancel
+          {tCommon('cancel')}
         </button>
       </div>
     );
@@ -335,7 +356,7 @@ export default function UploadPage() {
               color: 'var(--text-primary)',
             }}
           >
-            Crop Photo
+            {t('cropPhoto')}
           </span>
           <div style={{ width: 24 }} />
         </div>
@@ -375,7 +396,7 @@ export default function UploadPage() {
               fontWeight: 600,
             }}
           >
-            Confirm
+            {tCommon('confirm')}
           </button>
         </div>
       </div>
@@ -404,7 +425,7 @@ export default function UploadPage() {
             color: 'var(--text-primary)',
           }}
         >
-          Add Details
+          {t('addDetails')}
         </span>
         <button
           onClick={handleSubmit}
@@ -420,7 +441,7 @@ export default function UploadPage() {
           }}
         >
           {uploading && <Loader2 size={16} strokeWidth={1.5} className="animate-spin" />}
-          Upload
+          {tCommon('upload')}
         </button>
       </div>
 
@@ -458,13 +479,13 @@ export default function UploadPage() {
               marginBottom: 8,
             }}
           >
-            Meal title *
+            {t('mealTitle')}
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Sunday Roast Chicken"
+            placeholder={t('mealTitlePlaceholder')}
             maxLength={120}
             className="w-full px-4 py-3 rounded-2xl outline-none"
             style={{
@@ -503,7 +524,7 @@ export default function UploadPage() {
               marginBottom: 8,
             }}
           >
-            Cuisine (optional)
+            {t('cuisineOptional')}
           </label>
           <div className="relative">
             <select
@@ -511,7 +532,7 @@ export default function UploadPage() {
               onChange={(e) =>
                 setCuisine(e.target.value as typeof CUISINE_OPTIONS[number] | '')
               }
-              aria-label="Cuisine"
+              aria-label={t('cuisine')}
               className="w-full px-4 py-3 rounded-2xl outline-none appearance-none"
               style={{
                 backgroundColor: 'var(--bg-surface)',
@@ -521,7 +542,7 @@ export default function UploadPage() {
                 border: '1px solid transparent',
               }}
             >
-              <option value="">Select cuisine</option>
+              <option value="">{t('selectCuisine')}</option>
               {CUISINE_OPTIONS.map((c) => (
                 <option key={c} value={c}>
                   {CUISINE_LABELS[c]}
@@ -549,7 +570,7 @@ export default function UploadPage() {
               marginBottom: 8,
             }}
           >
-            Location (optional)
+            {t('locationOptional')}
           </label>
           <div
             className="flex items-center gap-2 w-full px-4 py-3 rounded-2xl"
@@ -592,7 +613,7 @@ export default function UploadPage() {
                     color: 'var(--text-secondary)',
                   }}
                 >
-                  Remove
+                  {tCommon('remove')}
                 </button>
               </div>
             ) : (
@@ -605,7 +626,7 @@ export default function UploadPage() {
                   color: 'var(--text-secondary)',
                 }}
               >
-                Add location
+                {t('addLocation')}
               </button>
             )}
           </div>
@@ -618,8 +639,7 @@ export default function UploadPage() {
                 marginTop: 4,
               }}
             >
-              We&apos;ll use your approximate area to show your meal on the map.
-              Your exact location is never stored.
+              {t('locationHelper')}
             </p>
           )}
         </div>
@@ -636,13 +656,13 @@ export default function UploadPage() {
               marginBottom: 8,
             }}
           >
-            Tags (optional)
+            {t('tagsOptional')}
           </label>
           <input
             type="text"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            placeholder="#homemade, #roast, #sunday"
+            placeholder={t('tagsPlaceholder')}
             className="w-full px-4 py-3 rounded-2xl outline-none"
             style={{
               backgroundColor: 'var(--bg-surface)',
@@ -706,7 +726,7 @@ export default function UploadPage() {
           }}
         >
           {uploading && <Loader2 size={18} strokeWidth={1.5} className="animate-spin" />}
-          {uploading ? 'Uploading...' : 'Upload'}
+          {uploading ? tCommon('uploading') : tCommon('upload')}
         </button>
       </div>
 

@@ -1,9 +1,14 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Instrument_Serif, DM_Sans } from 'next/font/google';
+import Script from 'next/script';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
-import { AppShell } from '@/components/layout/AppShell';
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
+import { AppShell } from '@/components/layout/AppShell';
+import { ToastContainer } from '@/components/ui/Toast';
 import '@/styles/globals.css';
 
 const instrumentSerif = Instrument_Serif({
@@ -11,6 +16,7 @@ const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   variable: '--font-instrument-serif',
   display: 'swap',
+  preload: true,
 });
 
 const dmSans = DM_Sans({
@@ -18,22 +24,42 @@ const dmSans = DM_Sans({
   weight: ['400', '500', '600', '700'],
   variable: '--font-dm-sans',
   display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
   title: 'meal.photos — Rate Real Meals',
   description:
     'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'meal.photos',
+  },
+  icons: {
+    apple: '/icons/icon-192.png',
+  },
 };
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  themeColor: '#121212',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${instrumentSerif.variable} ${dmSans.variable}`}
     >
       <body
@@ -43,12 +69,31 @@ export default function RootLayout({
           fontFamily: 'var(--font-body)',
         }}
       >
-        <PostHogProvider>
-          <AuthProvider>
-            <OneSignalProvider />
-            <AppShell>{children}</AppShell>
-          </AuthProvider>
-        </PostHogProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-(--accent-primary) focus:text-(--bg-primary) focus:text-sm focus:font-semibold"
+        >
+          Skip to content
+        </a>
+        <NextIntlClientProvider messages={messages}>
+          <PostHogProvider>
+            <AuthProvider>
+              <OneSignalProvider />
+              <AppShell>{children}</AppShell>
+              <ToastContainer />
+            </AuthProvider>
+          </PostHogProvider>
+        </NextIntlClientProvider>
+        <SpeedInsights />
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+        />
+        <Script id="register-sw" strategy="afterInteractive">
+          {`if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+          }`}
+        </Script>
       </body>
     </html>
   );

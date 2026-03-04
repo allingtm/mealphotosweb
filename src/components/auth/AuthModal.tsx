@@ -2,12 +2,15 @@
 
 import { X, Mail } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 
 type AuthMode = 'signup' | 'signin';
 
 export function AuthModal() {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
   const isOpen = useAppStore((s) => s.isAuthModalOpen);
   const closeModal = useAppStore((s) => s.closeAuthModal);
 
@@ -65,12 +68,12 @@ export function AuthModal() {
         });
         if (error) setError(error.message);
       } catch {
-        setError('Something went wrong. Please try again.');
+        setError(t('authError'));
       } finally {
         setLoading(false);
       }
     },
-    []
+    [t]
   );
 
   const handleMagicLink = useCallback(
@@ -93,12 +96,12 @@ export function AuthModal() {
           setMagicLinkSent(true);
         }
       } catch {
-        setError('Something went wrong. Please try again.');
+        setError(t('authError'));
       } finally {
         setLoading(false);
       }
     },
-    [email]
+    [email, t]
   );
 
   if (!isOpen) return null;
@@ -131,7 +134,7 @@ export function AuthModal() {
             borderRadius: 'var(--radius-full)',
             color: 'var(--text-secondary)',
           }}
-          aria-label="Close"
+          aria-label={tCommon('close')}
         >
           <X size={20} strokeWidth={1.5} />
         </button>
@@ -149,7 +152,7 @@ export function AuthModal() {
                 marginBottom: 8,
               }}
             >
-              {mode === 'signup' ? 'Join meal.photos' : 'Welcome back'}
+              {mode === 'signup' ? t('joinTitle') : t('welcomeBack')}
             </h2>
             <p
               style={{
@@ -160,8 +163,8 @@ export function AuthModal() {
               }}
             >
               {mode === 'signup'
-                ? 'Sign up to upload meals, save recipes, and track your streak.'
-                : 'Sign in to your account.'}
+                ? t('signupDesc')
+                : t('signinDesc')}
             </p>
 
             {/* Error */}
@@ -194,7 +197,7 @@ export function AuthModal() {
               }}
             >
               <GoogleIcon />
-              Continue with Google
+              {t('continueWithGoogle')}
             </button>
 
             {/* Apple OAuth */}
@@ -212,14 +215,14 @@ export function AuthModal() {
               }}
             >
               <AppleIcon />
-              Continue with Apple
+              {t('continueWithApple')}
             </button>
 
             {/* Divider */}
             <div className="mb-4 flex items-center gap-3">
               <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
               <span style={{ color: 'var(--text-secondary)', fontSize: 14, fontFamily: 'var(--font-body)' }}>
-                or
+                {tCommon('or')}
               </span>
               <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
             </div>
@@ -235,14 +238,14 @@ export function AuthModal() {
                   color: 'var(--text-secondary)',
                 }}
               >
-                Email
+                {t('emailLabel')}
               </label>
               <input
                 id="auth-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
                 required
                 disabled={loading}
                 className="mb-3 w-full rounded-xl border px-4 outline-none transition-colors focus:border-[var(--accent-primary)]"
@@ -269,7 +272,7 @@ export function AuthModal() {
                 }}
               >
                 <Mail size={18} strokeWidth={1.5} />
-                Send Magic Link
+                {t('sendMagicLink')}
               </button>
             </form>
 
@@ -282,13 +285,13 @@ export function AuthModal() {
                 color: 'var(--text-secondary)',
               }}
             >
-              {mode === 'signup' ? 'Already have an account? ' : "Don't have an account? "}
+              {mode === 'signup' ? t('alreadyHaveAccount') : t('dontHaveAccount')}
               <button
                 onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
                 className="underline"
                 style={{ color: 'var(--accent-primary)' }}
               >
-                {mode === 'signup' ? 'Sign in' : 'Sign up'}
+                {mode === 'signup' ? t('signIn') : t('signUp')}
               </button>
             </p>
           </>
@@ -299,6 +302,7 @@ export function AuthModal() {
 }
 
 function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => void }) {
+  const t = useTranslations('auth');
   return (
     <div className="text-center">
       <div
@@ -319,7 +323,7 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           marginBottom: 8,
         }}
       >
-        Check your email
+        {t('checkEmail')}
       </h2>
       <p
         style={{
@@ -329,8 +333,8 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           marginBottom: 24,
         }}
       >
-        We sent a magic link to{' '}
-        <span style={{ color: 'var(--text-primary)' }}>{email}</span>. Click it to sign in.
+        {t('magicLinkSent')}{' '}
+        <span style={{ color: 'var(--text-primary)' }}>{email}</span>. {t('clickToSignIn')}
       </p>
       <button
         onClick={onBack}
@@ -341,7 +345,7 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           fontSize: 14,
         }}
       >
-        Try a different method
+        {t('tryDifferentMethod')}
       </button>
     </div>
   );

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { leaderboardQuerySchema } from '@/lib/validations/leaderboard';
+import { Redis } from '@upstash/redis';
 import type { LeaderboardEntry } from '@/types/database';
+
+const redis = Redis.fromEnv();
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -25,6 +28,24 @@ export async function GET(request: NextRequest) {
 
   const { scope, time_range, cuisine, country, city, limit, offset } = parsed.data;
 
+  // Redis cache key based on query params
+  const cacheKey = `lb:${scope}:${time_range}:${cuisine ?? ''}:${country ?? ''}:${city ?? ''}:${limit}:${offset}`;
+
+  // Try cache
+  try {
+    const cached = await redis.get<string>(cacheKey);
+    if (cached) {
+      const response = NextResponse.json(typeof cached === 'string' ? JSON.parse(cached) : cached);
+      response.headers.set(
+        'Cache-Control',
+        'public, max-age=300, stale-while-revalidate=600'
+      );
+      return response;
+    }
+  } catch {
+    // Redis unavailable — fall through
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('get_leaderboard', {
@@ -44,7 +65,19 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({
-    entries: (data ?? []) as LeaderboardEntry[],
-  });
+  const body = { entries: (data ?? []) as LeaderboardEntry[] };
+
+  // Cache for 5 minutes
+  try {
+    await redis.set(cacheKey, JSON.stringify(body), { ex: 300 });
+  } catch {
+    // Redis unavailable — continue
+  }
+
+  const response = NextResponse.json(body);
+  response.headers.set(
+    'Cache-Control',
+    'public, max-age=300, stale-while-revalidate=600'
+  );
+  return response;
 }

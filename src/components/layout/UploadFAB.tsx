@@ -2,10 +2,12 @@
 
 import { Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 
 export function UploadFAB() {
   const router = useRouter();
+  const t = useTranslations('nav');
   const requireAuth = useRequireAuth();
 
   const handleClick = async () => {
@@ -22,7 +24,7 @@ export function UploadFAB() {
         height: 56,
         backgroundColor: 'var(--accent-primary)',
       }}
-      aria-label="Upload meal photo"
+      aria-label={t('uploadMealPhoto')}
     >
       <Camera size={24} strokeWidth={1.5} color="#121212" />
     </button>
