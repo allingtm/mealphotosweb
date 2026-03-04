@@ -4,10 +4,12 @@ import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import { useTranslations } from 'next-intl';
+import { Trash2 } from 'lucide-react';
 import { RatingBar } from '@/components/feed/RatingBar';
 import { RecipeRequestProgress } from './RecipeRequestProgress';
 import { RecipeDisplay } from './RecipeDisplay';
 import { RecipeForm } from './RecipeForm';
+import { DeleteMealDialog } from './DeleteMealDialog';
 import type { Recipe } from '@/types/database';
 import posthog from 'posthog-js';
 
@@ -47,6 +49,7 @@ export function MealDetailClient({
   const [avgRating, setAvgRating] = useState(initialAvgRating);
   const [ratingCount, setRatingCount] = useState(initialRatingCount);
   const [recipe, setRecipe] = useState<Recipe | null>(initialRecipe);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleRate = useCallback(
     async (score: number) => {
@@ -130,6 +133,34 @@ export function MealDetailClient({
         >
           {tRecipe('comingSoon', { username: authorUsername })}
         </div>
+      )}
+
+      {/* Delete button (own meals only) */}
+      {isOwnMeal && (
+        <>
+          <button
+            type="button"
+            onClick={() => setShowDeleteDialog(true)}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl transition-opacity"
+            style={{
+              height: 48,
+              backgroundColor: 'transparent',
+              border: '1px solid var(--bg-elevated)',
+              color: 'var(--status-error)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            <Trash2 size={18} strokeWidth={1.5} />
+            Delete meal
+          </button>
+          <DeleteMealDialog
+            mealId={mealId}
+            isOpen={showDeleteDialog}
+            onClose={() => setShowDeleteDialog(false)}
+          />
+        </>
       )}
     </div>
   );

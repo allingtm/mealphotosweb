@@ -11,4 +11,5 @@ export const ANALYTICS_EVENTS = {
   STREAK_MILESTONE: 'streak_milestone',
   RESTAURANT_SUBSCRIBED: 'restaurant_subscribed',
   RESTAURANT_REVEALED: 'restaurant_revealed',
+  MEAL_DELETED: 'meal_deleted',
 } as const;

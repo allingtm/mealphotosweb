@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { profileUpdateSchema } from '@/lib/validations/profile';
@@ -27,8 +27,6 @@ export function EditProfileModal({
 }: EditProfileModalProps) {
   const t = useTranslations('profile');
   const tCommon = useTranslations('common');
-  const backdropRef = useRef<HTMLDivElement>(null);
-
   const [displayName, setDisplayName] = useState(profile.display_name ?? '');
   const [username, setUsername] = useState(profile.username);
   const [bio, setBio] = useState(profile.bio ?? '');
@@ -48,16 +46,6 @@ export function EditProfileModal({
       setFieldErrors({});
     }
   }, [isOpen, profile]);
-
-  // Close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
 
   // Prevent body scroll
   useEffect(() => {
@@ -166,12 +154,8 @@ export function EditProfileModal({
 
   return (
     <div
-      ref={backdropRef}
       className="fixed inset-0 z-[100] flex items-end justify-center"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
-      onClick={(e) => {
-        if (e.target === backdropRef.current) onClose();
-      }}
     >
       <div
         className="relative w-full max-w-lg animate-slide-up"
