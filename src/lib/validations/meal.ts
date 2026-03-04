@@ -5,6 +5,18 @@ export const CUISINE_OPTIONS = [
   'middle_eastern', 'american', 'french', 'other',
 ] as const;
 
+export const CUISINE_LABELS: Record<typeof CUISINE_OPTIONS[number], string> = {
+  italian: 'Italian',
+  asian: 'Asian',
+  mexican: 'Mexican',
+  british: 'British',
+  indian: 'Indian',
+  middle_eastern: 'Middle Eastern',
+  american: 'American',
+  french: 'French',
+  other: 'Other',
+};
+
 export const mealUploadSchema = z.object({
   title: z.string()
     .min(2, 'Title must be at least 2 characters')
@@ -20,6 +32,11 @@ export const mealUploadSchema = z.object({
   tags: z.array(
     z.string().max(30, 'Each tag must be under 30 characters').regex(/^[a-zA-Z0-9]+$/, 'Tags must be alphanumeric')
   ).max(10, 'Maximum 10 tags').optional().default([]),
+});
+
+/** Server-side schema that adds turnstile token requirement */
+export const mealUploadServerSchema = mealUploadSchema.extend({
+  turnstile_token: z.string().min(1, 'Bot verification required'),
 });
 
 export const ratingSchema = z.object({
