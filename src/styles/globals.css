@@ -148,3 +148,40 @@ body {
     transform: translateY(-6px);
   }
 }
+
+/* Map pin drop-bounce animation */
+@keyframes pin-drop-bounce {
+  0% {
+    transform: translateY(-20px) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(2px) scale(1.1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-3px) scale(0.95);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pin-drop {
+  animation: pin-drop-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Recipe request progress bar pulse when near threshold */
+@keyframes pulse-progress {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-progress {
+  animation: pulse-progress 2s ease-in-out infinite;
+}

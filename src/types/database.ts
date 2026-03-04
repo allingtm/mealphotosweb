@@ -178,6 +178,7 @@ export interface MapPin {
   photo_url: string;
   avg_rating: number;
   rating_count: number;
+  recipe_request_count: number;
   lng: number;
   lat: number;
   is_restaurant: boolean;

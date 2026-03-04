@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.onesignal.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://imagedelivery.net https://api.mapbox.com https://lh3.googleusercontent.com https://*.googleusercontent.com data: blob:",
-              "connect-src 'self' https://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://app.posthog.com",
+              "connect-src 'self' https://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.tiles.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://app.posthog.com",
               "font-src 'self'",
               "frame-src https://challenges.cloudflare.com https://js.stripe.com",
               "worker-src 'self' blob:",
