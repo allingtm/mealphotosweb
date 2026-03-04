@@ -8,6 +8,7 @@ import { Settings, Trophy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
+import { MenuButton } from '@/components/layout/MenuButton';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
 
 interface ProfileHeaderProps {
@@ -65,6 +66,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
               <Trophy size={24} strokeWidth={1.5} color="var(--text-primary)" />
             </Link>
             <NotificationBell onClick={() => setIsPanelOpen(true)} />
+            <MenuButton />
           </div>
         </div>
       )}

@@ -23,6 +23,8 @@
     "upload": "Upload",
     "profile": "Profile",
     "rankings": "Rankings",
+    "directory": "Directory",
+    "menu": "Menu",
     "uploadMealPhoto": "Upload meal photo"
   },
   "feed": {
@@ -267,6 +269,34 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "cookieSettings": "Cookies"
+  },
+  "menu": {
+    "title": "Menu",
+    "about": "About",
+    "contactUs": "Contact Us",
+    "feedback": "Feedback",
+    "signIn": "Sign In",
+    "profile": "Profile"
+  },
+  "directory": {
+    "title": "Directory",
+    "comingSoon": "Coming soon",
+    "comingSoonDesc": "Explore restaurants and food businesses near you."
+  },
+  "about": {
+    "title": "About",
+    "comingSoon": "Coming soon",
+    "description": "Learn more about meal.photos and our mission."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "comingSoon": "Coming soon",
+    "description": "Get in touch with the meal.photos team."
+  },
+  "feedback": {
+    "title": "Feedback",
+    "comingSoon": "Coming soon",
+    "description": "We'd love to hear your thoughts on how we can improve."
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",

@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, User, Camera, Trophy } from 'lucide-react';
+import { Home, Globe, User, Camera, Trophy, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
+import { MenuButton } from './MenuButton';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
@@ -15,6 +16,7 @@ const sideNavItems = [
   { href: '/map', icon: Globe, label: 'map' },
   { href: '/upload', icon: Camera, label: 'upload' },
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
+  { href: '/directory', icon: Store, label: 'directory' },
   { href: '/profile', icon: User, label: 'profile' },
 ] as const;
 
@@ -112,6 +114,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           );
         })}
+
+        {/* Burger menu — pushed to bottom */}
+        <div className="mt-auto">
+          <MenuButton />
+        </div>
       </aside>
 
       {/* Main content — desktop gets right padding for sidebar */}

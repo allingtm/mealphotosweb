@@ -5,6 +5,7 @@ import { Utensils } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
+import { MenuButton } from '@/components/layout/MenuButton';
 
 export function FeedHeader() {
   const t = useTranslations('feed');
@@ -34,7 +35,10 @@ export function FeedHeader() {
             {t('title')}
           </span>
         </div>
-        <NotificationBell onClick={() => setIsPanelOpen(true)} />
+        <div className="flex items-center gap-1">
+          <NotificationBell onClick={() => setIsPanelOpen(true)} />
+          <MenuButton />
+        </div>
       </header>
 
       <NotificationPanel
