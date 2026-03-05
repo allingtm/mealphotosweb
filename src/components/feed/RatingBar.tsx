@@ -11,6 +11,13 @@ interface RatingBarProps {
   onRate: (score: number) => void;
 }
 
+function getScoreColor(score: number): string {
+  if (score <= 3) return 'var(--status-error)';
+  if (score <= 5) return 'var(--accent-primary)';
+  if (score <= 7) return 'var(--text-primary)';
+  return 'var(--status-success)';
+}
+
 export function RatingBar({
   isOwnMeal,
   hasRated,
@@ -36,7 +43,7 @@ export function RatingBar({
       setAnimatingScore(score);
       onRate(score);
 
-      setTimeout(() => setAnimatingScore(null), 200);
+      setTimeout(() => setAnimatingScore(null), 300);
     },
     [hasRated, selectedScore, onRate]
   );
@@ -64,11 +71,20 @@ export function RatingBar({
     <div
       role="radiogroup"
       aria-label={t('rateThisMeal')}
-      className="flex flex-wrap justify-center gap-1"
-      style={{ padding: '8px 0' }}
+      className="flex items-center justify-center"
+      style={{ padding: '4px 0' }}
     >
-      {/* Two-row layout for narrow viewports, single row for wider */}
-      <div className="hidden min-[400px]:flex gap-1 justify-center">
+      <div
+        className="flex items-center justify-center gap-1"
+        style={{
+          padding: '6px 8px',
+          borderRadius: 20,
+          backgroundColor: 'rgba(18, 18, 18, 0.3)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          willChange: 'transform',
+        }}
+      >
         {numbers.map((n) => (
           <RatingNumber
             key={n}
@@ -79,32 +95,6 @@ export function RatingBar({
             onSelect={handleRate}
           />
         ))}
-      </div>
-      <div className="flex flex-col gap-1 min-[400px]:hidden">
-        <div className="flex gap-1 justify-center">
-          {numbers.slice(0, 5).map((n) => (
-            <RatingNumber
-              key={n}
-              value={n}
-              selected={selectedScore === n}
-              animating={animatingScore === n}
-              disabled={isDisabled}
-              onSelect={handleRate}
-            />
-          ))}
-        </div>
-        <div className="flex gap-1 justify-center">
-          {numbers.slice(5).map((n) => (
-            <RatingNumber
-              key={n}
-              value={n}
-              selected={selectedScore === n}
-              animating={animatingScore === n}
-              disabled={isDisabled}
-              onSelect={handleRate}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -127,30 +117,31 @@ function RatingNumber({
 
   return (
     <button
+      type="button"
       role="radio"
-      aria-checked={selected}
+      aria-checked={selected ? 'true' : 'false'}
       aria-label={t('rateOutOf10', { value })}
       disabled={disabled && !selected}
       onClick={() => onSelect(value)}
-      className="flex items-center justify-center transition-transform"
+      className="flex items-center justify-center"
       style={{
-        width: 48,
-        height: 48,
-        borderRadius: 'var(--radius-full)',
+        width: 32,
+        height: 36,
+        borderRadius: 10,
         backgroundColor: selected
-          ? 'var(--accent-primary)'
-          : 'rgba(18, 18, 18, 0.5)',
+          ? getScoreColor(value)
+          : 'rgba(18, 18, 18, 0.6)',
         border: selected
           ? 'none'
-          : '1px solid rgba(245, 240, 232, 0.2)',
+          : '1.5px solid rgba(245, 240, 232, 0.15)',
         color: selected ? 'var(--bg-primary)' : 'var(--text-primary)',
         fontFamily: 'var(--font-body)',
-        fontSize: 16,
-        fontWeight: 600,
+        fontSize: 14,
+        fontWeight: 700,
         cursor: disabled && !selected ? 'default' : 'pointer',
-        opacity: disabled && !selected ? 0.4 : 1,
-        transform: animating ? 'scale(1.2)' : 'scale(1)',
-        transition: 'transform 200ms ease-out, opacity 200ms ease-out',
+        opacity: disabled && !selected ? 0.25 : 1,
+        animation: animating ? 'rating-pop 300ms ease-out' : 'none',
+        transition: 'opacity 200ms ease-out',
       }}
     >
       {value}

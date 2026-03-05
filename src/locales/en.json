@@ -43,7 +43,8 @@
     "rateThisMeal": "Rate this meal",
     "rateOutOf10": "Rate {value} out of 10",
     "yourMeal": "Your meal",
-    "avgScore": "Average score: {score} out of 10"
+    "avgScore": "Average score: {score} out of 10",
+    "signInToRate": "Sign in to rate meals"
   },
   "actions": {
     "shareThisMeal": "Share this meal",

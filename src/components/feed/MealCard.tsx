@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { MapPin, UtensilsCrossed } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
 import { useAppStore } from '@/lib/store';
+import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { createClient } from '@/lib/supabase/client';
 import { ratingSchema } from '@/lib/validations/meal';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -27,6 +28,7 @@ interface MealCardProps {
 export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardProps) {
   const t = useTranslations('feed');
   const user = useAppStore((s) => s.user);
+  const requireAuth = useRequireAuth();
   const isOwnMeal = user?.id === meal.user_id;
 
   const [avgRating, setAvgRating] = useState(meal.avg_rating);
@@ -36,6 +38,13 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
 
   const handleRate = useCallback(
     async (score: number) => {
+      // Auth gate — opens sign-up modal if not logged in
+      try {
+        await requireAuth();
+      } catch {
+        return;
+      }
+
       // Client-side validation (without turnstile for now)
       const parsed = ratingSchema.safeParse({
         meal_id: meal.id,
@@ -67,7 +76,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
         time_to_rate_seconds: timeToRate,
       });
     },
-    [meal.id, ratingStartTime]
+    [meal.id, ratingStartTime, requireAuth]
   );
 
   if (!isVisible) {
@@ -121,7 +130,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       {/* Right-side action column */}
       <div
         className="absolute right-3 z-10"
-        style={{ bottom: 160 }}
+        style={{ bottom: 130 }}
       >
         <ActionColumn
           mealId={meal.id}
@@ -134,7 +143,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       </div>
 
       {/* Bottom content — overlaid on gradient */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-4">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-2">
         {/* Title */}
         <h2
           style={{
