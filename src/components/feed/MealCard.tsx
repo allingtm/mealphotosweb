@@ -113,93 +113,30 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
         }}
       />
 
-      {/* Gradient overlay — lower ~40% */}
+      {/* Top gradient — dark→transparent for title/author legibility */}
+      <div
+        className="absolute inset-x-0 top-0 pointer-events-none"
+        style={{
+          height: '35%',
+          background: 'linear-gradient(to bottom, rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0))',
+        }}
+      />
+
+      {/* Bottom gradient — transparent→dark for rating bar */}
       <div
         className="absolute inset-x-0 bottom-0 pointer-events-none"
         style={{
-          height: '45%',
+          height: '25%',
           background: 'var(--gradient-overlay)',
         }}
       />
 
-      {/* Score badge — top right */}
-      <div className="absolute top-4 right-4 z-10">
-        <ScoreBadge score={avgRating} visible={showScore} />
-      </div>
-
-      {/* Right-side action column */}
-      <div
-        className="absolute right-3 z-10"
-        style={{ bottom: 110 }}
-      >
-        <ActionColumn
-          mealId={meal.id}
-          title={meal.title}
-          recipeRequestCount={meal.recipe_request_count}
-          recipeUnlockThreshold={meal.recipe_unlock_threshold}
-          recipeUnlocked={meal.recipe_unlocked}
-          commentCount={meal.comment_count}
-        />
-      </div>
-
-      {/* Bottom content — overlaid on gradient */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-12 md:pb-2">
-        {/* Title */}
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 22,
-            fontWeight: 400,
-            color: 'var(--text-emphasis)',
-            marginBottom: 8,
-            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
-          }}
-        >
-          {meal.title}
-        </h2>
-
-        {/* Venue pill */}
-        {meal.venue_name && meal.venue_mapbox_id && (
-          <Link
-            href={`/restaurant/${encodeURIComponent(meal.venue_mapbox_id)}`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '4px 10px 4px 8px',
-              borderRadius: 999,
-              backgroundColor: 'rgba(232, 168, 56, 0.15)',
-              marginBottom: 8,
-              textDecoration: 'none',
-            }}
-          >
-            <UtensilsCrossed
-              size={12}
-              strokeWidth={1.5}
-              style={{ color: 'var(--accent-primary)' }}
-            />
-            {meal.venue_verified && <VerifiedBadge size={12} />}
-            <span
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 12,
-                fontWeight: 500,
-                color: 'var(--accent-primary)',
-                maxWidth: 200,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {meal.venue_name}
-            </span>
-          </Link>
-        )}
-
+      {/* Top content — author, title, venue */}
+      <div className="absolute inset-x-0 top-0 z-10 px-4 pt-4" style={{ maxWidth: '75%' }}>
         {/* Author info */}
         <div
           className="flex items-center gap-2"
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 8 }}
         >
           {meal.avatar_url ? (
             <Image
@@ -244,7 +181,80 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
           )}
         </div>
 
-        {/* Rating bar */}
+        {/* Title */}
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            fontWeight: 400,
+            color: 'var(--text-emphasis)',
+            marginBottom: 8,
+            textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+          }}
+        >
+          {meal.title}
+        </h2>
+
+        {/* Venue pill */}
+        {meal.venue_name && meal.venue_mapbox_id && (
+          <Link
+            href={`/restaurant/${encodeURIComponent(meal.venue_mapbox_id)}`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 10px 4px 8px',
+              borderRadius: 999,
+              backgroundColor: 'rgba(232, 168, 56, 0.15)',
+              textDecoration: 'none',
+            }}
+          >
+            <UtensilsCrossed
+              size={12}
+              strokeWidth={1.5}
+              style={{ color: 'var(--accent-primary)' }}
+            />
+            {meal.venue_verified && <VerifiedBadge size={12} />}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'var(--accent-primary)',
+                maxWidth: 200,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {meal.venue_name}
+            </span>
+          </Link>
+        )}
+      </div>
+
+      {/* Score badge — top right */}
+      <div className="absolute top-4 right-4 z-10">
+        <ScoreBadge score={avgRating} visible={showScore} />
+      </div>
+
+      {/* Right-side action column — just below vertical centre */}
+      <div
+        className="absolute right-3 z-10"
+        style={{ top: '50%', marginTop: 16 }}
+      >
+        <ActionColumn
+          mealId={meal.id}
+          title={meal.title}
+          recipeRequestCount={meal.recipe_request_count}
+          recipeUnlockThreshold={meal.recipe_unlock_threshold}
+          recipeUnlocked={meal.recipe_unlocked}
+          commentCount={meal.comment_count}
+        />
+      </div>
+
+      {/* Bottom content — rating bar only */}
+      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 md:pb-2">
         <RatingBar
           mealId={meal.id}
           isOwnMeal={isOwnMeal}

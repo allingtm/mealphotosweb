@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { MoreVertical, X, Flag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
@@ -28,12 +29,18 @@ export function ReportButton({ mealId }: ReportButtonProps) {
   const user = useAppStore((s) => s.user);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [detail, setDetail] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleOpen = useCallback(() => {
+    setMenuOpen(true);
+  }, []);
+
+  const handleOpenReport = useCallback(() => {
+    setMenuOpen(false);
     if (!user) {
       openAuthModal();
       return;
@@ -49,9 +56,12 @@ export function ReportButton({ mealId }: ReportButtonProps) {
 
   // Escape key to close
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen && !menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
+      if (e.key === 'Escape') {
+        if (isOpen) handleClose();
+        if (menuOpen) setMenuOpen(false);
+      }
     };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
@@ -59,7 +69,7 @@ export function ReportButton({ mealId }: ReportButtonProps) {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
     };
-  }, [isOpen, handleClose]);
+  }, [isOpen, menuOpen, handleClose]);
 
   const handleSubmit = useCallback(async () => {
     if (!selectedReason || submitting) return;
@@ -108,7 +118,46 @@ export function ReportButton({ mealId }: ReportButtonProps) {
         />
       </button>
 
-      {isOpen && (
+      {/* Quick-action menu — portalled to escape overflow-hidden */}
+      {menuOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex items-end justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg animate-slide-up"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderTopLeftRadius: 'var(--radius-modal)',
+              borderTopRightRadius: 'var(--radius-modal)',
+              padding: '16px 16px 40px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={handleOpenReport}
+              className="flex items-center gap-3 w-full"
+              style={{
+                padding: '14px 16px',
+                borderRadius: 12,
+                backgroundColor: 'var(--bg-elevated)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+                color: 'var(--status-error)',
+                border: 'none',
+                textAlign: 'left',
+              }}
+            >
+              <Flag size={18} strokeWidth={1.5} />
+              Report this meal
+            </button>
+          </div>
+        </div>
+      , document.body)}
+
+      {/* Full report modal — portalled to escape overflow-hidden */}
+      {isOpen && createPortal(
         <div
           className="fixed inset-0 z-[100] flex items-end justify-center"
           style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
@@ -247,7 +296,7 @@ export function ReportButton({ mealId }: ReportButtonProps) {
             </p>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }

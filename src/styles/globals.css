@@ -28,6 +28,7 @@
 
   /* Feed card height: subtract header (48px) + bottom nav (56px) on mobile */
   --feed-card-height: calc(100dvh - 48px - 56px);
+  --feed-max-width: 480px;
 
   /* Spacing base */
   --space-unit: 8px;
@@ -457,6 +458,7 @@ textarea:focus-visible,
 @media (min-width: 768px) {
   :root {
     --feed-card-height: calc(100dvh - 48px);
+    --feed-max-width: 720px;
   }
 }
 

@@ -2,6 +2,7 @@
 
 import { MessageCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAppStore } from '@/lib/store';
 import { ShareButton } from './ShareButton';
 import { RecipeRequestButton } from './RecipeRequestButton';
 import { ReportButton } from './ReportButton';
@@ -24,6 +25,7 @@ export function ActionColumn({
   commentCount,
 }: ActionColumnProps) {
   const t = useTranslations('actions');
+  const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -39,6 +41,7 @@ export function ActionColumn({
       <button
         className="flex flex-col items-center gap-0.5"
         aria-label={t('viewComments', { count: commentCount })}
+        onClick={openAuthModal}
       >
         <div
           className="flex items-center justify-center"

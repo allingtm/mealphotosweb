@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
 import { signUpSchema, signInSchema, resetPasswordSchema } from '@/lib/validations';
+import { showToast } from '@/components/ui/Toast';
 
 type AuthMode = 'signup' | 'signin';
 type AuthView = 'form' | 'confirmEmail' | 'forgotPassword' | 'resetLinkSent';
@@ -269,11 +270,7 @@ export function AuthModal() {
             {/* Google OAuth */}
             <button
               onClick={() => {
-                const supabase = createClient();
-                supabase.auth.signInWithOAuth({
-                  provider: 'google',
-                  options: { redirectTo: `${window.location.origin}/auth/callback` },
-                });
+                showToast('Google sign-in coming soon — use email for now.', 'info');
               }}
               disabled={loading}
               className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
@@ -293,11 +290,7 @@ export function AuthModal() {
             {/* Apple OAuth */}
             <button
               onClick={() => {
-                const supabase = createClient();
-                supabase.auth.signInWithOAuth({
-                  provider: 'apple',
-                  options: { redirectTo: `${window.location.origin}/auth/callback` },
-                });
+                showToast('Apple sign-in coming soon — use email for now.', 'info');
               }}
               disabled={loading}
               className="mb-4 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"

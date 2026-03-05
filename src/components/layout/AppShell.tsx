@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
-import { MenuButton } from './MenuButton';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
@@ -211,10 +210,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         )}
 
-        {/* Burger menu — pushed to bottom */}
-        <div className="mt-auto">
-          <MenuButton />
-        </div>
       </aside>
 
       {/* Main content — desktop gets right padding for sidebar */}

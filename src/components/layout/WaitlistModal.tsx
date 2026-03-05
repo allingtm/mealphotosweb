@@ -40,7 +40,7 @@ export function WaitlistModal() {
 
     const timer = setTimeout(() => {
       showModal();
-    }, 2000);
+    }, 20000);
 
     return () => clearTimeout(timer);
   }, [isCookieBannerVisible, showModal]);

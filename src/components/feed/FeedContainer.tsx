@@ -220,8 +220,8 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
       <OnboardingOverlay />
       <div
         ref={scrollContainerRef}
-        className="snap-y-mandatory overflow-y-scroll mx-auto md:h-auto! md:flex-1 md:min-h-0"
-        style={{ height: 'var(--feed-card-height)', maxWidth: 640 }}
+        className="snap-y-mandatory overflow-y-scroll w-full mx-auto md:h-auto! md:flex-1 md:min-h-0"
+        style={{ height: 'var(--feed-card-height)', maxWidth: 'var(--feed-max-width)' }}
       >
         {meals.map((meal, index) => (
           <div
