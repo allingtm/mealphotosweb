@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
+import { showToast } from '@/components/ui/Toast';
 
 type AuthMode = 'signup' | 'signin';
 
@@ -54,28 +55,6 @@ export function AuthModal() {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
-
-  const handleOAuth = useCallback(
-    async (provider: 'google' | 'apple') => {
-      setError(null);
-      setLoading(true);
-      try {
-        const supabase = createClient();
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
-          },
-        });
-        if (error) setError(error.message);
-      } catch {
-        setError(t('authError'));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [t]
-  );
 
   const handleMagicLink = useCallback(
     async (e: React.FormEvent) => {
@@ -185,7 +164,7 @@ export function AuthModal() {
 
             {/* Google OAuth */}
             <button
-              onClick={() => handleOAuth('google')}
+              onClick={() => showToast('Coming soon!', 'info')}
               disabled={loading}
               className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
               style={{
@@ -203,7 +182,7 @@ export function AuthModal() {
 
             {/* Apple OAuth */}
             <button
-              onClick={() => handleOAuth('apple')}
+              onClick={() => showToast('Coming soon!', 'info')}
               disabled={loading}
               className="mb-4 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
               style={{
