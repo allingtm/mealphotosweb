@@ -95,23 +95,29 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
         <BlurHashCanvas hash={meal.photo_blur_hash} />
       )}
 
-      {/* Meal photo — full bleed */}
-      <Image
-        src={meal.photo_url}
-        alt={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
-        fill
-        className="object-cover"
-        sizes="100vw"
-        priority={index === 0}
-        {...(hasBlurDataURL
-          ? { placeholder: 'blur' as const, blurDataURL: meal.blurDataURL }
-          : {})}
-        onLoad={() => setImageLoaded(true)}
-        style={{
-          opacity: hasBlurDataURL || imageLoaded ? 1 : 0,
-          transition: 'opacity 200ms',
-        }}
-      />
+      {/* Meal photo — full bleed, tappable to detail */}
+      <Link
+        href={`/meal/${meal.id}`}
+        className="absolute inset-0 z-0"
+        aria-label={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
+      >
+        <Image
+          src={meal.photo_url}
+          alt={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority={index === 0}
+          {...(hasBlurDataURL
+            ? { placeholder: 'blur' as const, blurDataURL: meal.blurDataURL }
+            : {})}
+          onLoad={() => setImageLoaded(true)}
+          style={{
+            opacity: hasBlurDataURL || imageLoaded ? 1 : 0,
+            transition: 'opacity 200ms',
+          }}
+        />
+      </Link>
 
       {/* Top gradient — dark→transparent for title/author legibility */}
       <div

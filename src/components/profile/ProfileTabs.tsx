@@ -20,10 +20,11 @@ interface ProfileTabsProps {
   username?: string;
 }
 
-const USER_TAB_KEYS = ['myMeals', 'saved'] as const;
+const OWN_TAB_KEYS = ['myMeals', 'saved'] as const;
+const PUBLIC_TAB_KEYS = ['meals'] as const;
 const RESTAURANT_TAB_KEYS = ['allMeals', 'ourDishes', 'dinerPosts'] as const;
 
-type TabKey = typeof USER_TAB_KEYS[number] | typeof RESTAURANT_TAB_KEYS[number];
+type TabKey = typeof OWN_TAB_KEYS[number] | typeof PUBLIC_TAB_KEYS[number] | typeof RESTAURANT_TAB_KEYS[number];
 
 const RESTAURANT_TAB_PARAMS: Record<string, string> = {
   allMeals: 'all',
@@ -41,16 +42,17 @@ export function ProfileTabs({
 }: ProfileTabsProps) {
   const t = useTranslations('profile');
 
-  const defaultTab: TabKey = isRestaurant ? 'allMeals' : 'myMeals';
+  const mealsTab: TabKey = authorView ? 'myMeals' : 'meals';
+  const defaultTab: TabKey = isRestaurant ? 'allMeals' : mealsTab;
   const [activeTab, setActiveTab] = useState<TabKey>(defaultTab);
 
   let visibleTabs: readonly TabKey[];
   if (isRestaurant) {
     visibleTabs = RESTAURANT_TAB_KEYS;
   } else if (showSavedTab) {
-    visibleTabs = USER_TAB_KEYS;
+    visibleTabs = OWN_TAB_KEYS;
   } else {
-    visibleTabs = ['myMeals'] as const;
+    visibleTabs = [mealsTab] as const;
   }
 
   return (
@@ -94,7 +96,7 @@ export function ProfileTabs({
       </div>
 
       {/* Tab content */}
-      {activeTab === 'myMeals' && <MealGrid meals={meals} authorView={authorView} />}
+      {(activeTab === 'myMeals' || activeTab === 'meals') && <MealGrid meals={meals} authorView={authorView} />}
       {activeTab === 'saved' && <MealGrid meals={savedMeals} showHeart />}
       {isRestaurant && RESTAURANT_TAB_KEYS.includes(activeTab as typeof RESTAURANT_TAB_KEYS[number]) && (
         <MealGrid

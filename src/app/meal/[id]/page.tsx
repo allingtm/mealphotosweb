@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, UtensilsCrossed } from 'lucide-react';
+import { MapPin, UtensilsCrossed } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { timeAgo } from '@/lib/utils/time';
 import { ShareButton } from '@/components/feed/ShareButton';
 import { ScoreBadge } from '@/components/feed/ScoreBadge';
@@ -12,11 +13,12 @@ import { BlurHashCanvas } from '@/components/feed/BlurHashCanvas';
 import { ScoreDistribution } from '@/components/meal/ScoreDistribution';
 import { MealDetailClient } from '@/components/meal/MealDetailClient';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { BackButton } from '@/components/ui/BackButton';
 import type { Recipe, Ingredient } from '@/types/database';
 
 // Cache the meal fetch so generateMetadata and the page share the same data
 const getMeal = cache(async (id: string) => {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const { data } = await supabase
     .from('meals')
     .select(
@@ -225,8 +227,9 @@ export default async function MealDetailPage({
       )}
 
       <div
+        className="w-full flex-1 min-h-0 overflow-y-auto"
         style={{
-          maxWidth: 640,
+          maxWidth: 720,
           margin: '0 auto',
           backgroundColor: 'var(--bg-primary)',
           minHeight: '100dvh',
@@ -243,23 +246,7 @@ export default async function MealDetailPage({
             backgroundColor: 'var(--bg-primary)',
           }}
         >
-          <Link
-            href="/"
-            className="flex items-center justify-center"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'rgba(18, 18, 18, 0.5)',
-            }}
-            aria-label="Back to feed"
-          >
-            <ArrowLeft
-              size={24}
-              strokeWidth={1.5}
-              color="var(--text-primary)"
-            />
-          </Link>
+          <BackButton />
           <ShareButton mealId={meal.id} title={meal.title} />
         </div>
 
