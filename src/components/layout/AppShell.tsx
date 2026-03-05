@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Compass, User, Camera, Trophy, ChefHat, Store, Shield } from 'lucide-react';
+import { Home, Compass, User, Camera, Trophy, ChefHat, Store, Shield, UtensilsCrossed } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -47,6 +47,74 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         aria-label="Main navigation"
       >
         {sideNavItems.map(({ href, icon: Icon, label }) => {
+          // Hide My Meals when not logged in (it's injected before profile)
+          if (label === 'profile' && user) {
+            // Inject My Meals link before Profile
+            return (
+              <div key="my-meals-and-profile" className="contents">
+                <Link
+                  href="/my-meals"
+                  className="flex flex-col items-center justify-center gap-1 py-2"
+                  style={{ minWidth: 48, minHeight: 48 }}
+                  aria-current={isActive('/my-meals') ? 'page' : undefined}
+                >
+                  <UtensilsCrossed
+                    size={24}
+                    strokeWidth={1.5}
+                    color={isActive('/my-meals') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+                  />
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: isActive('/my-meals') ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    {t('myMeals')}
+                  </span>
+                </Link>
+                <Link
+                  href={href}
+                  className="flex flex-col items-center justify-center gap-1 py-2"
+                  style={{ minWidth: 48, minHeight: 48 }}
+                  aria-current={isActive(href) ? 'page' : undefined}
+                >
+                  {user?.user_metadata?.avatar_url ? (
+                    <Image
+                      src={user.user_metadata.avatar_url}
+                      alt="Profile"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                      style={{
+                        border: isActive(href)
+                          ? '2px solid var(--accent-primary)'
+                          : '2px solid transparent',
+                      }}
+                    />
+                  ) : (
+                    <Icon
+                      size={24}
+                      strokeWidth={1.5}
+                      color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+                    />
+                  )}
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    }}
+                  >
+                    {t(label)}
+                  </span>
+                </Link>
+              </div>
+            );
+          }
+
           if (label === 'profile' && !user) {
             return (
               <button

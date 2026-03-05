@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Settings, Trophy } from 'lucide-react';
+import { Trophy, Camera } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 import { MenuButton } from '@/components/layout/MenuButton';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
+import { AvatarCropModal } from '@/components/profile/AvatarCropModal';
 
 interface ProfileHeaderProps {
   profile: {
@@ -28,6 +29,9 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
   const router = useRouter();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isAvatarCropOpen, setIsAvatarCropOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const locationParts = [profile.location_city, profile.location_country].filter(Boolean);
   const location = locationParts.join(', ');
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
@@ -37,21 +41,9 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
       {/* Top action row — only on own profile */}
       {isOwnProfile && (
         <div
-          className="flex items-center justify-between"
+          className="flex items-center justify-end"
           style={{ marginBottom: 16 }}
         >
-          <Link
-            href="/settings"
-            className="flex items-center justify-center"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--radius-full)',
-            }}
-            aria-label={t('settings')}
-          >
-            <Settings size={24} strokeWidth={1.5} color="var(--text-primary)" />
-          </Link>
           <div className="flex items-center gap-2">
             <Link
               href="/leaderboard"
@@ -74,34 +66,81 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
       {/* Avatar + Info */}
       <div className="flex flex-col items-center" style={{ gap: 12 }}>
         {/* Avatar */}
-        {profile.avatar_url ? (
-          <Image
-            src={profile.avatar_url}
-            alt={profile.username}
-            width={80}
-            height={80}
-            className="rounded-full"
+        <div className="relative">
+          {isOwnProfile && (
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              aria-label={t('changeAvatar')}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setAvatarFile(file);
+                  setIsAvatarCropOpen(true);
+                }
+                e.target.value = '';
+              }}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => isOwnProfile && fileInputRef.current?.click()}
+            disabled={!isOwnProfile}
             style={{
-              border: '2px solid var(--accent-primary)',
-              objectFit: 'cover',
-            }}
-          />
-        ) : (
-          <div
-            className="flex items-center justify-center rounded-full"
-            style={{
-              width: 80,
-              height: 80,
-              border: '2px solid var(--accent-primary)',
-              backgroundColor: 'var(--bg-surface)',
-              fontFamily: 'var(--font-display)',
-              fontSize: 32,
-              color: 'var(--accent-primary)',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: isOwnProfile ? 'pointer' : 'default',
+              position: 'relative',
             }}
           >
-            {initial}
-          </div>
-        )}
+            {profile.avatar_url ? (
+              <Image
+                src={profile.avatar_url}
+                alt={profile.username}
+                width={80}
+                height={80}
+                className="rounded-full"
+                style={{
+                  border: '2px solid var(--accent-primary)',
+                  objectFit: 'cover',
+                }}
+              />
+            ) : (
+              <div
+                className="flex items-center justify-center rounded-full"
+                style={{
+                  width: 80,
+                  height: 80,
+                  border: '2px solid var(--accent-primary)',
+                  backgroundColor: 'var(--bg-surface)',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 32,
+                  color: 'var(--accent-primary)',
+                }}
+              >
+                {initial}
+              </div>
+            )}
+            {isOwnProfile && (
+              <div
+                className="absolute flex items-center justify-center rounded-full"
+                style={{
+                  bottom: 0,
+                  right: 0,
+                  width: 28,
+                  height: 28,
+                  backgroundColor: 'var(--accent-primary)',
+                  border: '2px solid var(--bg-primary)',
+                }}
+              >
+                <Camera size={14} strokeWidth={2} color="var(--bg-primary)" />
+              </div>
+            )}
+          </button>
+        </div>
 
         {/* Username */}
         <h1
@@ -182,6 +221,19 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
           onClose={() => setIsEditOpen(false)}
           onSaved={() => router.refresh()}
           profile={profile}
+        />
+      )}
+
+      {/* Avatar crop modal */}
+      {isOwnProfile && (
+        <AvatarCropModal
+          isOpen={isAvatarCropOpen}
+          onClose={() => {
+            setIsAvatarCropOpen(false);
+            setAvatarFile(null);
+          }}
+          onSaved={() => router.refresh()}
+          file={avatarFile}
         />
       )}
     </div>

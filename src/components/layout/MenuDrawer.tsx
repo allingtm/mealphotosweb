@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut, UtensilsCrossed, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
+import { DangerZoneDrawer } from '@/components/layout/DangerZoneDrawer';
 
 interface MenuDrawerProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const openAuthModal = useAppStore((s) => s.openAuthModal);
   const panelRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState(false);
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -182,6 +184,31 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
             </button>
           )}
 
+          {/* My Meals — only when logged in */}
+          {user && (
+            <Link
+              href="/my-meals"
+              onClick={onClose}
+              className="flex items-center gap-3 w-full"
+              style={{
+                padding: '14px 16px',
+                textDecoration: 'none',
+              }}
+            >
+              <UtensilsCrossed size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {t('myMeals')}
+              </span>
+            </Link>
+          )}
+
           {/* Divider */}
           <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', margin: '4px 16px' }} />
 
@@ -265,6 +292,31 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
                   {tSettings('signOut')}
                 </span>
               </button>
+
+              <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', margin: '4px 16px' }} />
+              <button
+                type="button"
+                onClick={() => setIsDangerZoneOpen(true)}
+                className="flex items-center gap-3 w-full"
+                style={{
+                  padding: '14px 16px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <AlertTriangle size={20} strokeWidth={1.5} color="var(--status-error)" />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 15,
+                    fontWeight: 500,
+                    color: 'var(--status-error)',
+                  }}
+                >
+                  {tSettings('dangerZone')}
+                </span>
+              </button>
             </>
           )}
         </div>
@@ -312,6 +364,12 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
           </Link>
         </div>
       </div>
+
+      {/* Danger Zone bottom sheet */}
+      <DangerZoneDrawer
+        isOpen={isDangerZoneOpen}
+        onClose={() => setIsDangerZoneOpen(false)}
+      />
     </>
   );
 }

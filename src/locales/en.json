@@ -27,6 +27,7 @@
     "recipes": "Recipes",
     "business": "Business",
     "menu": "Menu",
+    "myMeals": "My Meals",
     "uploadMealPhoto": "Upload meal photo"
   },
   "feed": {
@@ -175,7 +176,9 @@
     "saveProfile": "Save",
     "profileUpdated": "Profile updated",
     "profileUpdateFailed": "Failed to update profile",
-    "usernameTaken": "Username is already taken"
+    "usernameTaken": "Username is already taken",
+    "changeAvatar": "Change avatar",
+    "avatarUpdated": "Avatar updated"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -360,7 +363,8 @@
     "contactUs": "Contact Us",
     "feedback": "Feedback",
     "signIn": "Sign In",
-    "profile": "Profile"
+    "profile": "Profile",
+    "myMeals": "My Meals"
   },
   "directory": {
     "title": "Directory",
