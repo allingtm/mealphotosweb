@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       {/* Desktop / tablet side rail */}
       <aside
-        className="fixed left-0 top-0 bottom-0 z-50 hidden md:flex flex-col items-center gap-2 border-r py-8"
+        className="fixed left-0 top-0 bottom-0 z-50 hidden md:flex flex-col items-center gap-2 border-r py-8 overflow-y-auto"
         style={{
           width: 72,
           backgroundColor: 'var(--bg-surface)',
