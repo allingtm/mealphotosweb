@@ -18,6 +18,9 @@ export interface Profile {
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
   is_admin: boolean;
+  banned_at: string | null;
+  suspended_until: string | null;
+  ban_reason: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -34,7 +34,7 @@ export default async function AdminPage({
   const serviceClient = createServiceRoleClient();
 
   // Parallel data fetches
-  const [moderationResult, reportsResult, disputesResult] = await Promise.all([
+  const [moderationResult, reportsResult, disputesResult, membersCountResult] = await Promise.all([
     serviceClient
       .from('meal_moderation')
       .select('id, meal_id, status, moderation_labels, created_at, meals(title, photo_url)')
@@ -54,6 +54,9 @@ export default async function AdminPage({
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
       .limit(50),
+    serviceClient
+      .from('profiles')
+      .select('id', { count: 'exact', head: true }),
   ]);
 
   const moderationQueue = (moderationResult.data ?? []) as unknown as Array<{
@@ -124,6 +127,7 @@ export default async function AdminPage({
     reports: reports.length,
     disputes: disputes.length,
     urgentReports: reports.filter((r) => r.priority === 'urgent').length,
+    members: membersCountResult.count ?? 0,
   };
 
   return (

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { showToast } from '@/components/ui/Toast';
+import { MembersTab } from './MembersTab';
 
 interface ModerationItem {
   id: string;
@@ -59,11 +60,13 @@ interface AdminTabsProps {
     reports: number;
     disputes: number;
     urgentReports: number;
+    members: number;
   };
 }
 
 const TABS = [
   { key: 'overview', label: 'Overview' },
+  { key: 'members', label: 'Members' },
   { key: 'moderation', label: 'Moderation' },
   { key: 'reports', label: 'Reports' },
   { key: 'disputes', label: 'Disputes' },
@@ -173,9 +176,13 @@ export function AdminTabs({
               <StatCard label="Pending Reports" value={counts.reports} />
               <StatCard label="Urgent Reports" value={counts.urgentReports} color="var(--status-error)" />
               <StatCard label="Pending Disputes" value={counts.disputes} />
+              <StatCard label="Total Members" value={counts.members} />
             </div>
           </div>
         )}
+
+        {/* Members tab */}
+        {activeTab === 'members' && <MembersTab />}
 
         {/* Moderation tab */}
         {activeTab === 'moderation' && (
