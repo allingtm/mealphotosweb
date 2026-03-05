@@ -4,7 +4,6 @@ import { AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 export default function FeedError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -50,28 +49,6 @@ export default function FeedError({
       >
         {tCommon('tryAgain')}
       </button>
-
-      {/* TODO: remove after confirming CSP fix */}
-      <details
-        style={{
-          marginTop: 16,
-          padding: 12,
-          borderRadius: 8,
-          backgroundColor: 'var(--bg-surface)',
-          color: 'var(--text-secondary)',
-          fontFamily: 'monospace',
-          fontSize: 11,
-          textAlign: 'left',
-          maxWidth: '90vw',
-          wordBreak: 'break-all',
-        }}
-      >
-        <summary style={{ cursor: 'pointer', marginBottom: 8 }}>Error details</summary>
-        <p><strong>Name:</strong> {error?.name ?? 'unknown'}</p>
-        <p><strong>Message:</strong> {error?.message ?? 'unknown'}</p>
-        <p><strong>Digest:</strong> {error?.digest ?? 'none'}</p>
-        <p style={{ whiteSpace: 'pre-wrap' }}><strong>Stack:</strong> {error?.stack?.slice(0, 500) ?? 'no stack'}</p>
-      </details>
     </div>
   );
 }
