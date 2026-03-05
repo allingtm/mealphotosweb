@@ -14,6 +14,7 @@ export const adminMemberUpdateSchema = z.object({
   banned_at: z.string().datetime().nullable().optional(),
   suspended_until: z.string().datetime().nullable().optional(),
   ban_reason: z.string().max(500).trim().nullable().optional(),
+  moderation_tier: z.enum(['new', 'trusted', 'flagged']).optional(),
 });
 
 export const adminMealUpdateSchema = z.object({

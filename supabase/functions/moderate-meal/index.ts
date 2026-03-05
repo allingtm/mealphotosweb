@@ -39,16 +39,53 @@ async function generateBlurhash(imageUrl: string): Promise<string | null> {
 
 Deno.serve(async (req: Request) => {
   try {
-    const { meal_id, image_url } = await req.json();
+    const { meal_id, image_url, user_id, force_vision } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Start blurhash generation in parallel with Vision API call
+    // Start blurhash generation in parallel
     const blurhashPromise = generateBlurhash(image_url).catch((err) => {
       console.error("Blurhash generation failed:", err);
       return null;
     });
 
-    // Call Google Cloud Vision API
+    // Look up user's moderation tier
+    let tier = "new";
+    if (user_id) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("moderation_tier")
+        .eq("id", user_id)
+        .single();
+      tier = profile?.moderation_tier ?? "new";
+    }
+
+    // Trusted users: skip Cloud Vision, auto-approve (unless force_vision)
+    if (tier === "trusted" && !force_vision) {
+      await supabase.from("meal_moderation").update({
+        status: "approved",
+        moderation_labels: { reason: "trusted_auto_approve" },
+        cloud_vision_checked: false,
+      }).eq("meal_id", meal_id);
+
+      const blurhash = await blurhashPromise;
+      if (blurhash) {
+        await supabase.from("meals").update({ photo_blur_hash: blurhash }).eq("id", meal_id);
+      }
+
+      console.log(JSON.stringify({
+        event: "moderation_skipped",
+        user_id,
+        meal_id,
+        moderation_tier: "trusted",
+      }));
+
+      return new Response(
+        JSON.stringify({ status: "approved", skipped: true }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // New, flagged, or force_vision: call Cloud Vision API
     const visionRes = await fetch(`${VISION_API_URL}?key=${VISION_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -70,6 +107,7 @@ Deno.serve(async (req: Request) => {
       await supabase.from("meal_moderation").update({
         status: "manual_review",
         moderation_labels: { reason: "vision_api_error", httpStatus: visionRes.status },
+        cloud_vision_checked: true,
       }).eq("meal_id", meal_id);
 
       const blurhash = await blurhashPromise;
@@ -91,6 +129,7 @@ Deno.serve(async (req: Request) => {
       await supabase.from("meal_moderation").update({
         status: "manual_review",
         moderation_labels: { reason: "vision_api_error", error: annotation.error },
+        cloud_vision_checked: true,
       }).eq("meal_id", meal_id);
 
       const blurhash = await blurhashPromise;
@@ -141,7 +180,16 @@ Deno.serve(async (req: Request) => {
     await supabase.from("meal_moderation").update({
       status,
       moderation_labels: moderationLabels,
+      cloud_vision_checked: true,
     }).eq("meal_id", meal_id);
+
+    console.log(JSON.stringify({
+      event: "moderation_checked",
+      user_id,
+      meal_id,
+      moderation_tier: tier,
+      result: status,
+    }));
 
     // Await blurhash and update meal row
     const blurhash = await blurhashPromise;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { reportSchema, getReportPriority } from '@/lib/validations';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -69,6 +70,71 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Report insert error:', error);
       return NextResponse.json({ error: 'Failed to submit report' }, { status: 500 });
+    }
+
+    // Retroactive moderation + auto-hide for meal reports
+    if (reported_meal_id) {
+      const serviceClient = createServiceRoleClient();
+
+      // Check if Cloud Vision was run on this meal
+      const { data: moderation } = await serviceClient
+        .from('meal_moderation')
+        .select('cloud_vision_checked')
+        .eq('meal_id', reported_meal_id)
+        .single();
+
+      if (moderation && !moderation.cloud_vision_checked) {
+        // Get meal image URL and user_id for retroactive Vision check
+        const { data: meal } = await serviceClient
+          .from('meals')
+          .select('photo_url, user_id')
+          .eq('id', reported_meal_id)
+          .single();
+
+        if (meal?.photo_url) {
+          // Fire-and-forget retroactive Cloud Vision check
+          fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/moderate-meal`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+                'x-edge-secret': process.env.EDGE_FUNCTION_SECRET!,
+              },
+              body: JSON.stringify({
+                meal_id: reported_meal_id,
+                image_url: `${meal.photo_url}/feed`,
+                user_id: meal.user_id,
+                force_vision: true,
+              }),
+            }
+          ).catch((err: unknown) => {
+            console.error('Retroactive moderation invoke failed:', err);
+          });
+
+          console.log(JSON.stringify({
+            event: 'moderation_retroactive',
+            user_id: meal.user_id,
+            meal_id: reported_meal_id,
+            triggered_by: 'report',
+          }));
+        }
+      }
+
+      // Auto-hide at 3 distinct reporters
+      const { count } = await serviceClient
+        .from('reports')
+        .select('reporter_id', { count: 'exact', head: true })
+        .eq('reported_meal_id', reported_meal_id)
+        .eq('status', 'pending');
+
+      if ((count ?? 0) >= 3) {
+        await serviceClient
+          .from('meal_moderation')
+          .update({ status: 'manual_review' })
+          .eq('meal_id', reported_meal_id);
+      }
     }
 
     return NextResponse.json({ success: true }, { status: 201 });

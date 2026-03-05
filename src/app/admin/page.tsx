@@ -37,7 +37,7 @@ export default async function AdminPage({
   const [moderationResult, reportsResult, disputesResult, membersCountResult] = await Promise.all([
     serviceClient
       .from('meal_moderation')
-      .select('id, meal_id, status, moderation_labels, created_at, meals(title, photo_url)')
+      .select('id, meal_id, status, moderation_labels, cloud_vision_checked, created_at, meals(title, photo_url, user_id, profiles(username, moderation_tier))')
       .eq('status', 'manual_review')
       .order('created_at', { ascending: true })
       .limit(50),
@@ -64,8 +64,14 @@ export default async function AdminPage({
     meal_id: string;
     status: string;
     moderation_labels: Record<string, unknown>;
+    cloud_vision_checked: boolean;
     created_at: string;
-    meals: { title: string; photo_url: string } | null;
+    meals: {
+      title: string;
+      photo_url: string;
+      user_id: string;
+      profiles: { username: string; moderation_tier: string } | null;
+    } | null;
   }>;
 
   const reports = (reportsResult.data ?? []) as unknown as Array<{

@@ -274,6 +274,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           meal_id: meal.id,
           image_url: `${deliveryUrl}/feed`,
+          user_id: user.id,
         }),
       }
     ).catch((err: unknown) => {

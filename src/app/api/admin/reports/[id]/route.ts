@@ -47,6 +47,43 @@ export async function PATCH(
       return NextResponse.json({ error: 'Failed to update report' }, { status: 500 });
     }
 
+    // When admin upholds a report, demote the reported user to flagged
+    if (action === 'action') {
+      // Fetch the report to find the reported user
+      const { data: report } = await serviceClient
+        .from('reports')
+        .select('reported_user_id, reported_meal_id')
+        .eq('id', id)
+        .single();
+
+      if (report) {
+        let userId = report.reported_user_id;
+
+        // If no direct user, look up via meal
+        if (!userId && report.reported_meal_id) {
+          const { data: meal } = await serviceClient
+            .from('meals')
+            .select('user_id')
+            .eq('id', report.reported_meal_id)
+            .single();
+          userId = meal?.user_id ?? null;
+        }
+
+        if (userId) {
+          await serviceClient
+            .from('profiles')
+            .update({ moderation_tier: 'flagged' })
+            .eq('id', userId);
+
+          console.log(JSON.stringify({
+            event: 'user_demoted_to_flagged',
+            user_id: userId,
+            reason: `report_${id}`,
+          }));
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, status: newStatus });
   } catch (err) {
     console.error('Admin reports error:', err);

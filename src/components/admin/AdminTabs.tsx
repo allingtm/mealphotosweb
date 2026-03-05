@@ -11,10 +11,13 @@ interface ModerationItem {
   meal_id: string;
   status: string;
   moderation_labels: Record<string, unknown>;
+  cloud_vision_checked: boolean;
   created_at: string;
   meals: {
     title: string;
     photo_url: string;
+    user_id: string;
+    profiles: { username: string; moderation_tier: string } | null;
   } | null;
 }
 
@@ -104,6 +107,31 @@ export function AdminTabs({
   const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleDemoteUser = useCallback(
+    async (userId: string) => {
+      setActionLoading(`${userId}-demote`);
+      try {
+        const res = await fetch(`/api/admin/members/${userId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ moderation_tier: 'flagged' }),
+        });
+        if (res.ok) {
+          showToast('User demoted to flagged', 'success');
+          router.refresh();
+        } else {
+          const data = await res.json();
+          showToast(data.error ?? 'Demotion failed', 'error');
+        }
+      } catch {
+        showToast('Demotion failed', 'error');
+      } finally {
+        setActionLoading(null);
+      }
+    },
+    [router]
+  );
 
   const handleAction = useCallback(
     async (endpoint: string, id: string, action: string, adminNotes?: string) => {
@@ -198,44 +226,61 @@ export function AdminTabs({
             {moderationQueue.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-4"
                 style={{
                   padding: 16,
                   borderRadius: 12,
                   backgroundColor: 'var(--bg-surface)',
                 }}
               >
-                {item.meals?.photo_url && (
-                  <Image
-                    src={item.meals.photo_url}
-                    alt={item.meals.title ?? 'Meal'}
-                    width={64}
-                    height={64}
-                    className="rounded-lg object-cover"
-                    style={{ width: 64, height: 64 }}
-                  />
-                )}
-                <div className="flex-1">
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
-                    {item.meals?.title ?? 'Unknown meal'}
-                  </p>
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <ActionButton
-                    label="Approve"
-                    variant="success"
-                    loading={actionLoading === `${item.id}-approve`}
-                    onClick={() => handleAction('moderation', item.id, 'approve')}
-                  />
-                  <ActionButton
-                    label="Reject"
-                    variant="danger"
-                    loading={actionLoading === `${item.id}-reject`}
-                    onClick={() => handleAction('moderation', item.id, 'reject')}
-                  />
+                <div className="flex items-center gap-4">
+                  {item.meals?.photo_url && (
+                    <Image
+                      src={item.meals.photo_url}
+                      alt={item.meals.title ?? 'Meal'}
+                      width={64}
+                      height={64}
+                      className="rounded-lg object-cover"
+                      style={{ width: 64, height: 64 }}
+                    />
+                  )}
+                  <div className="flex-1">
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
+                      {item.meals?.title ?? 'Unknown meal'}
+                    </p>
+                    <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
+                      <TierBadge tier={item.meals?.profiles?.moderation_tier} />
+                      <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>
+                        CV: {item.cloud_vision_checked ? 'Checked' : 'Skipped'}
+                      </span>
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                      {item.meals?.profiles?.username ? `@${item.meals.profiles.username}` : ''} · {new Date(item.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <ActionButton
+                        label="Approve"
+                        variant="success"
+                        loading={actionLoading === `${item.id}-approve`}
+                        onClick={() => handleAction('moderation', item.id, 'approve')}
+                      />
+                      <ActionButton
+                        label="Reject"
+                        variant="danger"
+                        loading={actionLoading === `${item.id}-reject`}
+                        onClick={() => handleAction('moderation', item.id, 'reject')}
+                      />
+                    </div>
+                    {item.meals?.user_id && (
+                      <ActionButton
+                        label="Demote to Flagged"
+                        variant="danger"
+                        loading={actionLoading === `${item.meals.user_id}-demote`}
+                        onClick={() => handleDemoteUser(item.meals!.user_id)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -428,6 +473,33 @@ function StatCard({
         {value}
       </p>
     </div>
+  );
+}
+
+const TIER_STYLES: Record<string, { bg: string; text: string }> = {
+  new: { bg: 'var(--accent-primary)', text: '#121212' },
+  trusted: { bg: 'var(--status-success)', text: '#121212' },
+  flagged: { bg: 'var(--status-error)', text: '#FFFFFF' },
+};
+
+function TierBadge({ tier }: { tier?: string }) {
+  const t = tier ?? 'new';
+  const style = TIER_STYLES[t] ?? TIER_STYLES.new;
+  return (
+    <span
+      style={{
+        padding: '2px 6px',
+        borderRadius: 6,
+        fontSize: 10,
+        fontWeight: 600,
+        fontFamily: 'var(--font-body)',
+        color: style.text,
+        backgroundColor: style.bg,
+        textTransform: 'uppercase',
+      }}
+    >
+      {t}
+    </span>
   );
 }
 

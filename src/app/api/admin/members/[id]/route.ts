@@ -38,7 +38,7 @@ export async function GET(
     const [profileResult, mealStatsResult] = await Promise.all([
       serviceClient
         .from('profiles')
-        .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_restaurant, banned_at, suspended_until, ban_reason, created_at, updated_at')
+        .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_restaurant, moderation_tier, banned_at, suspended_until, ban_reason, created_at, updated_at')
         .eq('id', parsed.data.id)
         .single(),
       serviceClient
@@ -118,6 +118,7 @@ export async function PATCH(
     if (parsed.data.banned_at !== undefined) updates.banned_at = parsed.data.banned_at;
     if (parsed.data.suspended_until !== undefined) updates.suspended_until = parsed.data.suspended_until;
     if (parsed.data.ban_reason !== undefined) updates.ban_reason = parsed.data.ban_reason;
+    if (parsed.data.moderation_tier !== undefined) updates.moderation_tier = parsed.data.moderation_tier;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
@@ -127,7 +128,7 @@ export async function PATCH(
       .from('profiles')
       .update(updates)
       .eq('id', parsedParams.data.id)
-      .select('id, username, display_name, bio, avatar_url, is_admin, is_restaurant, banned_at, suspended_until, ban_reason, created_at, updated_at')
+      .select('id, username, display_name, bio, avatar_url, is_admin, is_restaurant, moderation_tier, banned_at, suspended_until, ban_reason, created_at, updated_at')
       .single();
 
     if (error) {

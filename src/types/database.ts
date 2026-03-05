@@ -18,6 +18,7 @@ export interface Profile {
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
   is_admin: boolean;
+  moderation_tier: 'new' | 'trusted' | 'flagged';
   banned_at: string | null;
   suspended_until: string | null;
   ban_reason: string | null;
@@ -180,6 +181,7 @@ export interface MealModeration {
   reviewed_by: string | null;
   created_at: string;
   reviewed_at: string | null;
+  cloud_vision_checked: boolean;
 }
 
 // Composite types from database functions
