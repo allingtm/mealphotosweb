@@ -14,6 +14,7 @@ interface RecipeRequestButtonProps {
   initialCount: number;
   threshold: number;
   unlocked: boolean;
+  hasRequested?: boolean;
 }
 
 export function RecipeRequestButton({
@@ -21,19 +22,21 @@ export function RecipeRequestButton({
   initialCount,
   threshold,
   unlocked,
+  hasRequested: initialHasRequested = false,
 }: RecipeRequestButtonProps) {
   const t = useTranslations('actions');
   const [count, setCount] = useState(initialCount);
-  const [requested, setRequested] = useState(false);
+  const [requested, setRequested] = useState(initialHasRequested);
   const [animating, setAnimating] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const requireAuth = useRequireAuth();
 
   const nearThreshold = !unlocked && count >= threshold * 0.85;
   const progress = Math.min(count / threshold, 1);
 
-  const handleRequest = useCallback(async () => {
-    if (requested || unlocked) return;
+  const handleToggle = useCallback(async () => {
+    if (unlocked || submitting) return;
 
     try {
       await requireAuth();
@@ -42,34 +45,72 @@ export function RecipeRequestButton({
     }
 
     const supabase = createClient();
-    const { data, error } = await supabase.rpc('request_recipe', {
-      p_meal_id: mealId,
-    });
+    setSubmitting(true);
 
-    if (error) return;
+    if (requested) {
+      // Optimistic update
+      setRequested(false);
+      setCount((c) => Math.max(c - 1, 0));
 
-    const result = data as { request_count: number; threshold: number; unlocked: boolean };
-    setCount(result.request_count);
-    setRequested(true);
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 300);
+      const { data, error } = await supabase.rpc('unrequest_recipe', {
+        p_meal_id: mealId,
+      });
 
-    // Trigger confetti if recipe just unlocked
-    if (result.unlocked) {
-      setShowConfetti(true);
+      setSubmitting(false);
+
+      if (error) {
+        // Revert on error
+        setRequested(true);
+        setCount((c) => c + 1);
+        return;
+      }
+
+      const result = data as { request_count: number; threshold: number; unlocked: boolean };
+      setCount(result.request_count);
+
+      posthog.capture(ANALYTICS_EVENTS.RECIPE_UNREQUESTED, {
+        meal_id: mealId,
+        current_count: result.request_count,
+      });
+    } else {
+      // Optimistic update
+      setRequested(true);
+      setCount((c) => c + 1);
+      setAnimating(true);
+      setTimeout(() => setAnimating(false), 300);
+
+      const { data, error } = await supabase.rpc('request_recipe', {
+        p_meal_id: mealId,
+      });
+
+      setSubmitting(false);
+
+      if (error) {
+        // Revert on error
+        setRequested(false);
+        setCount((c) => Math.max(c - 1, 0));
+        return;
+      }
+
+      const result = data as { request_count: number; threshold: number; unlocked: boolean };
+      setCount(result.request_count);
+
+      if (result.unlocked) {
+        setShowConfetti(true);
+      }
+
+      posthog.capture(ANALYTICS_EVENTS.RECIPE_REQUESTED, {
+        meal_id: mealId,
+        current_count: result.request_count,
+        threshold: result.threshold,
+      });
     }
-
-    posthog.capture(ANALYTICS_EVENTS.RECIPE_REQUESTED, {
-      meal_id: mealId,
-      current_count: result.request_count,
-      threshold: result.threshold,
-    });
-  }, [mealId, requested, unlocked, requireAuth]);
+  }, [mealId, requested, unlocked, submitting, requireAuth]);
 
   return (
     <button
-      onClick={handleRequest}
-      disabled={requested}
+      onClick={handleToggle}
+      disabled={submitting}
       className="flex flex-col items-center gap-0.5 relative"
       aria-label={t('requestRecipe', { count })}
     >

@@ -2,6 +2,7 @@ export const ANALYTICS_EVENTS = {
   MEAL_UPLOADED: 'meal_uploaded',
   MEAL_RATED: 'meal_rated',
   RECIPE_REQUESTED: 'recipe_requested',
+  RECIPE_UNREQUESTED: 'recipe_unrequested',
   RECIPE_UNLOCKED: 'recipe_unlocked',
   RECIPE_ADDED: 'recipe_added',
   SCORECARD_SHARED: 'scorecard_shared',

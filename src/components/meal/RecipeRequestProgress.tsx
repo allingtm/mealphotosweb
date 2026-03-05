@@ -32,8 +32,8 @@ export function RecipeRequestProgress({
   const progress = Math.min(count / threshold, 1);
   const nearThreshold = !unlocked && count >= threshold * 0.85;
 
-  const handleRequest = useCallback(async () => {
-    if (hasRequested || unlocked || submitting) return;
+  const handleToggle = useCallback(async () => {
+    if (unlocked || submitting) return;
 
     try {
       await requireAuth();
@@ -43,32 +43,55 @@ export function RecipeRequestProgress({
     setSubmitting(true);
 
     const supabase = createClient();
-    const { data, error } = await supabase.rpc('request_recipe', {
-      p_meal_id: mealId,
-    });
 
-    setSubmitting(false);
-    if (error) return;
-
-    const result = data as {
-      request_count: number;
-      threshold: number;
-      unlocked: boolean;
-    };
-    setCount(result.request_count);
-    setHasRequested(true);
-
-    posthog.capture(ANALYTICS_EVENTS.RECIPE_REQUESTED, {
-      meal_id: mealId,
-      current_count: result.request_count,
-      threshold: result.threshold,
-    });
-
-    if (result.unlocked) {
-      posthog.capture(ANALYTICS_EVENTS.RECIPE_UNLOCKED, {
-        meal_id: mealId,
-        request_count: result.request_count,
+    if (hasRequested) {
+      const { data, error } = await supabase.rpc('unrequest_recipe', {
+        p_meal_id: mealId,
       });
+
+      setSubmitting(false);
+      if (error) return;
+
+      const result = data as {
+        request_count: number;
+        threshold: number;
+        unlocked: boolean;
+      };
+      setCount(result.request_count);
+      setHasRequested(false);
+
+      posthog.capture(ANALYTICS_EVENTS.RECIPE_UNREQUESTED, {
+        meal_id: mealId,
+        current_count: result.request_count,
+      });
+    } else {
+      const { data, error } = await supabase.rpc('request_recipe', {
+        p_meal_id: mealId,
+      });
+
+      setSubmitting(false);
+      if (error) return;
+
+      const result = data as {
+        request_count: number;
+        threshold: number;
+        unlocked: boolean;
+      };
+      setCount(result.request_count);
+      setHasRequested(true);
+
+      posthog.capture(ANALYTICS_EVENTS.RECIPE_REQUESTED, {
+        meal_id: mealId,
+        current_count: result.request_count,
+        threshold: result.threshold,
+      });
+
+      if (result.unlocked) {
+        posthog.capture(ANALYTICS_EVENTS.RECIPE_UNLOCKED, {
+          meal_id: mealId,
+          request_count: result.request_count,
+        });
+      }
     }
   }, [mealId, hasRequested, unlocked, submitting, requireAuth]);
 
@@ -143,25 +166,25 @@ export function RecipeRequestProgress({
         </p>
       )}
 
-      {/* Request button */}
+      {/* Request/Unrequest button */}
       <button
-        onClick={handleRequest}
-        disabled={hasRequested || submitting}
+        onClick={handleToggle}
+        disabled={submitting}
         style={{
           width: '100%',
           padding: '10px 16px',
           borderRadius: 'var(--radius-full)',
           backgroundColor: hasRequested
-            ? 'var(--bg-elevated)'
+            ? 'transparent'
             : 'var(--accent-primary)',
-          color: hasRequested ? 'var(--text-secondary)' : 'var(--bg-primary)',
+          color: hasRequested ? 'var(--accent-primary)' : 'var(--bg-primary)',
           fontFamily: 'var(--font-body)',
           fontSize: 14,
           fontWeight: 600,
-          border: 'none',
-          cursor: hasRequested || submitting ? 'default' : 'pointer',
+          border: hasRequested ? '1.5px solid var(--accent-primary)' : 'none',
+          cursor: submitting ? 'default' : 'pointer',
           opacity: submitting ? 0.7 : 1,
-          transition: 'opacity 200ms',
+          transition: 'opacity 200ms, background-color 200ms, color 200ms',
         }}
       >
         {hasRequested ? t('requested') : t('requestRecipe')}

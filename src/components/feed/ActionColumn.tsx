@@ -15,6 +15,7 @@ interface ActionColumnProps {
   recipeUnlockThreshold: number;
   recipeUnlocked: boolean;
   commentCount: number;
+  hasRequested?: boolean;
 }
 
 export function ActionColumn({
@@ -24,6 +25,7 @@ export function ActionColumn({
   recipeUnlockThreshold,
   recipeUnlocked,
   commentCount,
+  hasRequested,
 }: ActionColumnProps) {
   const t = useTranslations('actions');
   const user = useAppStore((s) => s.user);
@@ -38,6 +40,7 @@ export function ActionColumn({
         initialCount={recipeRequestCount}
         threshold={recipeUnlockThreshold}
         unlocked={recipeUnlocked}
+        hasRequested={hasRequested}
       />
 
       <button

@@ -211,6 +211,7 @@ export interface FeedItem {
   venue_name: string | null;
   venue_mapbox_id: string | null;
   venue_verified: boolean;
+  user_has_requested: boolean;
 }
 
 export interface MapPin {
