@@ -22,6 +22,10 @@ export interface Profile {
   banned_at: string | null;
   suspended_until: string | null;
   ban_reason: string | null;
+  show_location: boolean;
+  show_streak: boolean;
+  follower_count: number;
+  following_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -231,19 +235,25 @@ export interface PublicProfile {
   id: string;
   username: string;
   display_name: string | null;
+  bio: string | null;
   avatar_url: string | null;
   location_city: string | null;
   location_country: string | null;
   streak_current: number;
   streak_best: number;
   is_restaurant: boolean;
+  subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
+  follower_count: number;
+  following_count: number;
+  show_location: boolean;
+  show_streak: boolean;
   created_at: string;
 }
 
 export interface ProfileStats {
   meal_count: number;
   avg_rating: number;
-  streak_current: number;
+  ratings_given_count: number;
 }
 
 export interface LeaderboardEntry {

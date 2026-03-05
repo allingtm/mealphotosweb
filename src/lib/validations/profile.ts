@@ -13,6 +13,8 @@ export const profileUpdateSchema = z.object({
   location_city: z.string().max(100).optional(),
   location_country: z.string().max(100).optional(),
   timezone: z.string().max(50).optional(),
+  show_location: z.boolean().optional(),
+  show_streak: z.boolean().optional(),
 });
 
 const REPORT_REASONS = [
@@ -49,4 +51,12 @@ export const disputeSchema = z.object({
 export const commentSchema = z.object({
   meal_id: z.string().uuid(),
   text: z.string().min(1).max(280, 'Comment must be under 280 characters').trim(),
+});
+
+export const followSchema = z.object({
+  following_id: z.string().uuid(),
+});
+
+export const blockSchema = z.object({
+  blocked_id: z.string().uuid(),
 });

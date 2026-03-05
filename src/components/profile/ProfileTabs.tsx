@@ -16,16 +16,42 @@ interface ProfileTabsProps {
   savedMeals?: MealGridItem[];
   showSavedTab?: boolean;
   authorView?: boolean;
+  isRestaurant?: boolean;
+  username?: string;
 }
 
-const TAB_KEYS = ['myMeals', 'saved'] as const;
-type TabKey = typeof TAB_KEYS[number];
+const USER_TAB_KEYS = ['myMeals', 'saved'] as const;
+const RESTAURANT_TAB_KEYS = ['allMeals', 'ourDishes', 'dinerPosts'] as const;
 
-export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false, authorView = false }: ProfileTabsProps) {
+type TabKey = typeof USER_TAB_KEYS[number] | typeof RESTAURANT_TAB_KEYS[number];
+
+const RESTAURANT_TAB_PARAMS: Record<string, string> = {
+  allMeals: 'all',
+  ourDishes: 'own',
+  dinerPosts: 'diner',
+};
+
+export function ProfileTabs({
+  meals,
+  savedMeals = [],
+  showSavedTab = false,
+  authorView = false,
+  isRestaurant = false,
+  username,
+}: ProfileTabsProps) {
   const t = useTranslations('profile');
-  const [activeTab, setActiveTab] = useState<TabKey>('myMeals');
 
-  const visibleTabs = showSavedTab ? TAB_KEYS : (['myMeals'] as const);
+  const defaultTab: TabKey = isRestaurant ? 'allMeals' : 'myMeals';
+  const [activeTab, setActiveTab] = useState<TabKey>(defaultTab);
+
+  let visibleTabs: readonly TabKey[];
+  if (isRestaurant) {
+    visibleTabs = RESTAURANT_TAB_KEYS;
+  } else if (showSavedTab) {
+    visibleTabs = USER_TAB_KEYS;
+  } else {
+    visibleTabs = ['myMeals'] as const;
+  }
 
   return (
     <div>
@@ -70,6 +96,12 @@ export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false, auth
       {/* Tab content */}
       {activeTab === 'myMeals' && <MealGrid meals={meals} authorView={authorView} />}
       {activeTab === 'saved' && <MealGrid meals={savedMeals} showHeart />}
+      {isRestaurant && RESTAURANT_TAB_KEYS.includes(activeTab as typeof RESTAURANT_TAB_KEYS[number]) && (
+        <MealGrid
+          meals={activeTab === 'allMeals' ? meals : []}
+          fetchUrl={username ? `/api/profiles/${username}/meals?tab=${RESTAURANT_TAB_PARAMS[activeTab]}` : undefined}
+        />
+      )}
     </div>
   );
 }

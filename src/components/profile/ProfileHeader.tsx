@@ -4,42 +4,64 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Trophy, Camera } from 'lucide-react';
+import { Trophy, Camera, ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 import { MenuButton } from '@/components/layout/MenuButton';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
 import { AvatarCropModal } from '@/components/profile/AvatarCropModal';
+import { FollowButton } from '@/components/profile/FollowButton';
+import { FollowerFollowingList } from '@/components/profile/FollowerFollowingList';
+import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface ProfileHeaderProps {
   profile: {
+    id: string;
     username: string;
     display_name: string | null;
     bio: string | null;
     avatar_url: string | null;
     location_city: string | null;
     location_country: string | null;
+    is_restaurant?: boolean;
+    subscription_status?: string;
+    show_location?: boolean;
+    show_streak?: boolean;
+    follower_count?: number;
+    following_count?: number;
   };
   isOwnProfile: boolean;
+  isFollowing?: boolean;
 }
 
-export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: ProfileHeaderProps) {
   const t = useTranslations('profile');
   const router = useRouter();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isAvatarCropOpen, setIsAvatarCropOpen] = useState(false);
+  const [followerListOpen, setFollowerListOpen] = useState(false);
+  const [followingListOpen, setFollowingListOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const locationParts = [profile.location_city, profile.location_country].filter(Boolean);
-  const location = locationParts.join(', ');
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
+
+  const isVerified = profile.is_restaurant && profile.subscription_status === 'active';
+  const followerCount = profile.follower_count ?? 0;
+  const followingCount = profile.following_count ?? 0;
+
+  // For restaurants, show full address; for users, show city only
+  const locationParts = profile.is_restaurant
+    ? [profile.location_city, profile.location_country].filter(Boolean)
+    : [profile.location_city].filter(Boolean);
+  const location = locationParts.join(', ');
 
   return (
     <div style={{ padding: '16px 16px 0' }}>
-      {/* Top action row — only on own profile */}
-      {isOwnProfile && (
+      {/* Top action row */}
+      {isOwnProfile ? (
         <div
           className="flex items-center justify-end"
           style={{ marginBottom: 16 }}
@@ -60,6 +82,31 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
             <NotificationBell onClick={() => setIsPanelOpen(true)} />
             <MenuButton />
           </div>
+        </div>
+      ) : (
+        <div
+          className="flex items-center justify-between"
+          style={{ marginBottom: 16 }}
+        >
+          <button
+            type="button"
+            onClick={() => router.back()}
+            style={{
+              width: 40,
+              height: 40,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            aria-label={t('back')}
+          >
+            <ArrowLeft size={24} strokeWidth={1.5} color="var(--text-primary)" />
+          </button>
+          <ProfileMoreMenu userId={profile.id} username={profile.username} />
         </div>
       )}
 
@@ -142,32 +189,35 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
           </button>
         </div>
 
+        {/* Display name + verified badge */}
+        <div className="flex items-center gap-1">
+          {profile.display_name && (
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 22,
+                fontWeight: 400,
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}
+            >
+              {profile.display_name}
+            </h1>
+          )}
+          {isVerified && <VerifiedBadge />}
+        </div>
+
         {/* Username */}
-        <h1
+        <p
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 22,
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            margin: 0,
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            margin: '-4px 0 0',
           }}
         >
           @{profile.username}
-        </h1>
-
-        {/* Display name */}
-        {profile.display_name && (
-          <p
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 16,
-              color: 'var(--text-primary)',
-              margin: '-4px 0 0',
-            }}
-          >
-            {profile.display_name}
-          </p>
-        )}
+        </p>
 
         {/* Location */}
         {location && (
@@ -179,12 +229,87 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
               margin: '-4px 0 0',
             }}
           >
-            {location}
+            📍 {location}
           </p>
         )}
 
-        {/* Edit Profile button — own profile only */}
-        {isOwnProfile && (
+        {/* Bio */}
+        {profile.bio && (
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              color: 'var(--text-primary)',
+              margin: 0,
+              textAlign: 'center',
+              maxWidth: 320,
+              lineHeight: 1.4,
+            }}
+          >
+            {profile.bio}
+          </p>
+        )}
+
+        {/* Follower / Following counts */}
+        <div className="flex items-center gap-1" style={{ marginTop: 4 }}>
+          {isOwnProfile ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setFollowerListOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                <strong>{followerCount}</strong>{' '}
+                <span style={{ color: 'var(--text-secondary)' }}>{t('followers')}</span>
+              </button>
+              <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}> · </span>
+              <button
+                type="button"
+                onClick={() => setFollowingListOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 14,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                <strong>{followingCount}</strong>{' '}
+                <span style={{ color: 'var(--text-secondary)' }}>{t('following')}</span>
+              </button>
+            </>
+          ) : (
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                color: 'var(--text-secondary)',
+                margin: 0,
+              }}
+            >
+              <strong style={{ color: 'var(--text-primary)' }}>{followerCount}</strong> {t('followers')}
+              {!profile.is_restaurant && (
+                <>
+                  {' · '}
+                  <strong style={{ color: 'var(--text-primary)' }}>{followingCount}</strong> {t('following')}
+                </>
+              )}
+            </p>
+          )}
+        </div>
+
+        {/* Action button */}
+        {isOwnProfile ? (
           <button
             type="button"
             onClick={() => setIsEditOpen(true)}
@@ -203,6 +328,14 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
           >
             {t('editProfile')}
           </button>
+        ) : (
+          <div style={{ marginTop: 4 }}>
+            <FollowButton
+              userId={profile.id}
+              username={profile.username}
+              initialIsFollowing={isFollowing}
+            />
+          </div>
         )}
       </div>
 
@@ -235,6 +368,24 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
           onSaved={() => router.refresh()}
           file={avatarFile}
         />
+      )}
+
+      {/* Follower / Following lists */}
+      {isOwnProfile && (
+        <>
+          <FollowerFollowingList
+            type="followers"
+            count={followerCount}
+            isOpen={followerListOpen}
+            onClose={() => setFollowerListOpen(false)}
+          />
+          <FollowerFollowingList
+            type="following"
+            count={followingCount}
+            isOpen={followingListOpen}
+            onClose={() => setFollowingListOpen(false)}
+          />
+        </>
       )}
     </div>
   );

@@ -138,34 +138,41 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
           className="flex items-center gap-2"
           style={{ marginBottom: 8 }}
         >
-          {meal.avatar_url ? (
-            <Image
-              src={meal.avatar_url}
-              alt={meal.username}
-              width={28}
-              height={28}
-              className="rounded-full"
-            />
-          ) : (
-            <div
-              className="rounded-full"
-              style={{
-                width: 28,
-                height: 28,
-                backgroundColor: 'var(--bg-elevated)',
-              }}
-            />
-          )}
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 14,
-              fontWeight: 500,
-              color: 'var(--text-primary)',
-            }}
+          <Link
+            href={`/profile/${meal.username}`}
+            className="flex items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+            style={{ textDecoration: 'none' }}
           >
-            @{meal.username}
-          </span>
+            {meal.avatar_url ? (
+              <Image
+                src={meal.avatar_url}
+                alt={meal.username}
+                width={28}
+                height={28}
+                className="rounded-full"
+              />
+            ) : (
+              <div
+                className="rounded-full"
+                style={{
+                  width: 28,
+                  height: 28,
+                  backgroundColor: 'var(--bg-elevated)',
+                }}
+              />
+            )}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+              }}
+            >
+              @{meal.username}
+            </span>
+          </Link>
           {meal.location_city && (
             <span
               className="flex items-center gap-0.5"

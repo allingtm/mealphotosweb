@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 import { profileUpdateSchema } from '@/lib/validations/profile';
 import { showToast } from '@/components/ui/Toast';
+import { ANALYTICS_EVENTS } from '@/lib/analytics';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -16,6 +18,8 @@ interface EditProfileModalProps {
     bio: string | null;
     location_city: string | null;
     location_country: string | null;
+    show_location?: boolean;
+    show_streak?: boolean;
   };
 }
 
@@ -32,6 +36,8 @@ export function EditProfileModal({
   const [bio, setBio] = useState(profile.bio ?? '');
   const [locationCity, setLocationCity] = useState(profile.location_city ?? '');
   const [locationCountry, setLocationCountry] = useState(profile.location_country ?? '');
+  const [showLocation, setShowLocation] = useState(profile.show_location ?? true);
+  const [showStreak, setShowStreak] = useState(profile.show_streak ?? true);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -43,6 +49,8 @@ export function EditProfileModal({
       setBio(profile.bio ?? '');
       setLocationCity(profile.location_city ?? '');
       setLocationCountry(profile.location_country ?? '');
+      setShowLocation(profile.show_location ?? true);
+      setShowStreak(profile.show_streak ?? true);
       setFieldErrors({});
     }
   }, [isOpen, profile]);
@@ -64,15 +72,19 @@ export function EditProfileModal({
       e.preventDefault();
       setFieldErrors({});
 
-      const payload: Record<string, string> = {};
+      const payload: Record<string, unknown> = {};
       if (displayName !== (profile.display_name ?? ''))
-        payload.display_name = displayName || undefined!;
+        payload.display_name = displayName || undefined;
       if (username !== profile.username) payload.username = username;
-      if (bio !== (profile.bio ?? '')) payload.bio = bio || undefined!;
+      if (bio !== (profile.bio ?? '')) payload.bio = bio || undefined;
       if (locationCity !== (profile.location_city ?? ''))
-        payload.location_city = locationCity || undefined!;
+        payload.location_city = locationCity || undefined;
       if (locationCountry !== (profile.location_country ?? ''))
-        payload.location_country = locationCountry || undefined!;
+        payload.location_country = locationCountry || undefined;
+      if (showLocation !== (profile.show_location ?? true))
+        payload.show_location = showLocation;
+      if (showStreak !== (profile.show_streak ?? true))
+        payload.show_streak = showStreak;
 
       // Nothing changed
       if (Object.keys(payload).length === 0) {
@@ -110,6 +122,24 @@ export function EditProfileModal({
           return;
         }
 
+        // Track analytics
+        const changedFields = Object.keys(payload);
+        posthog.capture(ANALYTICS_EVENTS.PROFILE_EDIT_SAVED, {
+          fields_changed: changedFields,
+        });
+        if (payload.show_location !== undefined) {
+          posthog.capture(ANALYTICS_EVENTS.PROFILE_PRIVACY_CHANGED, {
+            toggle: 'show_location',
+            new_value: payload.show_location,
+          });
+        }
+        if (payload.show_streak !== undefined) {
+          posthog.capture(ANALYTICS_EVENTS.PROFILE_PRIVACY_CHANGED, {
+            toggle: 'show_streak',
+            new_value: payload.show_streak,
+          });
+        }
+
         showToast(t('profileUpdated'), 'success');
         onSaved();
         onClose();
@@ -119,7 +149,7 @@ export function EditProfileModal({
         setSaving(false);
       }
     },
-    [displayName, username, bio, locationCity, locationCountry, profile, onClose, onSaved, t]
+    [displayName, username, bio, locationCity, locationCountry, showLocation, showStreak, profile, onClose, onSaved, t]
   );
 
   if (!isOpen) return null;
@@ -299,6 +329,111 @@ export function EditProfileModal({
             {fieldErrors.location_country && (
               <p style={errorStyle}>{fieldErrors.location_country}</p>
             )}
+          </div>
+
+          {/* Privacy section */}
+          <div style={{ marginTop: 8 }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: 12,
+                paddingTop: 8,
+                borderTop: '1px solid var(--bg-elevated)',
+              }}
+            >
+              {t('privacy')}
+            </p>
+
+            {/* Show location toggle */}
+            <div className="flex items-center justify-between" style={{ marginBottom: 12 }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 15,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {t('showLocation')}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowLocation(!showLocation)}
+                style={{
+                  width: 48,
+                  height: 28,
+                  borderRadius: 14,
+                  backgroundColor: showLocation ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'background-color 0.2s',
+                }}
+                role="switch"
+                aria-checked={showLocation ? 'true' : 'false'}
+                aria-label={t('showLocation')}
+              >
+                <span
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: 3,
+                    left: showLocation ? 23 : 3,
+                    transition: 'left 0.2s',
+                  }}
+                />
+              </button>
+            </div>
+
+            {/* Show streak toggle */}
+            <div className="flex items-center justify-between">
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 15,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {t('showStreak')}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowStreak(!showStreak)}
+                style={{
+                  width: 48,
+                  height: 28,
+                  borderRadius: 14,
+                  backgroundColor: showStreak ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'background-color 0.2s',
+                }}
+                role="switch"
+                aria-checked={showStreak ? 'true' : 'false'}
+                aria-label={t('showStreak')}
+              >
+                <span
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    backgroundColor: 'white',
+                    position: 'absolute',
+                    top: 3,
+                    left: showStreak ? 23 : 3,
+                    transition: 'left 0.2s',
+                  }}
+                />
+              </button>
+            </div>
           </div>
 
           {/* Save button */}

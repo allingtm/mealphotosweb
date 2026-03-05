@@ -5,27 +5,43 @@ import { useTranslations } from 'next-intl';
 interface StatsRowProps {
   mealCount: number;
   avgRating: number;
-  streak: number;
+  streak?: number;
+  ratingsGivenCount?: number;
+  isRestaurant?: boolean;
+  showStreak?: boolean;
 }
 
-export function StatsRow({ mealCount, avgRating, streak }: StatsRowProps) {
+export function StatsRow({
+  mealCount,
+  avgRating,
+  streak = 0,
+  ratingsGivenCount,
+  isRestaurant = false,
+  showStreak = true,
+}: StatsRowProps) {
   const t = useTranslations('profile');
+
+  const stats: { value: string; label: string; icon?: string }[] = [
+    { value: String(mealCount), label: t('meals') },
+    { value: avgRating > 0 ? avgRating.toFixed(1) : '—', label: t('avgRating') },
+  ];
+
+  if (!isRestaurant && showStreak && streak > 0) {
+    stats.push({ value: String(streak), label: t('streak'), icon: '🔥' });
+  }
+
+  if (!isRestaurant && ratingsGivenCount !== undefined) {
+    stats.push({ value: String(ratingsGivenCount), label: t('ratingsGiven') });
+  }
 
   return (
     <div
-      className="grid grid-cols-3 text-center"
+      className="flex justify-around text-center"
       style={{ padding: '16px 0', gap: 8 }}
     >
-      <StatItem value={String(mealCount)} label={t('meals')} />
-      <StatItem
-        value={avgRating > 0 ? avgRating.toFixed(1) : '—'}
-        label={t('avgRating')}
-      />
-      <StatItem
-        value={streak > 0 ? `${streak}` : '0'}
-        label={t('streak')}
-        icon={streak > 0 ? '🔥' : undefined}
-      />
+      {stats.map((stat) => (
+        <StatItem key={stat.label} value={stat.value} label={stat.label} icon={stat.icon} />
+      ))}
     </div>
   );
 }

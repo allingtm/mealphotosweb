@@ -94,10 +94,15 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
               </div>
 
               <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/profile/${pin.username}`);
+                }}
                 style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: 13,
                   color: 'var(--text-secondary)',
+                  cursor: 'pointer',
                 }}
               >
                 @{pin.username}
