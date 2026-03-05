@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? 'google'
             : provider === 'apple'
               ? 'apple'
-              : 'magic_link';
+              : 'email';
 
         posthog.capture(ANALYTICS_EVENTS.AUTH_COMPLETED, { method });
       }

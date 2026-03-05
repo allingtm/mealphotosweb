@@ -1,13 +1,14 @@
 'use client';
 
-import { X, Mail } from 'lucide-react';
+import { X, Lock, Mail, Eye, EyeOff } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
-import { showToast } from '@/components/ui/Toast';
+import { signUpSchema, signInSchema, resetPasswordSchema } from '@/lib/validations';
 
 type AuthMode = 'signup' | 'signin';
+type AuthView = 'form' | 'confirmEmail' | 'forgotPassword' | 'resetLinkSent';
 
 export function AuthModal() {
   const t = useTranslations('auth');
@@ -17,9 +18,12 @@ export function AuthModal() {
   const closeModal = useAppStore((s) => s.closeAuthModal);
 
   const [mode, setMode] = useState<AuthMode>('signup');
+  const [view, setView] = useState<AuthView>('form');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
 
@@ -27,9 +31,12 @@ export function AuthModal() {
   useEffect(() => {
     if (isOpen) {
       setMode('signup');
+      setView('form');
       setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
       setLoading(false);
-      setMagicLinkSent(false);
       setError(null);
     }
   }, [isOpen]);
@@ -56,24 +63,104 @@ export function AuthModal() {
     };
   }, [isOpen]);
 
-  const handleMagicLink = useCallback(
+  const handleSignUp = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!email.trim()) return;
       setError(null);
+
+      const result = signUpSchema.safeParse({ email: email.trim(), password, confirmPassword });
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        return;
+      }
+
       setLoading(true);
       try {
         const supabase = createClient();
-        const { error } = await supabase.auth.signInWithOtp({
+        const { data, error: authError } = await supabase.auth.signUp({
           email: email.trim(),
+          password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
-        if (error) {
-          setError(error.message);
+
+        if (authError) {
+          if (authError.message.toLowerCase().includes('already registered')) {
+            setError(t('emailAlreadyRegistered'));
+          } else {
+            setError(authError.message);
+          }
+        } else if (data.user && data.user.identities?.length === 0) {
+          // User already exists (email confirmation enabled returns empty identities)
+          setError(t('emailAlreadyRegistered'));
         } else {
-          setMagicLinkSent(true);
+          setView('confirmEmail');
+        }
+      } catch {
+        setError(t('authError'));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, password, confirmPassword, t]
+  );
+
+  const handleSignIn = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+
+      const result = signInSchema.safeParse({ email: email.trim(), password });
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+
+        if (authError) {
+          setError(t('invalidCredentials'));
+        } else {
+          closeModal();
+        }
+      } catch {
+        setError(t('authError'));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, password, t, closeModal]
+  );
+
+  const handleForgotPassword = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+
+      const result = resetPasswordSchema.safeParse({ email: email.trim() });
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const { error: authError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+          redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+        });
+
+        if (authError) {
+          setError(authError.message);
+        } else {
+          setView('resetLinkSent');
         }
       } catch {
         setError(t('authError'));
@@ -85,6 +172,15 @@ export function AuthModal() {
   );
 
   if (!isOpen) return null;
+
+  const inputStyle = {
+    height: 48,
+    backgroundColor: 'var(--bg-elevated)',
+    borderColor: 'var(--bg-elevated)',
+    color: 'var(--text-primary)',
+    fontFamily: 'var(--font-body)',
+    fontSize: 15,
+  };
 
   return (
     <div
@@ -119,8 +215,18 @@ export function AuthModal() {
           <X size={20} strokeWidth={1.5} />
         </button>
 
-        {magicLinkSent ? (
-          <MagicLinkSentView email={email} onBack={() => setMagicLinkSent(false)} />
+        {view === 'confirmEmail' ? (
+          <ConfirmEmailView email={email} onBack={() => { setView('form'); setMode('signin'); }} />
+        ) : view === 'forgotPassword' || view === 'resetLinkSent' ? (
+          <ForgotPasswordView
+            email={email}
+            setEmail={setEmail}
+            loading={loading}
+            error={error}
+            linkSent={view === 'resetLinkSent'}
+            onSubmit={handleForgotPassword}
+            onBack={() => { setView('form'); setError(null); }}
+          />
         ) : (
           <>
             {/* Heading */}
@@ -142,9 +248,7 @@ export function AuthModal() {
                 marginBottom: 24,
               }}
             >
-              {mode === 'signup'
-                ? t('signupDesc')
-                : t('signinDesc')}
+              {mode === 'signup' ? t('signupDesc') : t('signinDesc')}
             </p>
 
             {/* Error */}
@@ -164,7 +268,13 @@ export function AuthModal() {
 
             {/* Google OAuth */}
             <button
-              onClick={() => showToast('Coming soon!', 'info')}
+              onClick={() => {
+                const supabase = createClient();
+                supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: { redirectTo: `${window.location.origin}/auth/callback` },
+                });
+              }}
               disabled={loading}
               className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
               style={{
@@ -182,7 +292,13 @@ export function AuthModal() {
 
             {/* Apple OAuth */}
             <button
-              onClick={() => showToast('Coming soon!', 'info')}
+              onClick={() => {
+                const supabase = createClient();
+                supabase.auth.signInWithOAuth({
+                  provider: 'apple',
+                  options: { redirectTo: `${window.location.origin}/auth/callback` },
+                });
+              }}
               disabled={loading}
               className="mb-4 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
               style={{
@@ -207,8 +323,9 @@ export function AuthModal() {
               <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
             </div>
 
-            {/* Magic link form */}
-            <form onSubmit={handleMagicLink}>
+            {/* Password form */}
+            <form onSubmit={mode === 'signup' ? handleSignUp : handleSignIn} autoComplete="on">
+              {/* Email */}
               <label
                 htmlFor="auth-email"
                 className="mb-1 block"
@@ -223,24 +340,108 @@ export function AuthModal() {
               <input
                 id="auth-email"
                 type="email"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('emailPlaceholder')}
                 required
                 disabled={loading}
+                autoComplete="email"
                 className="mb-3 w-full rounded-xl border px-4 outline-none transition-colors focus:border-[var(--accent-primary)]"
-                style={{
-                  height: 48,
-                  backgroundColor: 'var(--bg-elevated)',
-                  borderColor: 'var(--bg-elevated)',
-                  color: 'var(--text-primary)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 15,
-                }}
+                style={inputStyle}
               />
+
+              {/* Password */}
+              <label
+                htmlFor="auth-password"
+                className="mb-1 block"
+                style={{
+                  fontSize: 14,
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {t('passwordLabel')}
+              </label>
+              <div className="relative mb-3">
+                <input
+                  id="auth-password"
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'signup' ? t('passwordPlaceholder') : ''}
+                  required
+                  disabled={loading}
+                  autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                  className="w-full rounded-xl border px-4 pr-12 outline-none transition-colors focus:border-[var(--accent-primary)]"
+                  style={inputStyle}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'var(--text-secondary)' }}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} strokeWidth={1.5} />
+                  ) : (
+                    <Eye size={20} strokeWidth={1.5} />
+                  )}
+                </button>
+              </div>
+
+              {/* Confirm Password (signup only) */}
+              {mode === 'signup' && (
+                <>
+                  <label
+                    htmlFor="auth-confirm-password"
+                    className="mb-1 block"
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {t('confirmPasswordLabel')}
+                  </label>
+                  <input
+                    id="auth-confirm-password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="confirm-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    autoComplete="new-password"
+                    className="mb-3 w-full rounded-xl border px-4 outline-none transition-colors focus:border-[var(--accent-primary)]"
+                    style={inputStyle}
+                  />
+                </>
+              )}
+
+              {/* Forgot password (signin only) */}
+              {mode === 'signin' && (
+                <div className="mb-3 text-right">
+                  <button
+                    type="button"
+                    onClick={() => { setView('forgotPassword'); setError(null); }}
+                    style={{
+                      color: 'var(--accent-primary)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 14,
+                    }}
+                  >
+                    {t('forgotPassword')}
+                  </button>
+                </div>
+              )}
+
+              {/* Submit */}
               <button
                 type="submit"
-                disabled={loading || !email.trim()}
+                disabled={loading || !email.trim() || !password}
                 className="flex w-full items-center justify-center gap-2 rounded-xl transition-opacity disabled:opacity-50"
                 style={{
                   height: 48,
@@ -251,8 +452,8 @@ export function AuthModal() {
                   fontWeight: 600,
                 }}
               >
-                <Mail size={18} strokeWidth={1.5} />
-                {t('sendMagicLink')}
+                <Lock size={18} strokeWidth={1.5} />
+                {mode === 'signup' ? t('signUpButton') : t('signInButton')}
               </button>
             </form>
 
@@ -267,7 +468,12 @@ export function AuthModal() {
             >
               {mode === 'signup' ? t('alreadyHaveAccount') : t('dontHaveAccount')}
               <button
-                onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
+                onClick={() => {
+                  setMode(mode === 'signup' ? 'signin' : 'signup');
+                  setError(null);
+                  setPassword('');
+                  setConfirmPassword('');
+                }}
                 className="underline"
                 style={{ color: 'var(--accent-primary)' }}
               >
@@ -319,7 +525,7 @@ export function AuthModal() {
   );
 }
 
-function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => void }) {
+function ConfirmEmailView({ email, onBack }: { email: string; onBack: () => void }) {
   const t = useTranslations('auth');
   return (
     <div className="text-center">
@@ -341,7 +547,7 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           marginBottom: 8,
         }}
       >
-        {t('checkEmail')}
+        {t('confirmEmail')}
       </h2>
       <p
         style={{
@@ -351,8 +557,7 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           marginBottom: 24,
         }}
       >
-        {t('magicLinkSent')}{' '}
-        <span style={{ color: 'var(--text-primary)' }}>{email}</span>. {t('clickToSignIn')}
+        <span style={{ color: 'var(--text-primary)' }}>{email}</span>
       </p>
       <button
         onClick={onBack}
@@ -363,8 +568,147 @@ function MagicLinkSentView({ email, onBack }: { email: string; onBack: () => voi
           fontSize: 14,
         }}
       >
-        {t('tryDifferentMethod')}
+        {t('backToSignIn')}
       </button>
+    </div>
+  );
+}
+
+function ForgotPasswordView({
+  email,
+  setEmail,
+  loading,
+  error,
+  linkSent,
+  onSubmit,
+  onBack,
+}: {
+  email: string;
+  setEmail: (v: string) => void;
+  loading: boolean;
+  error: string | null;
+  linkSent: boolean;
+  onSubmit: (e: React.FormEvent) => void;
+  onBack: () => void;
+}) {
+  const t = useTranslations('auth');
+
+  return (
+    <div>
+      <h2
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 24,
+          color: 'var(--accent-primary)',
+          marginBottom: 8,
+        }}
+      >
+        {t('resetPasswordTitle')}
+      </h2>
+
+      {linkSent ? (
+        <div className="text-center">
+          <div
+            className="mx-auto mb-4 mt-4 flex items-center justify-center rounded-full"
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: 'rgba(232, 168, 56, 0.15)',
+            }}
+          >
+            <Mail size={28} strokeWidth={1.5} style={{ color: 'var(--accent-primary)' }} />
+          </div>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              color: 'var(--text-secondary)',
+              marginBottom: 24,
+            }}
+          >
+            {t('resetLinkSent')}
+          </p>
+        </div>
+      ) : (
+        <>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              color: 'var(--text-secondary)',
+              marginBottom: 24,
+            }}
+          >
+            {t('resetPasswordDesc')}
+          </p>
+
+          {error && (
+            <div
+              className="mb-4 rounded-lg px-4 py-3"
+              style={{
+                backgroundColor: 'rgba(212, 85, 58, 0.15)',
+                color: 'var(--status-error)',
+                fontSize: 14,
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={onSubmit}>
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('emailPlaceholder')}
+              required
+              disabled={loading}
+              autoComplete="email"
+              className="mb-3 w-full rounded-xl border px-4 outline-none transition-colors focus:border-[var(--accent-primary)]"
+              style={{
+                height: 48,
+                backgroundColor: 'var(--bg-elevated)',
+                borderColor: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+              }}
+            />
+            <button
+              type="submit"
+              disabled={loading || !email.trim()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl transition-opacity disabled:opacity-50"
+              style={{
+                height: 48,
+                backgroundColor: 'var(--accent-primary)',
+                color: 'var(--bg-primary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+                fontWeight: 600,
+              }}
+            >
+              <Mail size={18} strokeWidth={1.5} />
+              {t('sendResetLink')}
+            </button>
+          </form>
+        </>
+      )}
+
+      <div className="mt-4 text-center">
+        <button
+          onClick={onBack}
+          className="underline"
+          style={{
+            color: 'var(--accent-primary)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+          }}
+        >
+          {t('backToSignIn')}
+        </button>
+      </div>
     </div>
   );
 }
