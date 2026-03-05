@@ -134,10 +134,22 @@ function UploadPageContent() {
     });
   }, [requireAuth, router]);
 
-  // Open file picker immediately
+  // Pick up file from FAB (passed via store) and skip straight to crop
   useEffect(() => {
-    if (user && step === 'pick') {
-      // Small delay to ensure DOM is ready
+    const { pendingUploadFile, setPendingUploadFile } = useAppStore.getState();
+    if (pendingUploadFile && step === 'pick') {
+      setSelectedFile(pendingUploadFile);
+      setPreviewUrl(URL.createObjectURL(pendingUploadFile));
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setStep('crop');
+      setPendingUploadFile(null);
+    }
+  }, [step]);
+
+  // Fallback: open file picker if no pending file
+  useEffect(() => {
+    if (user && step === 'pick' && !useAppStore.getState().pendingUploadFile) {
       const t = setTimeout(() => fileInputRef.current?.click(), 100);
       return () => clearTimeout(t);
     }

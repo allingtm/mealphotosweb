@@ -40,6 +40,9 @@ interface AppState {
   isWaitlistModalOpen: boolean;
   showWaitlistModal: () => void;
   hideWaitlistModal: () => void;
+
+  pendingUploadFile: File | null;
+  setPendingUploadFile: (file: File | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -71,4 +74,7 @@ export const useAppStore = create<AppState>((set) => ({
   isWaitlistModalOpen: false,
   showWaitlistModal: () => set({ isWaitlistModalOpen: true }),
   hideWaitlistModal: () => set({ isWaitlistModalOpen: false }),
+
+  pendingUploadFile: null,
+  setPendingUploadFile: (file) => set({ pendingUploadFile: file }),
 }));
