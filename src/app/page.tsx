@@ -7,13 +7,22 @@ import type { FeedItem } from '@/types/database';
 export default async function FeedPage() {
   const supabase = await createClient();
 
-  const { data } = await supabase.rpc('get_feed', {
-    p_limit: 10,
-  });
+  let meals: FeedItem[] = [];
+  let nextCursor: string | null = null;
 
-  const meals = (data ?? []) as FeedItem[];
-  const nextCursor =
-    meals.length === 10 ? meals[meals.length - 1].created_at : null;
+  try {
+    const { data, error } = await supabase.rpc('get_feed', {
+      p_limit: 10,
+    });
+
+    if (!error && data) {
+      meals = data as FeedItem[];
+      nextCursor =
+        meals.length === 10 ? meals[meals.length - 1].created_at : null;
+    }
+  } catch {
+    // Fall through with empty feed — FeedContainer handles empty state
+  }
 
   // Pre-compute blur data URLs server-side for the first 3 cards
   const mealsWithBlur = meals.map((meal, index) => ({
