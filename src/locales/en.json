@@ -197,6 +197,8 @@
   },
   "upload": {
     "selectPhoto": "Select Photo",
+    "takePhoto": "Take Photo",
+    "chooseFromGallery": "Choose from Gallery",
     "selectMealPhoto": "Select meal photo",
     "cropPhoto": "Crop Photo",
     "dragToReposition": "Drag to reposition, pinch or scroll to zoom",

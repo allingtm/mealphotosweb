@@ -97,7 +97,8 @@ function UploadPageContent() {
   const t = useTranslations('upload');
   const tCommon = useTranslations('common');
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<UploadStep>('pick');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -138,7 +139,7 @@ function UploadPageContent() {
   useEffect(() => {
     if (user && step === 'pick') {
       // Small delay to ensure DOM is ready
-      const t = setTimeout(() => fileInputRef.current?.click(), 100);
+      const t = setTimeout(() => cameraInputRef.current?.click(), 100);
       return () => clearTimeout(t);
     }
   }, [user, step]);
@@ -376,16 +377,24 @@ function UploadPageContent() {
         style={{ minHeight: 'calc(100dvh - 56px)' }}
       >
         <input
-          ref={fileInputRef}
+          ref={cameraInputRef}
           type="file"
           accept="image/*"
           capture="environment"
           onChange={handleFileSelect}
           className="hidden"
-          aria-label={t('selectMealPhoto')}
+          aria-label={t('takePhoto')}
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+          aria-label={t('chooseFromGallery')}
         />
         <button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => cameraInputRef.current?.click()}
           className="px-6 py-3 rounded-2xl font-semibold"
           style={{
             backgroundColor: 'var(--accent-primary)',
@@ -395,7 +404,21 @@ function UploadPageContent() {
             fontWeight: 600,
           }}
         >
-          {t('selectPhoto')}
+          {t('takePhoto')}
+        </button>
+        <button
+          onClick={() => galleryInputRef.current?.click()}
+          className="mt-4 px-6 py-3 rounded-2xl font-semibold"
+          style={{
+            backgroundColor: 'transparent',
+            color: 'var(--text-primary)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            fontWeight: 500,
+            border: '1px solid var(--text-secondary)',
+          }}
+        >
+          {t('chooseFromGallery')}
         </button>
         <button
           onClick={handleCancel}
