@@ -5,12 +5,12 @@ import { blurhashToDataURL } from '@/lib/blurhash-to-data-url';
 import type { FeedItem } from '@/types/database';
 
 export default async function FeedPage() {
-  const supabase = await createClient();
-
   let meals: FeedItem[] = [];
   let nextCursor: string | null = null;
 
   try {
+    const supabase = await createClient();
+
     const { data, error } = await supabase.rpc('get_feed', {
       p_limit: 10,
     });
@@ -20,7 +20,9 @@ export default async function FeedPage() {
       nextCursor =
         meals.length === 10 ? meals[meals.length - 1].created_at : null;
     }
-  } catch {
+  } catch (e) {
+    // Log for server-side diagnostics
+    console.error('[FeedPage] Failed to load feed:', e);
     // Fall through with empty feed — FeedContainer handles empty state
   }
 
