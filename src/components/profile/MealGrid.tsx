@@ -22,9 +22,10 @@ interface MealGridItem {
 interface MealGridProps {
   meals: MealGridItem[];
   showHeart?: boolean;
+  authorView?: boolean;
 }
 
-export function MealGrid({ meals, showHeart }: MealGridProps) {
+export function MealGrid({ meals, showHeart, authorView }: MealGridProps) {
   const t = useTranslations('profile');
 
   if (meals.length === 0) {
@@ -51,7 +52,7 @@ export function MealGrid({ meals, showHeart }: MealGridProps) {
       {meals.map((meal) => (
         <Link
           key={meal.id}
-          href={`/meal/${meal.id}`}
+          href={authorView ? `/my-meals/${meal.id}` : `/meal/${meal.id}`}
           className="relative block"
           style={{ aspectRatio: '1' }}
         >

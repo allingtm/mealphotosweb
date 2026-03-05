@@ -68,7 +68,7 @@ export default async function MyMealsPage() {
           streak={profileResult.data?.streak_current ?? 0}
         />
       </div>
-      <ProfileTabs meals={meals} savedMeals={savedMeals} showSavedTab />
+      <ProfileTabs meals={meals} savedMeals={savedMeals} showSavedTab authorView />
     </div>
   );
 }

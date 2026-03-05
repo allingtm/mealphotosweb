@@ -406,6 +406,17 @@
     "successDismiss": "Start exploring",
     "errorGeneric": "Something went wrong. Please try again."
   },
+  "mealEdit": {
+    "title": "Edit Meal",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "updated": "Meal updated",
+    "updateFailed": "Failed to update meal",
+    "updateLocation": "Update location",
+    "locationUpdated": "Location updated",
+    "removeVenue": "Remove venue",
+    "removeLocation": "Remove location"
+  },
   "errors": {
     "somethingWentWrong": "Something went wrong",
     "unexpectedError": "An unexpected error occurred. Please try again.",

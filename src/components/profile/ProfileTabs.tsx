@@ -15,12 +15,13 @@ interface ProfileTabsProps {
   meals: MealGridItem[];
   savedMeals?: MealGridItem[];
   showSavedTab?: boolean;
+  authorView?: boolean;
 }
 
 const TAB_KEYS = ['myMeals', 'saved'] as const;
 type TabKey = typeof TAB_KEYS[number];
 
-export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false }: ProfileTabsProps) {
+export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false, authorView = false }: ProfileTabsProps) {
   const t = useTranslations('profile');
   const [activeTab, setActiveTab] = useState<TabKey>('myMeals');
 
@@ -67,7 +68,7 @@ export function ProfileTabs({ meals, savedMeals = [], showSavedTab = false }: Pr
       </div>
 
       {/* Tab content */}
-      {activeTab === 'myMeals' && <MealGrid meals={meals} />}
+      {activeTab === 'myMeals' && <MealGrid meals={meals} authorView={authorView} />}
       {activeTab === 'saved' && <MealGrid meals={savedMeals} showHeart />}
     </div>
   );

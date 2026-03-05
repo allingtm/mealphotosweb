@@ -11,9 +11,10 @@ interface DeleteMealDialogProps {
   mealId: string;
   isOpen: boolean;
   onClose: () => void;
+  redirectTo?: string;
 }
 
-export function DeleteMealDialog({ mealId, isOpen, onClose }: DeleteMealDialogProps) {
+export function DeleteMealDialog({ mealId, isOpen, onClose, redirectTo = '/' }: DeleteMealDialogProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -51,12 +52,12 @@ export function DeleteMealDialog({ mealId, isOpen, onClose }: DeleteMealDialogPr
       posthog.capture(ANALYTICS_EVENTS.MEAL_DELETED, { meal_id: mealId });
       showToast('Meal deleted', 'success');
       onClose();
-      router.push('/');
+      router.push(redirectTo);
     } catch {
       showToast('Something went wrong. Please try again.', 'error');
       setDeleting(false);
     }
-  }, [mealId, onClose, router]);
+  }, [mealId, onClose, router, redirectTo]);
 
   if (!isOpen) return null;
 
