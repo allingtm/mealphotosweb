@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { mealUploadServerSchema } from '@/lib/validations/meal';
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_IMAGES_ACCOUNT_ID!;
@@ -263,15 +262,23 @@ export async function POST(req: NextRequest) {
     }
 
     // 10. Trigger moderation Edge Function (async, don't await)
-    const adminClient = createServiceRoleClient();
-    adminClient.functions
-      .invoke('moderate-meal', {
-        body: { meal_id: meal.id, image_url: `${deliveryUrl}/public` },
-        headers: { 'x-edge-secret': process.env.EDGE_FUNCTION_SECRET! },
-      })
-      .catch((err: unknown) => {
-        console.error('Moderation function invoke failed:', err);
-      });
+    fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/moderate-meal`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'x-edge-secret': process.env.EDGE_FUNCTION_SECRET!,
+        },
+        body: JSON.stringify({
+          meal_id: meal.id,
+          image_url: `${deliveryUrl}/public`,
+        }),
+      }
+    ).catch((err: unknown) => {
+      console.error('Moderation function invoke failed:', err);
+    });
 
     // 11. Update streak
     await updateStreak(supabase, user.id);
