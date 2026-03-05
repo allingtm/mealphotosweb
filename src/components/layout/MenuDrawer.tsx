@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { X, User, Info, Mail, MessageSquare, Store, Shield } from 'lucide-react';
+import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
+import { createClient } from '@/lib/supabase/client';
 
 interface MenuDrawerProps {
   isOpen: boolean;
@@ -21,10 +23,20 @@ const menuItems = [
 export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const t = useTranslations('menu');
   const tFooter = useTranslations('footer');
+  const tSettings = useTranslations('settings');
   const user = useAppStore((s) => s.user);
   const isAdmin = useAppStore((s) => s.isAdmin);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
   const panelRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    onClose();
+    router.push('/');
+    router.refresh();
+  };
 
   // Close on outside click
   useEffect(() => {
@@ -223,6 +235,36 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
                   Admin
                 </span>
               </Link>
+            </>
+          )}
+
+          {/* Sign out — only visible when logged in */}
+          {user && (
+            <>
+              <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', margin: '4px 16px' }} />
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="flex items-center gap-3 w-full"
+                style={{
+                  padding: '14px 16px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <LogOut size={20} strokeWidth={1.5} color="var(--status-error)" />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 15,
+                    fontWeight: 500,
+                    color: 'var(--status-error)',
+                  }}
+                >
+                  {tSettings('signOut')}
+                </span>
+              </button>
             </>
           )}
         </div>
