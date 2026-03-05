@@ -241,7 +241,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       {/* Right-side action column — just below vertical centre */}
       <div
         className="absolute right-3 z-10"
-        style={{ top: '50%', marginTop: 16 }}
+        style={{ top: '50%', transform: 'translateY(-50%)' }}
       >
         <ActionColumn
           mealId={meal.id}
@@ -254,7 +254,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       </div>
 
       {/* Bottom content — rating bar only */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 md:pb-2">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-12 md:pb-5">
         <RatingBar
           mealId={meal.id}
           isOwnMeal={isOwnMeal}
