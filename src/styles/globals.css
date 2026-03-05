@@ -50,6 +50,31 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
+/* ─── Dark scrollbar ─────────────────────────────────────── */
+
+* {
+  scrollbar-color: var(--bg-elevated) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
 /* ─── Accessibility ───────────────────────────────────────── */
 
 /* Visible focus states — Amber outline, 2px, offset 2px */
