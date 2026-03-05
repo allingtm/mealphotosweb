@@ -13,14 +13,6 @@ export default function FeedError({
   const t = useTranslations('feed');
   const tCommon = useTranslations('common');
 
-  // Diagnostics — visible on mobile for debugging
-  const errorInfo = {
-    message: error?.message ?? 'unknown',
-    name: error?.name ?? 'unknown',
-    digest: error?.digest ?? 'none',
-    stack: error?.stack?.slice(0, 500) ?? 'no stack',
-  };
-
   return (
     <div
       className="flex flex-col items-center justify-center gap-4 text-center px-8"
@@ -59,7 +51,7 @@ export default function FeedError({
         {tCommon('tryAgain')}
       </button>
 
-      {/* Debug info — remove after diagnosing mobile issue */}
+      {/* TODO: remove after confirming CSP fix */}
       <details
         style={{
           marginTop: 16,
@@ -75,10 +67,10 @@ export default function FeedError({
         }}
       >
         <summary style={{ cursor: 'pointer', marginBottom: 8 }}>Error details</summary>
-        <p><strong>Name:</strong> {errorInfo.name}</p>
-        <p><strong>Message:</strong> {errorInfo.message}</p>
-        <p><strong>Digest:</strong> {errorInfo.digest}</p>
-        <p style={{ whiteSpace: 'pre-wrap' }}><strong>Stack:</strong> {errorInfo.stack}</p>
+        <p><strong>Name:</strong> {error?.name ?? 'unknown'}</p>
+        <p><strong>Message:</strong> {error?.message ?? 'unknown'}</p>
+        <p><strong>Digest:</strong> {error?.digest ?? 'none'}</p>
+        <p style={{ whiteSpace: 'pre-wrap' }}><strong>Stack:</strong> {error?.stack?.slice(0, 500) ?? 'no stack'}</p>
       </details>
     </div>
   );
