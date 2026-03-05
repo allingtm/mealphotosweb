@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const MAPBOX_CACHE = `mapbox-tiles-${CACHE_VERSION}`;
 const MAPBOX_CACHE_LIMIT = 50 * 1024 * 1024; // 50MB
@@ -53,9 +53,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App shell (HTML, CSS, JS, fonts) — stale-while-revalidate
+  // HTML pages — network-first so users always get fresh server-rendered content
+  if (request.destination === 'document') {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Static assets (JS, CSS, fonts) — stale-while-revalidate (content-hashed & immutable)
   if (
-    request.destination === 'document' ||
     request.destination === 'script' ||
     request.destination === 'style' ||
     request.destination === 'font' ||
@@ -65,6 +70,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 });
+
+// Network-first strategy for HTML pages
+async function networkFirst(request) {
+  const cache = await caches.open(APP_SHELL_CACHE);
+
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch {
+    const cachedResponse = await cache.match(request);
+    return cachedResponse || new Response('Offline', { status: 503 });
+  }
+}
 
 // Stale-while-revalidate strategy
 async function staleWhileRevalidate(request) {
