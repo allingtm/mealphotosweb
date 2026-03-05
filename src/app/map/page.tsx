@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+import { AppBar } from '@/components/layout/AppBar';
 
 const MapView = dynamic(
   () => import('@/components/map/MapView'),
@@ -9,9 +10,8 @@ const MapView = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex items-center justify-center w-full"
+        className="flex items-center justify-center w-full flex-1"
         style={{
-          height: 'calc(100dvh - 56px)',
           backgroundColor: 'var(--bg-primary)',
         }}
       >
@@ -27,5 +27,10 @@ const MapView = dynamic(
 );
 
 export default function MapPage() {
-  return <MapView />;
+  return (
+    <div className="flex flex-col h-[calc(100dvh-56px)] md:h-full md:flex-1">
+      <AppBar />
+      <MapView />
+    </div>
+  );
 }

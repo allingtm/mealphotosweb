@@ -400,7 +400,7 @@ export function MapView() {
     mapFilters.recipeOnly;
 
   return (
-    <div className="relative w-full" style={{ height: 'calc(100dvh - 56px)' }}>
+    <div className="relative w-full flex-1" style={{ minHeight: 0 }}>
       <div ref={mapContainer} className="w-full h-full" />
 
       <MapSearchBar

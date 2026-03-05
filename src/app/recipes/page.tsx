@@ -1,26 +1,18 @@
+'use client';
+
 import { ChefHat } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { getTranslations } from 'next-intl/server';
-
-export async function generateMetadata() {
-  const t = await getTranslations('recipes');
-  return {
-    title: `${t('title')} | meal.photos`,
-    description: t('comingSoonDesc'),
-  };
-}
+import { AppBar } from '@/components/layout/AppBar';
 
 export default function RecipesPage() {
-  return <RecipesContent />;
-}
-
-function RecipesContent() {
   const t = useTranslations('recipes');
 
   return (
-    <div
-      className="flex flex-col items-center justify-center"
-      style={{
+    <>
+      <AppBar />
+      <div
+        className="flex flex-col items-center justify-center"
+        style={{
         minHeight: '60vh',
         padding: '48px 24px',
         textAlign: 'center',
@@ -53,5 +45,6 @@ function RecipesContent() {
         {t('comingSoon')} — {t('comingSoonDesc')}
       </p>
     </div>
+    </>
   );
 }

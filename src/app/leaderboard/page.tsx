@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { LeaderboardClient } from '@/components/leaderboard/LeaderboardClient';
+import { AppBar } from '@/components/layout/AppBar';
 import type { LeaderboardEntry } from '@/types/database';
 
 export const metadata = {
@@ -46,20 +47,7 @@ export default async function LeaderboardPage() {
         paddingBottom: 72,
       }}
     >
-      {/* Header */}
-      <div style={{ padding: '16px 16px 0' }}>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 28,
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            margin: 0,
-          }}
-        >
-          Leaderboard
-        </h1>
-      </div>
+      <AppBar />
 
       <LeaderboardClient
         initialEntries={entries}
