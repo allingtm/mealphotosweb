@@ -190,7 +190,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
     return (
       <div
         className="flex flex-col items-center justify-center gap-4 text-center px-8"
-        style={{ height: 'calc(100dvh - 56px - 48px)' }}
+        style={{ height: 'var(--feed-card-height)' }}
       >
         <Utensils size={64} strokeWidth={1.5} color="var(--accent-primary)" />
         <h2
@@ -220,8 +220,8 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
       <OnboardingOverlay />
       <div
         ref={scrollContainerRef}
-        className="snap-y-mandatory overflow-y-scroll mx-auto"
-        style={{ height: 'calc(100dvh - 56px - 48px)', maxWidth: 480 }}
+        className="snap-y-mandatory overflow-y-scroll mx-auto md:h-auto! md:flex-1 md:min-h-0"
+        style={{ height: 'var(--feed-card-height)', maxWidth: 640 }}
       >
         {meals.map((meal, index) => (
           <div
@@ -266,7 +266,7 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
           <div
             className="flex flex-col items-center justify-center gap-2 text-center px-8 snap-start"
             style={{
-              height: 'calc(100dvh - 56px - 48px)',
+              height: 'var(--feed-card-height)',
               fontFamily: 'var(--font-body)',
             }}
           >

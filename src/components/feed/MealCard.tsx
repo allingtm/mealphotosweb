@@ -80,7 +80,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
   );
 
   if (!isVisible) {
-    return <div className="snap-start" style={{ height: 'calc(100dvh - 56px)' }} />;
+    return <div className="snap-start" style={{ height: 'var(--feed-card-height)' }} />;
   }
 
   const hasBlurDataURL = !!meal.blurDataURL;
@@ -88,7 +88,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
   return (
     <div
       className="snap-start relative overflow-hidden"
-      style={{ height: 'calc(100dvh - 56px)' }}
+      style={{ height: 'var(--feed-card-height)' }}
     >
       {/* Blur-hash placeholder — client canvas fallback when no server blurDataURL */}
       {!hasBlurDataURL && meal.photo_blur_hash && !imageLoaded && (
@@ -130,7 +130,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       {/* Right-side action column */}
       <div
         className="absolute right-3 z-10"
-        style={{ bottom: 130 }}
+        style={{ bottom: 110 }}
       >
         <ActionColumn
           mealId={meal.id}
@@ -143,7 +143,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       </div>
 
       {/* Bottom content — overlaid on gradient */}
-      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-2">
+      <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-12 md:pb-2">
         {/* Title */}
         <h2
           style={{

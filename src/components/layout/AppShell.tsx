@@ -220,7 +220,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content — desktop gets right padding for sidebar */}
       <main
         id="main-content"
-        className={`pb-14 md:pb-0 md:pl-18 ${!isFullBleed ? 'lg:pr-80' : ''}`}
+        className={`pb-14 md:pb-0 md:pl-18 md:h-dvh md:overflow-hidden md:flex md:flex-col ${!isFullBleed ? 'lg:pr-80' : ''}`}
       >
         {children}
       </main>

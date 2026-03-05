@@ -26,6 +26,9 @@
   --radius-modal: 24px;
   --radius-full: 999px;
 
+  /* Feed card height: subtract header (48px) + bottom nav (56px) on mobile */
+  --feed-card-height: calc(100dvh - 48px - 56px);
+
   /* Spacing base */
   --space-unit: 8px;
 
@@ -48,6 +51,14 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body), sans-serif;
+}
+
+@media (min-width: 768px) {
+  html,
+  body {
+    overflow: hidden;
+    height: 100dvh;
+  }
 }
 
 /* ─── Dark scrollbar ─────────────────────────────────────── */
@@ -440,6 +451,13 @@ textarea:focus-visible,
   font-size: 14px;
   color: var(--text-secondary);
   margin-bottom: 32px;
+}
+
+/* ─── Desktop: no bottom nav, only subtract header ────────── */
+@media (min-width: 768px) {
+  :root {
+    --feed-card-height: calc(100dvh - 48px);
+  }
 }
 
 /* ─── Reduced motion ──────────────────────────────────────── */
