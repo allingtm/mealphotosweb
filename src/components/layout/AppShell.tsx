@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, User, Camera, Trophy, ChefHat, Store, Shield } from 'lucide-react';
+import { Home, Compass, User, Camera, Trophy, ChefHat, Store, Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,7 +13,7 @@ import { AuthModal } from '@/components/auth/AuthModal';
 
 const sideNavItems = [
   { href: '/', icon: Home, label: 'feed' },
-  { href: '/map', icon: Globe, label: 'map' },
+  { href: '/map', icon: Compass, label: 'map' },
   { href: '/upload', icon: Camera, label: 'upload' },
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
   { href: '/recipes', icon: ChefHat, label: 'recipes' },

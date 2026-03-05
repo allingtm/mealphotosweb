@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, Trophy, ChefHat } from 'lucide-react';
+import { Home, Compass, Trophy, ChefHat } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -8,7 +8,7 @@ import { UploadFAB } from './UploadFAB';
 
 const leftTabs = [
   { href: '/', icon: Home, label: 'feed' },
-  { href: '/map', icon: Globe, label: 'map' },
+  { href: '/map', icon: Compass, label: 'map' },
 ] as const;
 
 const rightTabs = [
