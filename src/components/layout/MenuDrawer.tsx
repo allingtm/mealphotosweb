@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { X, User, Info, Mail, MessageSquare, Store } from 'lucide-react';
+import { X, User, Info, Mail, MessageSquare, Store, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
@@ -22,6 +22,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const t = useTranslations('menu');
   const tFooter = useTranslations('footer');
   const user = useAppStore((s) => s.user);
+  const isAdmin = useAppStore((s) => s.isAdmin);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -196,6 +197,34 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
               </span>
             </Link>
           ))}
+
+          {/* Admin link — only visible to admins */}
+          {isAdmin && (
+            <>
+              <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', margin: '4px 16px' }} />
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className="flex items-center gap-3 w-full"
+                style={{
+                  padding: '14px 16px',
+                  textDecoration: 'none',
+                }}
+              >
+                <Shield size={20} strokeWidth={1.5} color="var(--accent-primary)" />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 15,
+                    fontWeight: 500,
+                    color: 'var(--accent-primary)',
+                  }}
+                >
+                  Admin
+                </span>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Footer — legal links */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Globe, User, Camera, Trophy, ChefHat, Store } from 'lucide-react';
+import { Home, Globe, User, Camera, Trophy, ChefHat, Store, Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,6 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const user = useAppStore((s) => s.user);
+  const isAdmin = useAppStore((s) => s.isAdmin);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
 
   const isActive = (href: string) =>
@@ -115,6 +116,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           );
         })}
+
+        {/* Admin link — only visible to admins */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex flex-col items-center justify-center gap-1 py-2"
+            style={{ minWidth: 48, minHeight: 48 }}
+            aria-current={isActive('/admin') ? 'page' : undefined}
+          >
+            <Shield
+              size={24}
+              strokeWidth={1.5}
+              color={isActive('/admin') ? 'var(--accent-primary)' : 'var(--text-secondary)'}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 11,
+                fontWeight: 500,
+                color: isActive('/admin') ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              }}
+            >
+              Admin
+            </span>
+          </Link>
+        )}
 
         {/* Burger menu — pushed to bottom */}
         <div className="mt-auto">

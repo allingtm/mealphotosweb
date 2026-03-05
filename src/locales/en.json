@@ -371,6 +371,21 @@
     "comingSoon": "Coming soon",
     "description": "We'd love to hear your thoughts on how we can improve."
   },
+  "waitlist": {
+    "heading": "We're building in public",
+    "message": "Our developers are busy behind the scenes, but we're too excited to wait -- so welcome to the meal.photos open alpha! As a consequence, things may change, break, or look a little rough around the edges. Want to be first to know when new features drop?",
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "Your first name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Join the waiting list",
+    "submitting": "Joining...",
+    "noThanks": "No thanks, just browsing",
+    "successHeading": "You're on the list!",
+    "successMessage": "Thanks, {name}! We'll let you know when exciting things happen.",
+    "successDismiss": "Start exploring",
+    "errorGeneric": "Something went wrong. Please try again."
+  },
   "errors": {
     "somethingWentWrong": "Something went wrong",
     "unexpectedError": "An unexpected error occurred. Please try again.",

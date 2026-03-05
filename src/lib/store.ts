@@ -27,12 +27,19 @@ interface AppState {
   resetMapFilters: () => void;
   setMapPosition: (center: [number, number], zoom: number) => void;
 
+  isAdmin: boolean;
+  setIsAdmin: (isAdmin: boolean) => void;
+
   isCookieBannerVisible: boolean;
   isCookiePreferencesOpen: boolean;
   showCookieBanner: () => void;
   hideCookieBanner: () => void;
   openCookiePreferences: () => void;
   closeCookiePreferences: () => void;
+
+  isWaitlistModalOpen: boolean;
+  showWaitlistModal: () => void;
+  hideWaitlistModal: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -41,6 +48,9 @@ export const useAppStore = create<AppState>((set) => ({
   setUser: (user) => set({ user }),
   openAuthModal: () => set({ isAuthModalOpen: true }),
   closeAuthModal: () => set({ isAuthModalOpen: false }),
+
+  isAdmin: false,
+  setIsAdmin: (isAdmin) => set({ isAdmin }),
 
   mapFilters: { ...defaultMapFilters },
   mapCenter: null,
@@ -57,4 +67,8 @@ export const useAppStore = create<AppState>((set) => ({
     set({ isCookieBannerVisible: false, isCookiePreferencesOpen: false }),
   openCookiePreferences: () => set({ isCookiePreferencesOpen: true }),
   closeCookiePreferences: () => set({ isCookiePreferencesOpen: false }),
+
+  isWaitlistModalOpen: false,
+  showWaitlistModal: () => set({ isWaitlistModalOpen: true }),
+  hideWaitlistModal: () => set({ isWaitlistModalOpen: false }),
 }));

@@ -10,6 +10,7 @@ import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { ToastContainer } from '@/components/ui/Toast';
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
+import { WaitlistModal } from '@/components/layout/WaitlistModal';
 import '@/styles/globals.css';
 
 const instrumentSerif = Instrument_Serif({
@@ -83,6 +84,7 @@ export default async function RootLayout({
               <AppShell>{children}</AppShell>
               <ToastContainer />
               <CookieConsentBanner />
+              <WaitlistModal />
             </AuthProvider>
           </PostHogProvider>
         </NextIntlClientProvider>
