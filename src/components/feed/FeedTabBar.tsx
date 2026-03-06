@@ -22,19 +22,6 @@ export function FeedTabBar({ activeTab, onTabChange }: FeedTabBarProps) {
       }}
     >
       <button
-        onClick={() => onTabChange('following')}
-        className="flex-1 flex items-center justify-center"
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 14,
-          fontWeight: activeTab === 'following' ? 600 : 400,
-          color: activeTab === 'following' ? 'var(--text-primary)' : 'var(--text-secondary)',
-          borderBottom: activeTab === 'following' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-        }}
-      >
-        {t('following')}
-      </button>
-      <button
         onClick={() => onTabChange('discover')}
         className="flex-1 flex items-center justify-center"
         style={{
@@ -46,6 +33,19 @@ export function FeedTabBar({ activeTab, onTabChange }: FeedTabBarProps) {
         }}
       >
         {t('discover')}
+      </button>
+      <button
+        onClick={() => onTabChange('following')}
+        className="flex-1 flex items-center justify-center"
+        style={{
+          fontFamily: 'var(--font-body)',
+          fontSize: 14,
+          fontWeight: activeTab === 'following' ? 600 : 400,
+          color: activeTab === 'following' ? 'var(--text-primary)' : 'var(--text-secondary)',
+          borderBottom: activeTab === 'following' ? '2px solid var(--accent-primary)' : '2px solid transparent',
+        }}
+      >
+        {t('following')}
       </button>
     </div>
   );
