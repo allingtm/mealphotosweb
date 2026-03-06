@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
-import { FeedContainer } from '@/components/feed/FeedContainer';
-import { FeedHeader } from '@/components/feed/FeedHeader';
 import { blurhashToDataURL } from '@/lib/blurhash-to-data-url';
+import { FeedPageClient } from '@/components/feed/FeedPageClient';
 import type { FeedItem } from '@/types/database';
 
 export default async function FeedPage() {
@@ -36,9 +35,6 @@ export default async function FeedPage() {
   }));
 
   return (
-    <>
-      <FeedHeader />
-      <FeedContainer initialMeals={mealsWithBlur} initialCursor={nextCursor} />
-    </>
+    <FeedPageClient initialMeals={mealsWithBlur} initialCursor={nextCursor} />
   );
 }

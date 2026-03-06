@@ -12,9 +12,11 @@ export interface Profile {
   streak_best: number;
   streak_last_upload: string | null; // DATE as ISO string
   timezone: string;
+  plan: 'free' | 'personal' | 'business';
+  business_type: string | null;
   is_restaurant: boolean;
   stripe_customer_id: string | null;
-  subscription_tier: 'basic' | 'premium' | null;
+  subscription_tier: 'basic' | 'premium' | 'personal' | null;
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
   is_admin: boolean;
@@ -74,6 +76,8 @@ export interface Meal {
   venue_name: string | null;
   venue_mapbox_id: string | null;
   venue_address: string | null;
+  visibility: 'public' | 'private';
+  image_count: number;
   created_at: string;
   updated_at: string;
 }
@@ -113,6 +117,7 @@ export interface Recipe {
 export interface Follow {
   follower_id: string;
   following_id: string;
+  notify_on_upload: boolean;
   created_at: string;
 }
 
@@ -190,6 +195,25 @@ export interface MealModeration {
 
 // Composite types from database functions
 
+export interface MealImage {
+  id: string;
+  meal_id: string;
+  position: number;
+  cloudflare_image_id: string;
+  photo_url: string;
+  photo_blur_hash: string | null;
+  created_at: string;
+}
+
+export interface PrivateFeedListEntry {
+  id: string;
+  owner_id: string;
+  member_id: string;
+  status: 'pending' | 'accepted' | 'declined';
+  invited_at: string;
+  accepted_at: string | null;
+}
+
 export interface FeedItem {
   id: string;
   user_id: string;
@@ -216,6 +240,46 @@ export interface FeedItem {
   venue_mapbox_id: string | null;
   venue_verified: boolean;
   user_has_requested: boolean;
+  user_is_following: boolean;
+  visibility: 'public' | 'private';
+  image_count: number;
+}
+
+export interface FollowingFeedItem {
+  id: string;
+  user_id: string;
+  title: string;
+  photo_url: string;
+  photo_blur_hash: string | null;
+  blurDataURL?: string;
+  location_city: string | null;
+  avg_rating: number;
+  rating_count: number;
+  recipe_request_count: number;
+  recipe_unlock_threshold: number;
+  recipe_unlocked: boolean;
+  created_at: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  user_has_rated: boolean;
+  user_rating: number | null;
+  comment_count: number;
+  venue_name: string | null;
+  venue_mapbox_id: string | null;
+  venue_verified: boolean;
+  user_has_requested: boolean;
+  visibility: 'public' | 'private';
+  image_count: number;
+}
+
+export interface FollowSuggestion {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  meal_count: number;
+  avg_rating: number;
 }
 
 export interface MapPin {
@@ -241,6 +305,7 @@ export interface PublicProfile {
   location_country: string | null;
   streak_current: number;
   streak_best: number;
+  plan: 'free' | 'personal' | 'business';
   is_restaurant: boolean;
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   follower_count: number;

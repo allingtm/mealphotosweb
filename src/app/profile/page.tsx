@@ -23,7 +23,7 @@ export default async function ProfilePage() {
     supabase.from('user_badges').select('*').eq('user_id', user.id).order('awarded_at', { ascending: false }),
     supabase
       .from('meals')
-      .select('id, photo_url, avg_rating, rating_count, created_at, meal_moderation!inner(status)')
+      .select('id, photo_url, avg_rating, rating_count, created_at, visibility, meal_moderation!inner(status)')
       .eq('user_id', user.id)
       .eq('meal_moderation.status', 'approved')
       .order('created_at', { ascending: false })
@@ -45,6 +45,7 @@ export default async function ProfilePage() {
     avg_rating: m.avg_rating as number,
     rating_count: m.rating_count as number,
     created_at: m.created_at as string,
+    visibility: (m.visibility as string) ?? 'public',
   }));
   const savedMeals = (savedRes.data ?? []).map((r: Record<string, unknown>) => {
     const meal = r.meal as Record<string, unknown>;

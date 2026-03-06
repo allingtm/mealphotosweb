@@ -3,11 +3,24 @@ import { stripe } from '@/lib/stripe';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
+const PERSONAL_PRICE_ID = process.env.STRIPE_PERSONAL_PRICE_ID!;
+const BASIC_PRICE_ID = process.env.STRIPE_BASIC_PRICE_ID!;
 const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID!;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-function getTier(priceId: string): 'basic' | 'premium' {
-  return priceId === PREMIUM_PRICE_ID ? 'premium' : 'basic';
+function getPlanAndTier(priceId: string): {
+  plan: 'personal' | 'business' | 'free';
+  tier: 'personal' | 'basic' | 'premium';
+  isRestaurant: boolean;
+} {
+  if (priceId === PERSONAL_PRICE_ID) {
+    return { plan: 'personal', tier: 'personal', isRestaurant: false };
+  }
+  if (priceId === PREMIUM_PRICE_ID) {
+    return { plan: 'business', tier: 'premium', isRestaurant: true };
+  }
+  // Default to business basic
+  return { plan: 'business', tier: 'basic', isRestaurant: true };
 }
 
 export async function POST(req: Request) {
@@ -38,7 +51,7 @@ export async function POST(req: Request) {
         session.subscription as string
       );
       const priceId = subscription.items.data[0].price.id;
-      const tier = getTier(priceId);
+      const { plan, tier, isRestaurant } = getPlanAndTier(priceId);
 
       // Resolve user ID from subscription metadata, fallback to customer lookup
       let uid = subscription.metadata?.supabase_uid;
@@ -57,7 +70,8 @@ export async function POST(req: Request) {
       }
 
       await supabase.from('profiles').update({
-        is_restaurant: true,
+        plan,
+        is_restaurant: isRestaurant,
         subscription_tier: tier,
         subscription_status: 'active',
         subscription_id: subscription.id,
@@ -73,9 +87,11 @@ export async function POST(req: Request) {
       if (!uid) break;
 
       const priceId = subscription.items.data[0].price.id;
-      const tier = getTier(priceId);
+      const { plan, tier, isRestaurant } = getPlanAndTier(priceId);
 
       await supabase.from('profiles').update({
+        plan,
+        is_restaurant: isRestaurant,
         subscription_tier: tier,
         subscription_status: subscription.status === 'active' ? 'active' : 'past_due',
       }).eq('id', uid);
@@ -89,6 +105,7 @@ export async function POST(req: Request) {
       if (!uid) break;
 
       await supabase.from('profiles').update({
+        plan: 'free',
         is_restaurant: false,
         subscription_tier: null,
         subscription_status: 'cancelled',
@@ -129,13 +146,13 @@ export async function POST(req: Request) {
                 body: JSON.stringify({
                   from: 'meal.photos <noreply@meal.photos>',
                   to: email,
-                  subject: 'Payment failed — your restaurant subscription is at risk',
+                  subject: 'Payment failed — your subscription is at risk',
                   html: `
                     <div style="font-family: 'DM Sans', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #121212; color: #F5F0E8;">
                       <h1 style="font-family: 'Instrument Serif', serif; color: #E8A838; font-size: 28px; margin-bottom: 16px;">Payment Failed</h1>
-                      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">We couldn't process your latest payment for your restaurant subscription. Please update your payment method to avoid losing access to your dashboard and analytics.</p>
-                      <a href="https://meal.photos/business/dashboard" style="display: inline-block; background: #E8A838; color: #121212; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 16px;">Update Payment</a>
-                      <p style="font-size: 12px; color: #888888; margin-top: 32px;">You're receiving this because you have a restaurant subscription on meal.photos.</p>
+                      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">We couldn't process your latest payment. Please update your payment method to avoid losing access to your premium features.</p>
+                      <a href="https://meal.photos/settings" style="display: inline-block; background: #E8A838; color: #121212; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 16px;">Update Payment</a>
+                      <p style="font-size: 12px; color: #888888; margin-top: 32px;">You're receiving this because you have an active subscription on meal.photos.</p>
                     </div>
                   `,
                 }),

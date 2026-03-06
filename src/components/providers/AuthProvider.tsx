@@ -9,17 +9,19 @@ import { ANALYTICS_EVENTS } from '@/lib/analytics';
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAppStore((s) => s.setUser);
   const setIsAdmin = useAppStore((s) => s.setIsAdmin);
+  const setUserPlan = useAppStore((s) => s.setUserPlan);
 
   useEffect(() => {
     const supabase = createClient();
 
-    async function fetchAdminStatus(userId: string) {
+    async function fetchProfileFlags(userId: string) {
       const { data } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, plan')
         .eq('id', userId)
         .single();
       setIsAdmin(data?.is_admin ?? false);
+      setUserPlan((data?.plan as 'free' | 'personal' | 'business') ?? 'free');
     }
 
     // Hydrate the current session on mount
@@ -27,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         posthog.identify(session.user.id);
-        fetchAdminStatus(session.user.id);
+        fetchProfileFlags(session.user.id);
       }
     });
 
@@ -39,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (event === 'SIGNED_IN' && session?.user) {
         posthog.identify(session.user.id);
-        fetchAdminStatus(session.user.id);
+        fetchProfileFlags(session.user.id);
 
         // Determine auth method from provider
         const provider = session.user.app_metadata?.provider;
@@ -56,13 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_OUT') {
         posthog.reset();
         setIsAdmin(false);
+        setUserPlan('free');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser, setIsAdmin]);
+  }, [setUser, setIsAdmin, setUserPlan]);
 
   return <>{children}</>;
 }

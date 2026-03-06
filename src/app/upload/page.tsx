@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { X, MapPin, ChevronDown, Loader2 } from 'lucide-react';
+import { X, MapPin, ChevronDown, Loader2, Globe, Lock, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Cropper from 'react-easy-crop';
 import type { Area } from 'react-easy-crop';
@@ -59,6 +59,34 @@ async function cropAndCompress(file: File, pixelCrop: Area): Promise<Blob> {
   });
 }
 
+/** Calculate a center crop at 4:5 aspect ratio for a given file */
+async function getCenterCrop(file: File): Promise<Area> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const { naturalWidth: w, naturalHeight: h } = img;
+      const targetAspect = 4 / 5;
+      const imgAspect = w / h;
+      let cropW: number, cropH: number;
+      if (imgAspect > targetAspect) {
+        cropH = h;
+        cropW = h * targetAspect;
+      } else {
+        cropW = w;
+        cropH = w / targetAspect;
+      }
+      resolve({
+        x: Math.round((w - cropW) / 2),
+        y: Math.round((h - cropH) / 2),
+        width: Math.round(cropW),
+        height: Math.round(cropH),
+      });
+    };
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 /** Reverse-geocode coordinates to city/country */
 async function reverseGeocode(lat: number, lng: number): Promise<{ city?: string; country?: string }> {
   try {
@@ -94,6 +122,9 @@ function UploadPageContent() {
   const isRestaurantUpload = searchParams.get('restaurant') === 'true';
   const requireAuth = useRequireAuth();
   const user = useAppStore((s) => s.user);
+  const userPlan = useAppStore((s) => s.userPlan);
+  const isPaidUser = userPlan !== 'free';
+  const maxImages = isPaidUser ? 4 : 1;
   const t = useTranslations('upload');
   const tCommon = useTranslations('common');
 
@@ -118,6 +149,11 @@ function UploadPageContent() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationPermissionShown, setLocationPermissionShown] = useState(false);
   const [venue, setVenue] = useState<VenueData | null>(null);
+  const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+
+  // Multi-photo state (additional images beyond the primary)
+  const [additionalFiles, setAdditionalFiles] = useState<{ file: File; previewUrl: string; croppedBlob?: Blob; croppedUrl?: string }[]>([]);
+  const additionalFileInputRef = useRef<HTMLInputElement>(null);
 
   // Errors
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -261,6 +297,7 @@ function UploadPageContent() {
         lat: venue.lat,
         lng: venue.lng,
       } : null,
+      visibility,
     };
 
     const parsed = mealUploadSchema.safeParse(formData);
@@ -301,9 +338,21 @@ function UploadPageContent() {
       if (!croppedAreaPixels) throw new Error('No crop data');
       const compressedBlob = await cropAndCompress(selectedFile, croppedAreaPixels);
 
+      // Compress additional images in parallel
+      const additionalBlobs = await Promise.all(
+        additionalFiles
+          .filter((af) => af.croppedBlob)
+          .map((af) => af.croppedBlob!)
+      );
+
       // Build upload form data
       const uploadForm = new FormData();
-      uploadForm.append('file', compressedBlob, 'meal.jpg');
+      // Primary image as file_0 (server also accepts 'file' for backward compat)
+      uploadForm.append('file_0', compressedBlob, 'meal_0.jpg');
+      // Additional images
+      additionalBlobs.forEach((blob, i) => {
+        uploadForm.append(`file_${i + 1}`, blob, `meal_${i + 1}.jpg`);
+      });
       uploadForm.append('title', parsed.data.title);
       if (parsed.data.cuisine) uploadForm.append('cuisine', parsed.data.cuisine);
       if (parsed.data.location) {
@@ -321,6 +370,7 @@ function UploadPageContent() {
           lng: venue.lng,
         }));
       }
+      uploadForm.append('visibility', visibility);
       uploadForm.append('turnstile_token', turnstileToken);
       if (isRestaurantUpload) {
         uploadForm.append('is_restaurant_upload', 'true');
@@ -347,6 +397,9 @@ function UploadPageContent() {
         has_venue: !!venue,
         tags_count: parsed.data.tags.length,
         is_restaurant: isRestaurantUpload,
+        visibility,
+        image_count: 1 + additionalBlobs.length,
+        plan: userPlan,
       });
 
       // Prompt for push notifications on first upload
@@ -561,12 +614,13 @@ function UploadPageContent() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-8">
-        {/* Photo preview (small, cropped) */}
-        <div className="flex justify-center" style={{ marginBottom: 24 }}>
+        {/* Photo strip */}
+        <div className="flex gap-2 overflow-x-auto" style={{ marginBottom: 16, paddingBottom: 4 }}>
+          {/* Primary image */}
           <div
-            className="relative overflow-hidden rounded-2xl"
+            className="relative overflow-hidden rounded-2xl flex-shrink-0"
             style={{
-              width: 160,
+              width: 100,
               aspectRatio: '4/5',
               backgroundColor: 'var(--bg-surface)',
             }}
@@ -580,6 +634,166 @@ function UploadPageContent() {
               />
             )}
           </div>
+          {/* Additional images */}
+          {additionalFiles.map((af, i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden rounded-2xl flex-shrink-0"
+              style={{
+                width: 100,
+                aspectRatio: '4/5',
+                backgroundColor: 'var(--bg-surface)',
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={af.croppedUrl || af.previewUrl}
+                alt={`Photo ${i + 2}`}
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  URL.revokeObjectURL(af.previewUrl);
+                  if (af.croppedUrl) URL.revokeObjectURL(af.croppedUrl);
+                  setAdditionalFiles((prev) => prev.filter((_, j) => j !== i));
+                }}
+                className="absolute top-1 right-1 rounded-full flex items-center justify-center"
+                style={{
+                  width: 24,
+                  height: 24,
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                }}
+              >
+                <Trash2 size={12} strokeWidth={1.5} style={{ color: 'var(--text-emphasis)' }} />
+              </button>
+            </div>
+          ))}
+          {/* Add more button (paid users, under limit) */}
+          {isPaidUser && 1 + additionalFiles.length < maxImages && (
+            <button
+              type="button"
+              onClick={() => additionalFileInputRef.current?.click()}
+              className="flex-shrink-0 rounded-2xl flex items-center justify-center"
+              style={{
+                width: 100,
+                aspectRatio: '4/5',
+                backgroundColor: 'var(--bg-surface)',
+                border: '2px dashed var(--bg-elevated)',
+              }}
+            >
+              <Plus size={24} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
+            </button>
+          )}
+          {/* Upsell for free users */}
+          {!isPaidUser && (
+            <button
+              type="button"
+              onClick={() => router.push('/pricing')}
+              className="flex-shrink-0 rounded-2xl flex flex-col items-center justify-center gap-1"
+              style={{
+                width: 100,
+                aspectRatio: '4/5',
+                backgroundColor: 'var(--bg-surface)',
+                border: '2px dashed var(--bg-elevated)',
+              }}
+            >
+              <Plus size={20} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 10,
+                  color: 'var(--text-secondary)',
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                }}
+              >
+                {t('upgradeMultiPhoto')}
+              </span>
+            </button>
+          )}
+          <input
+            ref={additionalFileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              e.target.value = '';
+              const url = URL.createObjectURL(file);
+              // Auto-crop to 4:5 center for additional images
+              try {
+                const blob = await cropAndCompress(file, await getCenterCrop(file));
+                const croppedUrl = URL.createObjectURL(blob);
+                setAdditionalFiles((prev) => [...prev, { file, previewUrl: url, croppedBlob: blob, croppedUrl }]);
+              } catch {
+                setAdditionalFiles((prev) => [...prev, { file, previewUrl: url }]);
+              }
+            }}
+          />
+        </div>
+
+        {/* Visibility toggle */}
+        <div style={{ marginBottom: 16 }}>
+          <label
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'var(--text-secondary)',
+              display: 'block',
+              marginBottom: 8,
+            }}
+          >
+            {t('visibility')}
+          </label>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setVisibility('public')}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl flex-1"
+              style={{
+                backgroundColor: visibility === 'public' ? 'var(--accent-primary)' : 'var(--bg-surface)',
+                color: visibility === 'public' ? '#121212' : 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                fontWeight: 500,
+                border: '1px solid transparent',
+              }}
+            >
+              <Globe size={16} strokeWidth={1.5} />
+              {t('public')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setVisibility('private')}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl flex-1"
+              style={{
+                backgroundColor: visibility === 'private' ? 'var(--accent-primary)' : 'var(--bg-surface)',
+                color: visibility === 'private' ? '#121212' : 'var(--text-secondary)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                fontWeight: 500,
+                border: '1px solid transparent',
+              }}
+            >
+              <Lock size={16} strokeWidth={1.5} />
+              {t('private')}
+            </button>
+          </div>
+          {visibility === 'private' && (
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 11,
+                color: 'var(--text-secondary)',
+                marginTop: 4,
+              }}
+            >
+              {t('privateHelper')}
+            </p>
+          )}
         </div>
 
         {/* Title */}

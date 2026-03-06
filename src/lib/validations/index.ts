@@ -7,5 +7,6 @@ export { leaderboardQuerySchema } from './leaderboard';
 export { notificationQuerySchema, markReadSchema, NOTIFICATION_TYPES } from './notification';
 export type { NotificationType } from './notification';
 export { subscribeSchema, revealSchema } from './restaurant';
+export { inviteSchema, respondSchema } from './private-feed-list';
 export { waitlistSchema } from './waitlist';
 export { signUpSchema, signInSchema, resetPasswordSchema, updatePasswordSchema, PASSWORD_MIN_LENGTH } from './auth';

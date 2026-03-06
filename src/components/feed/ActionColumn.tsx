@@ -16,6 +16,7 @@ interface ActionColumnProps {
   recipeUnlocked: boolean;
   commentCount: number;
   hasRequested?: boolean;
+  visibility?: string;
 }
 
 export function ActionColumn({
@@ -26,6 +27,7 @@ export function ActionColumn({
   recipeUnlocked,
   commentCount,
   hasRequested,
+  visibility,
 }: ActionColumnProps) {
   const t = useTranslations('actions');
   const user = useAppStore((s) => s.user);
@@ -33,7 +35,7 @@ export function ActionColumn({
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <ShareButton mealId={mealId} title={title} />
+      {visibility !== 'private' && <ShareButton mealId={mealId} title={title} />}
 
       <RecipeRequestButton
         mealId={mealId}

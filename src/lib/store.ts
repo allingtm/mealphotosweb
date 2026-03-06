@@ -27,6 +27,9 @@ interface AppState {
   resetMapFilters: () => void;
   setMapPosition: (center: [number, number], zoom: number) => void;
 
+  userPlan: 'free' | 'personal' | 'business';
+  setUserPlan: (plan: 'free' | 'personal' | 'business') => void;
+
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
 
@@ -51,6 +54,9 @@ export const useAppStore = create<AppState>((set) => ({
   setUser: (user) => set({ user }),
   openAuthModal: () => set({ isAuthModalOpen: true }),
   closeAuthModal: () => set({ isAuthModalOpen: false }),
+
+  userPlan: 'free',
+  setUserPlan: (plan) => set({ userPlan: plan }),
 
   isAdmin: false,
   setIsAdmin: (isAdmin) => set({ isAdmin }),

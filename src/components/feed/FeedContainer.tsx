@@ -14,6 +14,7 @@ import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import posthog from 'posthog-js';
 import { MealCard } from './MealCard';
 import { OnboardingOverlay } from './OnboardingOverlay';
+import { FollowPrompt } from './FollowPrompt';
 
 interface FeedContainerProps {
   initialMeals: FeedItem[];
@@ -34,6 +35,14 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Follow prompt state
+  const [followPrompt, setFollowPrompt] = useState<{
+    userId: string;
+    username: string;
+    score: number;
+  } | null>(null);
+  const followPromptCountRef = useRef(0);
 
   // Track the current card index for analytics
   const currentIndexRef = useRef(0);
@@ -175,6 +184,23 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
     setLoading(false);
   }, [loading, hasMore, cursor]);
 
+  const handleRated = useCallback((score: number, meal: FeedItem) => {
+    cardsRatedRef.current += 1;
+    // Show follow prompt for ratings 7+ on unfollowed users, max 3 per session
+    if (
+      score >= 7 &&
+      !meal.user_is_following &&
+      followPromptCountRef.current < 3
+    ) {
+      followPromptCountRef.current += 1;
+      setFollowPrompt({
+        userId: meal.user_id,
+        username: meal.username,
+        score,
+      });
+    }
+  }, []);
+
   const registerRef = useCallback(
     (index: number, el: HTMLDivElement | null) => {
       if (el) {
@@ -234,7 +260,17 @@ export function FeedContainer({ initialMeals, initialCursor }: FeedContainerProp
               index={index}
               isVisible={visibleIndices.has(index)}
               ratingStartTime={cardTimestamps.current.get(index) ?? null}
+              showFollowingIndicator
+              onRated={handleRated}
             />
+            {followPrompt && followPrompt.userId === meal.user_id && (
+              <FollowPrompt
+                userId={followPrompt.userId}
+                username={followPrompt.username}
+                score={followPrompt.score}
+                onDismiss={() => setFollowPrompt(null)}
+              />
+            )}
           </div>
         ))}
 

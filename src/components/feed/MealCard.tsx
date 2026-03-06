@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, UtensilsCrossed } from 'lucide-react';
+import { Lock, MapPin, UtensilsCrossed } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
 import { useAppStore } from '@/lib/store';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
@@ -16,6 +16,7 @@ import { RatingBar } from './RatingBar';
 import { ScoreBadge } from './ScoreBadge';
 import { ActionColumn } from './ActionColumn';
 import { BlurHashCanvas } from './BlurHashCanvas';
+import { ImageCarousel } from './ImageCarousel';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 interface MealCardProps {
@@ -23,13 +24,17 @@ interface MealCardProps {
   index: number;
   isVisible: boolean;
   ratingStartTime: number | null;
+  showFollowingIndicator?: boolean;
+  onRated?: (score: number, meal: FeedItem) => void;
 }
 
-export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardProps) {
+export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowingIndicator, onRated }: MealCardProps) {
   const t = useTranslations('feed');
   const user = useAppStore((s) => s.user);
   const requireAuth = useRequireAuth();
   const isOwnMeal = user?.id === meal.user_id;
+  const isPrivate = meal.visibility === 'private';
+  const isMultiPhoto = (meal.image_count ?? 1) > 1;
 
   const [avgRating, setAvgRating] = useState(meal.avg_rating);
   const [hasRated, setHasRated] = useState(meal.user_has_rated);
@@ -75,8 +80,10 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
         meal_id: meal.id,
         time_to_rate_seconds: timeToRate,
       });
+
+      onRated?.(score, meal);
     },
-    [meal.id, ratingStartTime, requireAuth]
+    [meal, ratingStartTime, requireAuth, onRated]
   );
 
   if (!isVisible) {
@@ -91,46 +98,74 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
       style={{ height: 'var(--feed-card-height)' }}
     >
       {/* Blur-hash placeholder — client canvas fallback when no server blurDataURL */}
-      {!hasBlurDataURL && meal.photo_blur_hash && !imageLoaded && (
+      {!isMultiPhoto && !hasBlurDataURL && meal.photo_blur_hash && !imageLoaded && (
         <BlurHashCanvas hash={meal.photo_blur_hash} />
       )}
 
-      {/* Meal photo — full bleed, tappable to detail */}
-      <Link
-        href={`/meal/${meal.id}`}
-        className="absolute inset-0 z-0"
-        aria-label={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
-      >
-        <Image
-          src={meal.photo_url}
-          alt={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
-          fill
-          className="object-cover"
-          sizes="100vw"
+      {/* Meal photo(s) — full bleed */}
+      {isMultiPhoto ? (
+        <ImageCarousel
+          mealId={meal.id}
+          primaryImageUrl={meal.photo_url}
+          imageCount={meal.image_count}
+          blurHash={meal.photo_blur_hash}
+          blurDataURL={meal.blurDataURL}
           priority={index === 0}
-          {...(hasBlurDataURL
-            ? { placeholder: 'blur' as const, blurDataURL: meal.blurDataURL }
-            : {})}
-          onLoad={() => setImageLoaded(true)}
-          style={{
-            opacity: hasBlurDataURL || imageLoaded ? 1 : 0,
-            transition: 'opacity 200ms',
-          }}
+          onImageLoad={() => setImageLoaded(true)}
         />
-      </Link>
+      ) : (
+        <Link
+          href={`/meal/${meal.id}`}
+          className="absolute inset-0 z-0"
+          aria-label={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
+        >
+          <Image
+            src={meal.photo_url}
+            alt={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority={index === 0}
+            {...(hasBlurDataURL
+              ? { placeholder: 'blur' as const, blurDataURL: meal.blurDataURL }
+              : {})}
+            onLoad={() => setImageLoaded(true)}
+            style={{
+              opacity: hasBlurDataURL || imageLoaded ? 1 : 0,
+              transition: 'opacity 200ms',
+            }}
+          />
+        </Link>
+      )}
 
-      {/* Top gradient — dark→transparent for title/author legibility */}
+      {/* Lock icon for private posts */}
+      {isPrivate && (
+        <div
+          className="absolute top-4 left-4 z-20 flex items-center justify-center"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 'var(--radius-full)',
+            backgroundColor: 'rgba(18, 18, 18, 0.6)',
+          }}
+          aria-label="Private post"
+        >
+          <Lock size={16} strokeWidth={1.5} color="var(--text-primary)" />
+        </div>
+      )}
+
+      {/* Top gradient — dark->transparent for title/author legibility */}
       <div
-        className="absolute inset-x-0 top-0 pointer-events-none"
+        className="absolute inset-x-0 top-0 pointer-events-none z-[5]"
         style={{
           height: '35%',
           background: 'linear-gradient(to bottom, rgba(18, 18, 18, 0.7), rgba(18, 18, 18, 0))',
         }}
       />
 
-      {/* Bottom gradient — transparent→dark for rating bar */}
+      {/* Bottom gradient — transparent->dark for rating bar */}
       <div
-        className="absolute inset-x-0 bottom-0 pointer-events-none"
+        className="absolute inset-x-0 bottom-0 pointer-events-none z-[5]"
         style={{
           height: '25%',
           background: 'var(--gradient-overlay)',
@@ -179,7 +214,29 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
               @{meal.username}
             </span>
           </Link>
-          {meal.location_city && (
+          {showFollowingIndicator && meal.user_is_following && (
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              · {t('followingLabel')}
+            </span>
+          )}
+          {isPrivate ? (
+            <span
+              className="flex items-center gap-0.5"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              · Private
+            </span>
+          ) : meal.location_city ? (
             <span
               className="flex items-center gap-0.5"
               style={{
@@ -191,7 +248,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
               <MapPin size={14} strokeWidth={1.5} />
               {meal.location_city}
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Title */}
@@ -264,6 +321,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime }: MealCardPr
           recipeUnlocked={meal.recipe_unlocked}
           commentCount={meal.comment_count}
           hasRequested={meal.user_has_requested}
+          visibility={meal.visibility}
         />
       </div>
 

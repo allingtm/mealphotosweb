@@ -64,6 +64,7 @@ export default async function PublicProfilePage({ params }: Props) {
       .select('id, photo_url, avg_rating, rating_count, created_at, meal_moderation!inner(status)')
       .eq('user_id', profile.id)
       .eq('meal_moderation.status', 'approved')
+      .eq('visibility', 'public')
       .order('created_at', { ascending: false })
       .limit(18),
     user

@@ -55,6 +55,7 @@ export const commentSchema = z.object({
 
 export const followSchema = z.object({
   following_id: z.string().uuid(),
+  notify_on_upload: z.boolean().optional().default(false),
 });
 
 export const blockSchema = z.object({

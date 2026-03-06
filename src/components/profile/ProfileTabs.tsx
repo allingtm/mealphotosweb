@@ -9,6 +9,7 @@ interface MealGridItem {
   photo_url: string;
   avg_rating: number;
   rating_count: number;
+  visibility?: string;
 }
 
 interface ProfileTabsProps {

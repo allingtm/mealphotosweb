@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import { Heart, Lock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import posthog from 'posthog-js';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
@@ -21,6 +21,7 @@ interface MealGridItem {
   avg_rating: number;
   rating_count: number;
   created_at?: string;
+  visibility?: string;
 }
 
 interface MealGridProps {
@@ -159,6 +160,20 @@ export function MealGrid({ meals: initialMeals, showHeart, authorView, fetchUrl 
                 }}
               >
                 {Number(meal.avg_rating).toFixed(1)}
+              </span>
+            )}
+            {/* Lock icon for private meals */}
+            {meal.visibility === 'private' && (
+              <span
+                className="absolute top-1 left-1 flex items-center justify-center"
+                style={{
+                  backgroundColor: 'rgba(18, 18, 18, 0.6)',
+                  borderRadius: 'var(--radius-full)',
+                  width: 24,
+                  height: 24,
+                }}
+              >
+                <Lock size={12} strokeWidth={1.5} style={{ color: 'var(--text-emphasis)' }} />
               </span>
             )}
             {/* Heart overlay for saved tab */}

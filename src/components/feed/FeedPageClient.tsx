@@ -1,0 +1,83 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { useAppStore } from '@/lib/store';
+import { ANALYTICS_EVENTS } from '@/lib/analytics';
+import posthog from 'posthog-js';
+import type { FeedItem } from '@/types/database';
+import { FeedTabBar } from './FeedTabBar';
+import { FeedContainer } from './FeedContainer';
+import { FeedHeader } from './FeedHeader';
+import { FollowingFeed } from './FollowingFeed';
+
+type FeedTab = 'following' | 'discover';
+
+interface FeedPageClientProps {
+  initialMeals: FeedItem[];
+  initialCursor: string | null;
+}
+
+export function FeedPageClient({ initialMeals, initialCursor }: FeedPageClientProps) {
+  useTranslations('feed');
+  const user = useAppStore((s) => s.user);
+
+  const [activeTab, setActiveTab] = useState<FeedTab>(() => {
+    if (typeof window === 'undefined') return 'discover';
+    if (!user) return 'discover';
+    return (localStorage.getItem('feed_tab') as FeedTab) || 'discover';
+  });
+
+  // Re-check localStorage when user signs in
+  useEffect(() => {
+    if (user) {
+      const saved = localStorage.getItem('feed_tab') as FeedTab | null;
+      if (saved === 'following' || saved === 'discover') {
+        setActiveTab(saved);
+      }
+    } else {
+      setActiveTab('discover');
+    }
+  }, [user]);
+
+  // Persist tab choice
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('feed_tab', activeTab);
+    }
+  }, [activeTab, user]);
+
+  const handleTabChange = useCallback((tab: FeedTab) => {
+    posthog.capture(ANALYTICS_EVENTS.FEED_TAB_SWITCHED, {
+      from_tab: activeTab,
+      to_tab: tab,
+    });
+    setActiveTab(tab);
+
+    if (tab === 'discover') {
+      posthog.capture(ANALYTICS_EVENTS.DISCOVER_FEED_VIEWED, {
+        meals_loaded: initialMeals.length,
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const switchToDiscover = useCallback(() => {
+    handleTabChange('discover');
+  }, [handleTabChange]);
+
+  return (
+    <>
+      <FeedHeader />
+      {user && (
+        <FeedTabBar activeTab={activeTab} onTabChange={handleTabChange} />
+      )}
+      <div style={{ display: activeTab === 'discover' ? 'contents' : 'none' }}>
+        <FeedContainer initialMeals={initialMeals} initialCursor={initialCursor} />
+      </div>
+      {user && activeTab === 'following' && (
+        <FollowingFeed onSwitchToDiscover={switchToDiscover} />
+      )}
+    </>
+  );
+}

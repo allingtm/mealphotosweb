@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { following_id } = parsed.data;
+    const { following_id, notify_on_upload } = parsed.data;
 
     if (following_id === user.id) {
       return NextResponse.json({ error: 'Cannot follow yourself' }, { status: 400 });
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('follows')
-      .insert({ follower_id: user.id, following_id })
+      .insert({ follower_id: user.id, following_id, notify_on_upload })
       .select()
       .single();
 

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, UtensilsCrossed } from 'lucide-react';
+import { Lock, MapPin, UtensilsCrossed } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { timeAgo } from '@/lib/utils/time';
@@ -14,7 +14,8 @@ import { ScoreDistribution } from '@/components/meal/ScoreDistribution';
 import { MealDetailClient } from '@/components/meal/MealDetailClient';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BackButton } from '@/components/ui/BackButton';
-import type { Recipe, Ingredient } from '@/types/database';
+import { MealDetailCarousel } from '@/components/meal/MealDetailCarousel';
+import type { Recipe, Ingredient, MealImage } from '@/types/database';
 
 // Cache the meal fetch so generateMetadata and the page share the same data
 const getMeal = cache(async (id: string) => {
@@ -159,8 +160,11 @@ export default async function MealDetailPage({
     location_city: string | null;
   };
 
+  const isPrivate = meal.visibility === 'private';
+  const isMultiPhoto = (meal.image_count ?? 1) > 1;
+
   // Parallel data fetches
-  const [recipeResult, distributionResult, userRatingResult, userRequestResult, venueClaimResult] =
+  const [recipeResult, distributionResult, userRatingResult, userRequestResult, venueClaimResult, imagesResult] =
     await Promise.all([
       supabase
         .from('recipes')
@@ -193,6 +197,13 @@ export default async function MealDetailPage({
             .limit(1)
             .maybeSingle()
         : Promise.resolve({ data: null }),
+      isMultiPhoto
+        ? supabase
+            .from('meal_images')
+            .select('id, meal_id, position, photo_url, photo_blur_hash')
+            .eq('meal_id', id)
+            .order('position', { ascending: true })
+        : Promise.resolve({ data: null }),
     ]);
 
   const recipe = recipeResult.data as Recipe | null;
@@ -214,6 +225,8 @@ export default async function MealDetailPage({
     claimData?.profiles?.subscription_status === 'active' &&
     claimData?.profiles?.is_restaurant
   );
+
+  const mealImages = (imagesResult.data ?? []) as Pick<MealImage, 'id' | 'meal_id' | 'position' | 'photo_url' | 'photo_blur_hash'>[];
 
   return (
     <>
@@ -246,8 +259,13 @@ export default async function MealDetailPage({
             backgroundColor: 'var(--bg-primary)',
           }}
         >
-          <BackButton />
-          <ShareButton mealId={meal.id} title={meal.title} />
+          <div className="flex items-center gap-2">
+            <BackButton />
+            {isPrivate && (
+              <Lock size={16} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
+            )}
+          </div>
+          {!isPrivate && <ShareButton mealId={meal.id} title={meal.title} />}
         </div>
 
         {/* Photo */}
@@ -255,17 +273,26 @@ export default async function MealDetailPage({
           className="relative"
           style={{ width: '100%', aspectRatio: '4 / 5' }}
         >
-          {meal.photo_blur_hash && (
-            <BlurHashCanvas hash={meal.photo_blur_hash} />
+          {isMultiPhoto && mealImages.length > 1 ? (
+            <MealDetailCarousel
+              images={mealImages}
+              alt={`${meal.title} by ${profile.username}`}
+            />
+          ) : (
+            <>
+              {meal.photo_blur_hash && (
+                <BlurHashCanvas hash={meal.photo_blur_hash} />
+              )}
+              <Image
+                src={meal.photo_url}
+                alt={`${meal.title} by ${profile.username}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 640px"
+                priority
+              />
+            </>
           )}
-          <Image
-            src={meal.photo_url}
-            alt={`${meal.title} by ${profile.username}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 640px"
-            priority
-          />
           {/* Score badge — bottom right of photo */}
           <div className="absolute bottom-4 right-4 z-10">
             <ScoreBadge

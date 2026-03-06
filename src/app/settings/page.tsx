@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download } from 'lucide-react';
+import { ArrowLeft, ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download, CreditCard, Users, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
@@ -12,6 +12,8 @@ export default function SettingsPage() {
   const tLegal = useTranslations('legal');
   const router = useRouter();
   const user = useAppStore((s) => s.user);
+  const userPlan = useAppStore((s) => s.userPlan);
+  const planLabel = userPlan === 'personal' ? t('personalPlan') : userPlan === 'business' ? t('businessPlan') : t('freePlan');
   const showCookieBanner = useAppStore((s) => s.showCookieBanner);
   const openCookiePreferences = useAppStore((s) => s.openCookiePreferences);
 
@@ -106,6 +108,100 @@ export default function SettingsPage() {
       {/* Account section */}
       {user ? (
         <>
+          {/* Subscription section */}
+          <section className="mb-8">
+            <h2
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: 12,
+              }}
+            >
+              {t('subscription')}
+            </h2>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ backgroundColor: 'var(--bg-surface)' }}
+            >
+              <div
+                className="flex items-center justify-between px-4 py-3"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    <CreditCard size={20} strokeWidth={1.5} />
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 15 }}>
+                    {t('currentPlan', { plan: planLabel })}
+                  </span>
+                </div>
+                {userPlan === 'free' ? (
+                  <Link
+                    href="/pricing"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--accent-primary)',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {t('upgrade')}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/api/restaurants/portal"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                      color: 'var(--text-secondary)',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    {t('manageSubscription')}
+                  </Link>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Private Feed section */}
+          <section className="mb-8">
+            <h2
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                marginBottom: 12,
+              }}
+            >
+              {t('privateFeed')}
+            </h2>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{ backgroundColor: 'var(--bg-surface)' }}
+            >
+              <SettingsLink
+                href="/settings/private-feed-list"
+                icon={<Users size={20} strokeWidth={1.5} />}
+                label={t('manageFeedList')}
+              />
+              <SettingsDivider />
+              <SettingsLink
+                href="/settings/private-feed-list/invitations"
+                icon={<Mail size={20} strokeWidth={1.5} />}
+                label={t('viewInvitations')}
+              />
+            </div>
+          </section>
+
           <section className="mb-8">
             <h2
               style={{

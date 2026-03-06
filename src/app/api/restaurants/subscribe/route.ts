@@ -4,6 +4,7 @@ import { stripe, getBaseUrl } from '@/lib/stripe';
 import { subscribeSchema } from '@/lib/validations';
 
 const PRICE_IDS: Record<string, string> = {
+  personal: process.env.STRIPE_PERSONAL_PRICE_ID!,
   basic: process.env.STRIPE_BASIC_PRICE_ID!,
   premium: process.env.STRIPE_PREMIUM_PRICE_ID!,
 };
@@ -30,8 +31,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const { tier } = parsed.data;
-    const priceId = PRICE_IDS[tier];
+    const { plan, tier } = parsed.data;
+
+    // Determine the price ID
+    const priceKey = plan === 'personal' ? 'personal' : (tier ?? 'basic');
+    const priceId = PRICE_IDS[priceKey];
 
     // 3. Check if already subscribed
     const { data: profile } = await supabase
@@ -47,7 +51,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 5. Get or create Stripe customer
+    // 4. Get or create Stripe customer
     let customerId = profile?.stripe_customer_id;
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -61,14 +65,21 @@ export async function POST(req: Request) {
         .eq('id', user.id);
     }
 
-    // 6. Create Checkout session
+    // 5. Create Checkout session
     const baseUrl = getBaseUrl();
+    const successUrl = plan === 'personal'
+      ? `${baseUrl}/settings?upgraded=personal`
+      : `${baseUrl}/business/dashboard?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = plan === 'personal'
+      ? `${baseUrl}/pricing`
+      : `${baseUrl}/business`;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${baseUrl}/business/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/business`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       subscription_data: {
         metadata: { supabase_uid: user.id },
       },
