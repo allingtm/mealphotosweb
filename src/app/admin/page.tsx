@@ -38,7 +38,7 @@ export default async function AdminPage({
     serviceClient
       .from('meal_moderation')
       .select('id, meal_id, status, moderation_labels, cloud_vision_checked, created_at, meals(title, photo_url, user_id, profiles(username, moderation_tier))')
-      .eq('status', 'manual_review')
+      .in('status', ['manual_review', 'pending'])
       .order('created_at', { ascending: true })
       .limit(50),
     serviceClient
