@@ -40,6 +40,7 @@ export const mealUploadSchema = z.object({
     lng: z.number().min(-180).max(180).optional(),
   }).nullable().optional(),
   visibility: z.enum(['public', 'private']).default('public'),
+  comments_enabled: z.boolean().default(true),
 });
 
 /** Server-side schema that adds turnstile token requirement */
@@ -71,6 +72,7 @@ export const mealUpdateSchema = z.object({
     city: z.string().max(100).optional(),
     country: z.string().max(100).optional(),
   }).nullable().optional(),
+  comments_enabled: z.boolean().optional(),
 });
 
 export const ratingSchema = z.object({

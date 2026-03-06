@@ -27,12 +27,17 @@ export type ReportReason = typeof REPORT_REASONS[number];
 export const reportSchema = z.object({
   reported_meal_id: z.string().uuid().nullable().optional(),
   reported_user_id: z.string().uuid().nullable().optional(),
+  reported_comment_id: z.string().uuid().nullable().optional(),
   reason: z.enum(REPORT_REASONS),
   detail: z.string().max(500).trim().optional(),
 }).refine(
-  data => data.reported_meal_id || data.reported_user_id,
-  'Must report either a meal or a user'
+  data => data.reported_meal_id || data.reported_user_id || data.reported_comment_id,
+  'Must report a meal, user, or comment'
 );
+
+export const COMMENT_REPORT_REASONS = [
+  'inappropriate', 'spam', 'harassment', 'other',
+] as const;
 
 export function getReportPriority(
   reason: ReportReason

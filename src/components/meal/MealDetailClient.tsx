@@ -4,12 +4,13 @@ import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import { useTranslations } from 'next-intl';
-import { Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2, MessageSquareOff, MessageSquare, BellOff, Bell } from 'lucide-react';
 import { RatingBar } from '@/components/feed/RatingBar';
 import { RecipeRequestProgress } from './RecipeRequestProgress';
 import { RecipeDisplay } from './RecipeDisplay';
 import { RecipeForm } from './RecipeForm';
 import { DeleteMealDialog } from './DeleteMealDialog';
+import { showToast } from '@/components/ui/Toast';
 import type { Recipe } from '@/types/database';
 import posthog from 'posthog-js';
 
@@ -26,6 +27,8 @@ interface MealDetailClientProps {
   avgRating: number;
   ratingCount: number;
   authorUsername: string;
+  commentsEnabled?: boolean;
+  commentsMuted?: boolean;
   onRatingChange?: (newAvg: number) => void;
 }
 
@@ -42,6 +45,8 @@ export function MealDetailClient({
   avgRating: initialAvgRating,
   ratingCount: initialRatingCount,
   authorUsername,
+  commentsEnabled: initialCommentsEnabled = true,
+  commentsMuted: initialCommentsMuted = false,
 }: MealDetailClientProps) {
   const tScore = useTranslations('score');
   const tRecipe = useTranslations('recipe');
@@ -50,6 +55,9 @@ export function MealDetailClient({
   const [ratingCount, setRatingCount] = useState(initialRatingCount);
   const [recipe, setRecipe] = useState<Recipe | null>(initialRecipe);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAuthorMenu, setShowAuthorMenu] = useState(false);
+  const [commentsEnabled, setCommentsEnabled] = useState(initialCommentsEnabled);
+  const [commentsMuted, setCommentsMuted] = useState(initialCommentsMuted);
 
   const handleRate = useCallback(
     async (score: number) => {
@@ -77,6 +85,41 @@ export function MealDetailClient({
   const handleRecipeAdded = useCallback((newRecipe: Recipe) => {
     setRecipe(newRecipe);
   }, []);
+
+  const toggleComments = useCallback(async () => {
+    const newVal = !commentsEnabled;
+    setCommentsEnabled(newVal);
+    setShowAuthorMenu(false);
+    try {
+      const res = await fetch(`/api/meals/${mealId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comments_enabled: newVal }),
+      });
+      if (!res.ok) throw new Error();
+      showToast(newVal ? 'Comments enabled' : 'Comments disabled', 'success');
+    } catch {
+      setCommentsEnabled(!newVal);
+      showToast('Failed to update', 'error');
+    }
+  }, [commentsEnabled, mealId]);
+
+  const toggleMute = useCallback(async () => {
+    const newVal = !commentsMuted;
+    setCommentsMuted(newVal);
+    setShowAuthorMenu(false);
+    try {
+      const res = await fetch(`/api/meals/${mealId}/mute`, { method: 'POST' });
+      if (!res.ok) throw new Error();
+      showToast(newVal ? 'Comment notifications muted' : 'Comment notifications unmuted', 'success');
+      posthog.capture(newVal ? ANALYTICS_EVENTS.MEAL_COMMENTS_MUTED : ANALYTICS_EVENTS.MEAL_COMMENTS_UNMUTED, {
+        meal_id: mealId,
+      });
+    } catch {
+      setCommentsMuted(!newVal);
+      showToast('Failed to update', 'error');
+    }
+  }, [commentsMuted, mealId]);
 
   return (
     <div>
@@ -135,32 +178,118 @@ export function MealDetailClient({
         </div>
       )}
 
-      {/* Delete button (own meals only) */}
+      {/* Author menu (own meals only) */}
       {isOwnMeal && (
-        <>
+        <div style={{ position: 'relative', marginTop: 24 }}>
           <button
             type="button"
-            onClick={() => setShowDeleteDialog(true)}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl transition-opacity"
+            onClick={() => setShowAuthorMenu((v) => !v)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl"
             style={{
               height: 48,
               backgroundColor: 'transparent',
               border: '1px solid var(--bg-elevated)',
-              color: 'var(--status-error)',
+              color: 'var(--text-secondary)',
               fontFamily: 'var(--font-body)',
               fontSize: 14,
               fontWeight: 500,
             }}
           >
-            <Trash2 size={18} strokeWidth={1.5} />
-            Delete meal
+            <MoreVertical size={18} strokeWidth={1.5} />
+            Manage meal
           </button>
+
+          {showAuthorMenu && (
+            <>
+              {/* Backdrop */}
+              <div
+                style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+                onClick={() => setShowAuthorMenu(false)}
+              />
+              {/* Menu */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: 0,
+                  right: 0,
+                  marginBottom: 4,
+                  backgroundColor: 'var(--bg-surface)',
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  zIndex: 50,
+                  border: '1px solid var(--bg-elevated)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={toggleComments}
+                  className="flex w-full items-center gap-3 px-4"
+                  style={{
+                    height: 48,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 14,
+                  }}
+                >
+                  {commentsEnabled ? (
+                    <MessageSquareOff size={18} strokeWidth={1.5} />
+                  ) : (
+                    <MessageSquare size={18} strokeWidth={1.5} />
+                  )}
+                  {commentsEnabled ? 'Turn off comments' : 'Turn on comments'}
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  className="flex w-full items-center gap-3 px-4"
+                  style={{
+                    height: 48,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 14,
+                  }}
+                >
+                  {commentsMuted ? (
+                    <Bell size={18} strokeWidth={1.5} />
+                  ) : (
+                    <BellOff size={18} strokeWidth={1.5} />
+                  )}
+                  {commentsMuted ? 'Unmute comment notifications' : 'Mute comment notifications'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAuthorMenu(false);
+                    setShowDeleteDialog(true);
+                  }}
+                  className="flex w-full items-center gap-3 px-4"
+                  style={{
+                    height: 48,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--status-error)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 14,
+                  }}
+                >
+                  <Trash2 size={18} strokeWidth={1.5} />
+                  Delete meal
+                </button>
+              </div>
+            </>
+          )}
+
           <DeleteMealDialog
             mealId={mealId}
             isOpen={showDeleteDialog}
             onClose={() => setShowDeleteDialog(false)}
           />
-        </>
+        </div>
       )}
     </div>
   );

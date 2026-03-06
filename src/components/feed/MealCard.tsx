@@ -320,6 +320,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowin
           recipeUnlockThreshold={meal.recipe_unlock_threshold}
           recipeUnlocked={meal.recipe_unlocked}
           commentCount={meal.comment_count}
+          commentsEnabled={meal.comments_enabled ?? true}
           hasRequested={meal.user_has_requested}
           visibility={meal.visibility}
         />

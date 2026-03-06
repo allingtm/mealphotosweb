@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { reported_meal_id, reported_user_id, reason, detail } = parsed.data;
+    const { reported_meal_id, reported_user_id, reported_comment_id, reason, detail } = parsed.data;
 
     if (reported_user_id && reported_user_id === user.id) {
       return NextResponse.json({ error: 'Cannot report yourself' }, { status: 400 });
@@ -56,12 +56,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Check comment ownership for self-report prevention
+    if (reported_comment_id) {
+      const svc = createServiceRoleClient();
+      const { data: comment } = await svc
+        .from('comments')
+        .select('user_id')
+        .eq('id', reported_comment_id)
+        .single();
+      if (comment?.user_id === user.id) {
+        return NextResponse.json({ error: 'Cannot report your own comment' }, { status: 400 });
+      }
+    }
+
     const priority = getReportPriority(reason);
 
     const { error } = await supabase.from('reports').insert({
       reporter_id: user.id,
       reported_meal_id: reported_meal_id ?? null,
       reported_user_id: reported_user_id ?? null,
+      reported_comment_id: reported_comment_id ?? null,
       reason,
       detail: detail ?? null,
       priority,
@@ -134,6 +148,41 @@ export async function POST(request: NextRequest) {
           .from('meal_moderation')
           .update({ status: 'manual_review' })
           .eq('meal_id', reported_meal_id);
+      }
+    }
+
+    // Auto-hide comment at 3 distinct reporters
+    if (reported_comment_id) {
+      const serviceClient = createServiceRoleClient();
+      const { count: commentReportCount } = await serviceClient
+        .from('reports')
+        .select('reporter_id', { count: 'exact', head: true })
+        .eq('reported_comment_id', reported_comment_id)
+        .eq('status', 'pending');
+
+      if ((commentReportCount ?? 0) >= 3) {
+        // Hide the comment
+        await serviceClient
+          .from('comments')
+          .update({ visible: false })
+          .eq('id', reported_comment_id);
+
+        // Notify the commenter
+        const { data: hiddenComment } = await serviceClient
+          .from('comments')
+          .select('user_id, meal_id, meals!inner(title)')
+          .eq('id', reported_comment_id)
+          .single();
+
+        if (hiddenComment) {
+          const mealData = hiddenComment.meals as unknown as { title: string };
+          await serviceClient.from('notifications').insert({
+            user_id: hiddenComment.user_id,
+            type: 'comment_hidden',
+            title: `Your comment on ${mealData.title} was hidden for review`,
+            data: { meal_id: hiddenComment.meal_id, comment_id: reported_comment_id },
+          });
+        }
       }
     }
 

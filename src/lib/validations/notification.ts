@@ -17,6 +17,9 @@ export const NOTIFICATION_TYPES = [
   'streak_reminder',
   'streak_milestone',
   'new_follower',
+  'new_comment',
+  'comment_thread',
+  'comment_hidden',
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

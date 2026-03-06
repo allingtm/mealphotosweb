@@ -122,6 +122,9 @@ export interface Meal {
   venue_address: string | null;
   visibility: 'public' | 'private';
   image_count: number;
+  comment_count: number;
+  comments_enabled: boolean;
+  comments_muted: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -188,6 +191,7 @@ export interface Report {
   reporter_id: string;
   reported_meal_id: string | null;
   reported_user_id: string | null;
+  reported_comment_id: string | null;
   reason:
     | 'not_food' | 'inappropriate' | 'spam' | 'harassment' | 'other'
     | 'stolen_photo' | 'wrong_venue' | 'food_safety' | 'privacy' | 'copyright';
@@ -223,7 +227,24 @@ export interface Comment {
   meal_id: string;
   user_id: string;
   text: string;
+  visible: boolean;
   created_at: string;
+}
+
+export interface CommentWithProfile {
+  id: string;
+  meal_id: string;
+  user_id: string;
+  text: string;
+  visible: boolean;
+  created_at: string;
+  is_author: boolean;
+  is_optimistic?: boolean;
+  profiles: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 export interface MealModeration {
@@ -285,6 +306,7 @@ export interface FeedItem {
   venue_verified: boolean;
   user_has_requested: boolean;
   user_is_following: boolean;
+  comments_enabled: boolean;
   visibility: 'public' | 'private';
   image_count: number;
 }
@@ -313,6 +335,7 @@ export interface FollowingFeedItem {
   venue_mapbox_id: string | null;
   venue_verified: boolean;
   user_has_requested: boolean;
+  comments_enabled: boolean;
   visibility: 'public' | 'private';
   image_count: number;
 }

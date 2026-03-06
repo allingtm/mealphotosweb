@@ -150,6 +150,7 @@ function UploadPageContent() {
   const [locationPermissionShown, setLocationPermissionShown] = useState(false);
   const [venue, setVenue] = useState<VenueData | null>(null);
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
 
   // Multi-photo state (additional images beyond the primary)
   const [additionalFiles, setAdditionalFiles] = useState<{ file: File; previewUrl: string; croppedBlob?: Blob; croppedUrl?: string }[]>([]);
@@ -298,6 +299,7 @@ function UploadPageContent() {
         lng: venue.lng,
       } : null,
       visibility,
+      comments_enabled: commentsEnabled,
     };
 
     const parsed = mealUploadSchema.safeParse(formData);
@@ -371,6 +373,7 @@ function UploadPageContent() {
         }));
       }
       uploadForm.append('visibility', visibility);
+      uploadForm.append('comments_enabled', commentsEnabled ? 'true' : 'false');
       uploadForm.append('turnstile_token', turnstileToken);
       if (isRestaurantUpload) {
         uploadForm.append('is_restaurant_upload', 'true');
@@ -794,6 +797,55 @@ function UploadPageContent() {
               {t('privateHelper')}
             </p>
           )}
+        </div>
+
+        {/* Allow comments toggle */}
+        <div style={{ marginBottom: 16 }}>
+          <button
+            type="button"
+            onClick={() => setCommentsEnabled((v) => !v)}
+            className="flex items-center justify-between w-full"
+            style={{
+              padding: '10px 0',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              Allow comments
+            </span>
+            <div
+              style={{
+                width: 44,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: commentsEnabled ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                position: 'relative',
+                transition: 'background-color 0.2s',
+              }}
+            >
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: '#fff',
+                  position: 'absolute',
+                  top: 2,
+                  left: commentsEnabled ? 22 : 2,
+                  transition: 'left 0.2s',
+                }}
+              />
+            </div>
+          </button>
         </div>
 
         {/* Title */}

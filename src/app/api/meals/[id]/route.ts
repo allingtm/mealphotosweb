@@ -77,6 +77,10 @@ export async function PATCH(
       update.tags = validatedBody.data.tags;
     }
 
+    if (validatedBody.data.comments_enabled !== undefined) {
+      update.comments_enabled = validatedBody.data.comments_enabled;
+    }
+
     if (validatedBody.data.venue !== undefined) {
       if (validatedBody.data.venue === null) {
         update.venue_name = null;

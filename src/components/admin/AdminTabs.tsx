@@ -30,6 +30,12 @@ interface ReportItem {
   created_at: string;
   reported_meal_id: string | null;
   reported_user_id: string | null;
+  reported_comment_id: string | null;
+  comments: {
+    text: string;
+    user_id: string;
+    profiles: { username: string } | null;
+  } | null;
 }
 
 interface DisputeItem {
@@ -326,6 +332,23 @@ export function AdminTabs({
                     {REASON_LABELS[item.reason] ?? item.reason}
                   </span>
                 </div>
+                {item.reported_comment_id && item.comments && (
+                  <div
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      backgroundColor: 'var(--bg-elevated)',
+                      marginBottom: 8,
+                    }}
+                  >
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 2 }}>
+                      @{item.comments.profiles?.username ?? 'unknown'}:
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-primary)' }}>
+                      {item.comments.text}
+                    </p>
+                  </div>
+                )}
                 {item.detail && (
                   <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8 }}>
                     {item.detail}
@@ -334,7 +357,7 @@ export function AdminTabs({
                 <div className="flex items-center justify-between">
                   <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
                     {new Date(item.created_at).toLocaleDateString()}
-                    {item.reported_meal_id ? ' · Meal report' : ' · User report'}
+                    {item.reported_comment_id ? ' · Comment report' : item.reported_meal_id ? ' · Meal report' : ' · User report'}
                   </span>
                   <div className="flex gap-2">
                     <ActionButton

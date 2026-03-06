@@ -15,6 +15,7 @@ import { MealDetailClient } from '@/components/meal/MealDetailClient';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BackButton } from '@/components/ui/BackButton';
 import { MealDetailCarousel } from '@/components/meal/MealDetailCarousel';
+import { CommentsSection } from '@/components/comments/CommentsSection';
 import type { Recipe, Ingredient, MealImage } from '@/types/database';
 
 // Cache the meal fetch so generateMetadata and the page share the same data
@@ -138,10 +139,13 @@ function RecipeJsonLd({
 
 export default async function MealDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ comments?: string }>;
 }) {
   const { id } = await params;
+  const { comments: scrollToCommentsParam } = await searchParams;
   const supabase = await createClient();
 
   // Get current user (non-blocking — works for anon too)
@@ -164,7 +168,7 @@ export default async function MealDetailPage({
   const isMultiPhoto = (meal.image_count ?? 1) > 1;
 
   // Parallel data fetches
-  const [recipeResult, distributionResult, userRatingResult, userRequestResult, venueClaimResult, imagesResult] =
+  const [recipeResult, distributionResult, userRatingResult, userRequestResult, venueClaimResult, imagesResult, profileResult] =
     await Promise.all([
       supabase
         .from('recipes')
@@ -204,6 +208,13 @@ export default async function MealDetailPage({
             .eq('meal_id', id)
             .order('position', { ascending: true })
         : Promise.resolve({ data: null }),
+      user
+        ? supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+        : Promise.resolve({ data: null }),
     ]);
 
   const recipe = recipeResult.data as Recipe | null;
@@ -226,6 +237,7 @@ export default async function MealDetailPage({
     claimData?.profiles?.is_restaurant
   );
 
+  const isAdmin = !!(profileResult.data as { is_admin?: boolean } | null)?.is_admin;
   const mealImages = (imagesResult.data ?? []) as Pick<MealImage, 'id' | 'meal_id' | 'position' | 'photo_url' | 'photo_blur_hash'>[];
 
   return (
@@ -303,7 +315,7 @@ export default async function MealDetailPage({
         </div>
 
         {/* Content */}
-        <div style={{ padding: '16px 16px 32px' }}>
+        <div style={{ padding: '16px 16px 80px' }}>
           {/* Title */}
           <h1
             style={{
@@ -424,12 +436,25 @@ export default async function MealDetailPage({
             avgRating={Number(meal.avg_rating)}
             ratingCount={meal.rating_count}
             authorUsername={profile.username}
+            commentsEnabled={meal.comments_enabled ?? true}
+            commentsMuted={meal.comments_muted ?? false}
           />
 
           {/* Score distribution */}
           <ScoreDistribution
             distribution={distribution}
             totalRatings={meal.rating_count}
+          />
+
+          {/* Comments */}
+          <CommentsSection
+            mealId={meal.id}
+            mealAuthorId={meal.user_id}
+            commentsEnabled={meal.comments_enabled ?? true}
+            commentCount={meal.comment_count ?? 0}
+            scrollToComments={scrollToCommentsParam === '1'}
+            isOwnMeal={isOwnMeal}
+            isAdmin={isAdmin}
           />
         </div>
       </div>

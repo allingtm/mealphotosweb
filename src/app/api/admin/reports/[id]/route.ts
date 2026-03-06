@@ -52,12 +52,27 @@ export async function PATCH(
       // Fetch the report to find the reported user
       const { data: report } = await serviceClient
         .from('reports')
-        .select('reported_user_id, reported_meal_id')
+        .select('reported_user_id, reported_meal_id, reported_comment_id')
         .eq('id', id)
         .single();
 
       if (report) {
         let userId = report.reported_user_id;
+
+        // If comment report, hide the comment and look up the commenter
+        if (report.reported_comment_id) {
+          await serviceClient
+            .from('comments')
+            .update({ visible: false })
+            .eq('id', report.reported_comment_id);
+
+          const { data: comment } = await serviceClient
+            .from('comments')
+            .select('user_id')
+            .eq('id', report.reported_comment_id)
+            .single();
+          userId = comment?.user_id ?? null;
+        }
 
         // If no direct user, look up via meal
         if (!userId && report.reported_meal_id) {

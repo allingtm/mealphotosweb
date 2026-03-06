@@ -53,4 +53,13 @@ export const ANALYTICS_EVENTS = {
   DISCOVER_SEARCH: 'discover_search',
   DISCOVER_BUSINESS_TAPPED: 'discover_business_tapped',
   MAP_FILTER_CHANGED: 'map_filter_changed',
+
+  // Comments
+  COMMENT_POSTED: 'comment_posted',
+  COMMENT_DELETED: 'comment_deleted',
+  COMMENT_REPORTED: 'comment_reported',
+  COMMENT_ICON_TAPPED: 'comment_icon_tapped',
+  COMMENTS_LOADED: 'comments_loaded',
+  MEAL_COMMENTS_MUTED: 'meal_muted',
+  MEAL_COMMENTS_UNMUTED: 'meal_unmuted',
 } as const;

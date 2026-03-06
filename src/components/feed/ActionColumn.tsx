@@ -1,12 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
-import { showToast } from '@/components/ui/Toast';
+import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import { ShareButton } from './ShareButton';
 import { RecipeRequestButton } from './RecipeRequestButton';
 import { ReportButton } from './ReportButton';
+import posthog from 'posthog-js';
 
 interface ActionColumnProps {
   mealId: string;
@@ -15,6 +17,7 @@ interface ActionColumnProps {
   recipeUnlockThreshold: number;
   recipeUnlocked: boolean;
   commentCount: number;
+  commentsEnabled?: boolean;
   hasRequested?: boolean;
   visibility?: string;
 }
@@ -26,12 +29,30 @@ export function ActionColumn({
   recipeUnlockThreshold,
   recipeUnlocked,
   commentCount,
+  commentsEnabled = true,
   hasRequested,
   visibility,
 }: ActionColumnProps) {
   const t = useTranslations('actions');
   const user = useAppStore((s) => s.user);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
+  const router = useRouter();
+
+  const disabled = !commentsEnabled;
+
+  const handleCommentTap = () => {
+    if (!user) {
+      openAuthModal();
+      return;
+    }
+
+    posthog.capture(ANALYTICS_EVENTS.COMMENT_ICON_TAPPED, {
+      meal_id: mealId,
+      source: 'feed_card',
+    });
+
+    router.push(`/meal/${mealId}?comments=1`);
+  };
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -48,7 +69,8 @@ export function ActionColumn({
       <button
         className="flex flex-col items-center gap-0.5"
         aria-label={t('viewComments', { count: commentCount })}
-        onClick={() => user ? showToast('Comments coming soon.', 'info') : openAuthModal()}
+        onClick={handleCommentTap}
+        disabled={disabled}
       >
         <div
           className="flex items-center justify-center"
@@ -62,19 +84,21 @@ export function ActionColumn({
           <MessageCircle
             size={24}
             strokeWidth={1.5}
-            color="var(--text-primary)"
+            color={disabled ? 'var(--text-secondary)' : 'var(--text-primary)'}
           />
         </div>
-        <span
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 12,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-          }}
-        >
-          {commentCount}
-        </span>
+        {!disabled && commentCount > 0 && (
+          <span
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+            }}
+          >
+            {commentCount}
+          </span>
+        )}
       </button>
 
       <ReportButton mealId={mealId} />

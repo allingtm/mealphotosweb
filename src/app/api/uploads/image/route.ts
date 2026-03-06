@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
     const turnstileToken = formData.get('turnstile_token') as string;
     const isRestaurantUpload = formData.get('is_restaurant_upload') === 'true';
     const visibility = (formData.get('visibility') as string) || 'public';
+    const commentsEnabled = formData.get('comments_enabled') !== 'false';
 
     // Collect files (support both single 'file' and indexed 'file_0', 'file_1', etc.)
     const files: File[] = [];
@@ -293,6 +294,7 @@ export async function POST(req: NextRequest) {
         venue_mapbox_id: parsed.data.venue?.mapbox_id ?? null,
         venue_address: parsed.data.venue?.address ?? null,
         visibility: parsed.data.visibility,
+        comments_enabled: commentsEnabled,
         image_count: files.length,
         ...(isRestaurantUpload && {
           is_restaurant_meal: true,

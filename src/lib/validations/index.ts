@@ -1,6 +1,6 @@
-export { mealUploadSchema, mealUploadServerSchema, ratingSchema, recipeRequestSchema, CUISINE_OPTIONS, CUISINE_LABELS } from './meal';
+export { mealUploadSchema, mealUploadServerSchema, mealUpdateSchema, ratingSchema, recipeRequestSchema, CUISINE_OPTIONS, CUISINE_LABELS } from './meal';
 export { ingredientSchema, recipeSchema } from './recipe';
-export { profileUpdateSchema, reportSchema, commentSchema, disputeSchema, followSchema, blockSchema, getReportPriority } from './profile';
+export { profileUpdateSchema, reportSchema, commentSchema, disputeSchema, followSchema, blockSchema, getReportPriority, COMMENT_REPORT_REASONS } from './profile';
 export type { ReportReason } from './profile';
 export { mapPinsQuerySchema } from './map';
 export { leaderboardQuerySchema } from './leaderboard';

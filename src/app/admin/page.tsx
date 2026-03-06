@@ -43,7 +43,7 @@ export default async function AdminPage({
       .limit(50),
     serviceClient
       .from('reports')
-      .select('id, reason, priority, detail, status, created_at, reported_meal_id, reported_user_id')
+      .select('id, reason, priority, detail, status, created_at, reported_meal_id, reported_user_id, reported_comment_id, comments(text, user_id, profiles(username))')
       .eq('status', 'pending')
       .order('priority', { ascending: true })
       .order('created_at', { ascending: true })
@@ -83,6 +83,12 @@ export default async function AdminPage({
     created_at: string;
     reported_meal_id: string | null;
     reported_user_id: string | null;
+    reported_comment_id: string | null;
+    comments: {
+      text: string;
+      user_id: string;
+      profiles: { username: string } | null;
+    } | null;
   }>;
 
   // Enrich disputes with restaurant username and dispute stats
