@@ -44,4 +44,13 @@ export const ANALYTICS_EVENTS = {
   PRIVATE_MEAL_RATED: 'private_meal_rated',
   MULTI_PHOTO_UPSELL_SHOWN: 'multi_photo_upsell_shown',
   MULTI_PHOTO_UPSELL_TAPPED: 'multi_photo_upsell_tapped',
+
+  // Business types & discovery
+  BUSINESS_ONBOARDING_STARTED: 'business_onboarding_started',
+  BUSINESS_ONBOARDING_COMPLETED: 'business_onboarding_completed',
+  BUSINESS_PROFILE_VIEWED: 'business_profile_viewed',
+  BUSINESS_POST_CREATED: 'business_post_created',
+  DISCOVER_SEARCH: 'discover_search',
+  DISCOVER_BUSINESS_TAPPED: 'discover_business_tapped',
+  MAP_FILTER_CHANGED: 'map_filter_changed',
 } as const;

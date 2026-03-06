@@ -1,5 +1,49 @@
 // TypeScript interfaces matching Supabase tables
 
+// =============================================
+// Business type constants
+// =============================================
+
+export const BUSINESS_TYPES = [
+  'restaurant', 'takeaway', 'cafe', 'pub', 'bakery',
+  'food_truck', 'catering', 'meal_prep_service', 'cooking_school',
+  'nutritionist', 'personal_trainer', 'dietitian',
+  'other',
+] as const;
+
+export type BusinessType = (typeof BUSINESS_TYPES)[number];
+
+export const FOOD_DRINK_TYPES: BusinessType[] = [
+  'restaurant', 'takeaway', 'cafe', 'pub', 'bakery',
+  'food_truck', 'catering', 'meal_prep_service', 'cooking_school',
+];
+
+export const HEALTH_NUTRITION_TYPES: BusinessType[] = [
+  'nutritionist', 'personal_trainer', 'dietitian',
+];
+
+export function getBusinessTypeGroup(type: BusinessType): 'food_drink' | 'health_nutrition' | 'other' {
+  if (FOOD_DRINK_TYPES.includes(type)) return 'food_drink';
+  if (HEALTH_NUTRITION_TYPES.includes(type)) return 'health_nutrition';
+  return 'other';
+}
+
+export const BUSINESS_TYPE_LABELS: Record<BusinessType, string> = {
+  restaurant: 'Restaurant',
+  takeaway: 'Takeaway',
+  cafe: 'Cafe',
+  pub: 'Pub / Gastropub',
+  bakery: 'Bakery',
+  food_truck: 'Food Truck / Market Stall',
+  catering: 'Catering',
+  meal_prep_service: 'Meal Prep Service',
+  cooking_school: 'Cooking School',
+  nutritionist: 'Nutritionist',
+  personal_trainer: 'Personal Trainer',
+  dietitian: 'Dietitian',
+  other: 'Other',
+};
+
 export interface Profile {
   id: string;
   username: string;
@@ -282,6 +326,57 @@ export interface FollowSuggestion {
   avg_rating: number;
 }
 
+export interface BusinessProfile {
+  id: string;
+  business_type: BusinessType;
+  business_name: string;
+  phone: string | null;
+  email: string | null;
+  website_url: string | null;
+  booking_url: string | null;
+  address_line_1: string | null;
+  address_line_2: string | null;
+  address_city: string | null;
+  address_postcode: string | null;
+  address_country: string | null;
+  location: unknown | null;
+  opening_hours: Record<string, { open: string; close: string }> | null;
+  cuisine_types: string[] | null;
+  delivery_available: boolean;
+  menu_url: string | null;
+  qualifications: string[] | null;
+  specialisms: string[] | null;
+  accepts_clients: boolean;
+  consultation_type: string[] | null;
+  service_area: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BusinessPost {
+  id: string;
+  user_id: string;
+  title: string | null;
+  body: string | null;
+  image_url: string | null;
+  cloudflare_image_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BusinessSearchResult {
+  profile_id: string;
+  username: string;
+  business_name: string;
+  business_type: BusinessType;
+  avatar_url: string | null;
+  address_city: string | null;
+  avg_rating: number | null;
+  meal_count: number;
+  accepts_clients: boolean;
+  distance_km: number | null;
+}
+
 export interface MapPin {
   id: string;
   title: string;
@@ -292,6 +387,19 @@ export interface MapPin {
   lng: number;
   lat: number;
   is_restaurant: boolean;
+  username: string;
+}
+
+export interface MapBusinessPin {
+  id: string;
+  business_name: string;
+  business_type: BusinessType;
+  avatar_url: string | null;
+  avg_rating: number | null;
+  accepts_clients: boolean;
+  address_city: string | null;
+  lng: number;
+  lat: number;
   username: string;
 }
 

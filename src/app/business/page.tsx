@@ -1,10 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Check, ChefHat, Crown, Loader2 } from 'lucide-react';
-import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
-import { ANALYTICS_EVENTS } from '@/lib/analytics';
-import posthog from 'posthog-js';
+import { Check, ChefHat, Crown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface PricingTier {
   name: string;
@@ -21,10 +18,11 @@ const tiers: PricingTier[] = [
     price: '29',
     popular: false,
     features: [
-      'Restaurant profile',
+      'Business profile & verified badge',
       'Map pin for your location',
-      '10 anonymous dish uploads',
+      '10 dish uploads per month',
       'Basic rating stats',
+      'Content posts on your profile',
     ],
   },
   {
@@ -38,42 +36,13 @@ const tiers: PricingTier[] = [
       'Analytics dashboard',
       'Priority map placement',
       '"Top Rated" badges',
+      'Content posts on your profile',
     ],
   },
 ];
 
 export default function BusinessPage() {
-  const requireAuth = useRequireAuth();
-  const [loadingTier, setLoadingTier] = useState<string | null>(null);
-
-  const handleSubscribe = async (tierData: PricingTier) => {
-    try {
-      await requireAuth();
-      setLoadingTier(tierData.name);
-
-      const res = await fetch('/api/restaurants/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: tierData.tier }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.error || 'Something went wrong');
-        setLoadingTier(null);
-        return;
-      }
-
-      posthog.capture(ANALYTICS_EVENTS.RESTAURANT_SUBSCRIBED, {
-        tier: tierData.tier,
-      });
-
-      window.location.href = data.url;
-    } catch {
-      setLoadingTier(null);
-    }
-  };
+  const router = useRouter();
 
   return (
     <div
@@ -102,7 +71,7 @@ export default function BusinessPage() {
             marginBottom: 16,
           }}
         >
-          Restaurant Testing
+          Business Plan
         </h1>
         <p
           style={{
@@ -112,8 +81,8 @@ export default function BusinessPage() {
             lineHeight: 1.6,
           }}
         >
-          Test your dishes anonymously against real public opinion. See honest ratings
-          before revealing your restaurant identity.
+          Whether you run a restaurant, cafe, or nutrition practice — get a verified profile,
+          appear on the map, and connect with your community.
         </p>
       </div>
 
@@ -213,32 +182,21 @@ export default function BusinessPage() {
             </ul>
 
             <button
-              onClick={() => handleSubscribe(tier)}
-              disabled={loadingTier !== null}
+              type="button"
+              onClick={() => router.push('/business/onboard')}
               className="w-full py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
               style={{
-                backgroundColor:
-                  loadingTier !== null
-                    ? 'var(--bg-elevated)'
-                    : tier.popular
-                      ? 'var(--accent-primary)'
-                      : 'var(--bg-elevated)',
-                color:
-                  loadingTier !== null
-                    ? 'var(--text-secondary)'
-                    : tier.popular
-                      ? '#121212'
-                      : 'var(--text-primary)',
+                backgroundColor: tier.popular
+                  ? 'var(--accent-primary)'
+                  : 'var(--bg-elevated)',
+                color: tier.popular ? '#121212' : 'var(--text-primary)',
                 fontFamily: 'var(--font-body)',
                 fontSize: 16,
                 fontWeight: 600,
                 border: tier.popular ? 'none' : '1px solid var(--text-secondary)',
               }}
             >
-              {loadingTier === tier.name && (
-                <Loader2 size={18} strokeWidth={1.5} className="animate-spin" />
-              )}
-              {loadingTier === tier.name ? 'Redirecting...' : 'Get Started'}
+              Get Started
             </button>
           </div>
         ))}
@@ -258,10 +216,10 @@ export default function BusinessPage() {
         </h2>
         <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
           {[
-            { step: '1', title: 'Subscribe', desc: 'Choose a plan and sign up' },
-            { step: '2', title: 'Upload Anonymously', desc: 'Your dishes appear without branding' },
-            { step: '3', title: 'Get Honest Ratings', desc: 'See how the public really rates your food' },
-            { step: '4', title: 'Reveal', desc: 'Show your restaurant identity when ready' },
+            { step: '1', title: 'Choose your type', desc: 'Restaurant, nutritionist, PT, or more' },
+            { step: '2', title: 'Set up profile', desc: 'Add your details and go live on the map' },
+            { step: '3', title: 'Share & engage', desc: 'Upload dishes and post updates' },
+            { step: '4', title: 'Get discovered', desc: 'Appear in search and on the map' },
           ].map((item) => (
             <div key={item.step} className="flex flex-col items-center">
               <div

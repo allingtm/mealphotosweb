@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Eye, EyeOff, CreditCard, Loader2, TrendingUp, Star, Trophy } from 'lucide-react';
+import { Plus, Eye, EyeOff, CreditCard, Loader2, TrendingUp, Star, Trophy, FileText, Settings } from 'lucide-react';
 import { DishCard } from './DishCard';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
+import { BUSINESS_TYPE_LABELS, type BusinessType } from '@/types/database';
 import posthog from 'posthog-js';
 
 interface MealData {
@@ -22,6 +23,8 @@ interface ProfileData {
   subscription_tier: 'basic' | 'premium' | null;
   subscription_status: string;
   is_restaurant: boolean;
+  business_type: BusinessType | null;
+  business_name: string | null;
 }
 
 interface DashboardClientProps {
@@ -94,7 +97,10 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
   };
 
   const tierLabel = profile.subscription_tier === 'premium' ? 'Premium' : 'Basic';
-  const restaurantName = profile.display_name || profile.username;
+  const restaurantName = profile.business_name || profile.display_name || profile.username;
+  const businessTypeLabel = profile.business_type
+    ? BUSINESS_TYPE_LABELS[profile.business_type]
+    : null;
 
   return (
     <div className="px-4 pb-24" style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -116,7 +122,7 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
               fontWeight: 500,
             }}
           >
-            Welcome to your restaurant dashboard!
+            Welcome to your business dashboard!
           </p>
           <button
             type="button"
@@ -164,6 +170,57 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
           >
             {tierLabel} Plan
           </span>
+          {businessTypeLabel && (
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 13,
+                color: 'var(--text-secondary)',
+              }}
+            >
+              {businessTypeLabel}
+            </span>
+          )}
+        </div>
+
+        {/* Quick actions */}
+        <div className="flex gap-2" style={{ marginTop: 16 }}>
+          <button
+            type="button"
+            onClick={() => router.push(`/profile/${profile.username}`)}
+            className="flex items-center gap-1.5 rounded-full"
+            style={{
+              padding: '8px 14px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--bg-elevated)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              fontWeight: 500,
+              color: 'var(--text-primary)',
+            }}
+          >
+            <Settings size={14} strokeWidth={1.5} />
+            Manage Profile
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              posthog.capture(ANALYTICS_EVENTS.BUSINESS_POST_CREATED, { action: 'open_form' });
+              router.push(`/profile/${profile.username}?tab=updates`);
+            }}
+            className="flex items-center gap-1.5 rounded-full"
+            style={{
+              padding: '8px 14px',
+              backgroundColor: 'var(--accent-primary)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#121212',
+            }}
+          >
+            <FileText size={14} strokeWidth={1.5} />
+            Create Post
+          </button>
         </div>
       </div>
 

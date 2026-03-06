@@ -6,7 +6,11 @@ import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 import { MenuButton } from '@/components/layout/MenuButton';
 
-export function AppBar() {
+interface AppBarProps {
+  rightAction?: React.ReactNode;
+}
+
+export function AppBar({ rightAction }: AppBarProps) {
   const t = useTranslations('feed');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -32,6 +36,7 @@ export function AppBar() {
           {t('title')}
         </span>
         <div className="flex items-center gap-1">
+          {rightAction}
           <NotificationBell onClick={() => setIsPanelOpen(true)} />
           <MenuButton />
         </div>

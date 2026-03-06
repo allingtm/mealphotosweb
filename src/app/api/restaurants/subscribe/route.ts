@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { plan, tier } = parsed.data;
+    const { plan, tier, business_type } = parsed.data;
 
     // Determine the price ID
     const priceKey = plan === 'personal' ? 'personal' : (tier ?? 'basic');
@@ -80,6 +80,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      metadata: business_type ? { business_type } : undefined,
       subscription_data: {
         metadata: { supabase_uid: user.id },
       },

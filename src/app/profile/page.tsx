@@ -4,7 +4,7 @@ import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { StatsRow } from '@/components/profile/StatsRow';
 import { BadgeRow } from '@/components/profile/BadgeRow';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
-import type { Profile, UserBadge, ProfileStats } from '@/types/database';
+import type { Profile, UserBadge, ProfileStats, BusinessProfile } from '@/types/database';
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -37,6 +37,18 @@ export default async function ProfilePage() {
   ]);
 
   const p = profileRes.data as Profile;
+
+  // Fetch business profile if applicable
+  let businessProfile: BusinessProfile | null = null;
+  if (p.plan === 'business') {
+    const { data: bp } = await supabase
+      .from('business_profiles')
+      .select('*')
+      .eq('id', p.id)
+      .single();
+    businessProfile = bp as BusinessProfile | null;
+  }
+
   const stats = (statsRes.data as ProfileStats) ?? { meal_count: 0, avg_rating: 0, ratings_given_count: 0 };
   const badges = (badgesRes.data ?? []) as UserBadge[];
   const meals = (mealsRes.data ?? []).map((m: Record<string, unknown>) => ({
@@ -79,12 +91,14 @@ export default async function ProfilePage() {
           location_city: p.location_city,
           location_country: p.location_country,
           is_restaurant: p.is_restaurant,
+          plan: p.plan,
           subscription_status: p.subscription_status,
           show_location: p.show_location,
           show_streak: p.show_streak,
           follower_count: p.follower_count,
           following_count: p.following_count,
         }}
+        businessProfile={businessProfile}
         isOwnProfile
       />
       <div style={{ padding: '0 16px' }}>
@@ -105,6 +119,7 @@ export default async function ProfilePage() {
         authorView
         isRestaurant={p.is_restaurant}
         username={p.username}
+        businessType={businessProfile?.business_type ?? p.business_type ?? null}
       />
     </div>
   );

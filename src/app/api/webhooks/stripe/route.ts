@@ -69,14 +69,22 @@ export async function POST(req: Request) {
         break;
       }
 
-      await supabase.from('profiles').update({
+      // Read business_type from session metadata (set during onboarding)
+      const businessType = session.metadata?.business_type ?? null;
+
+      const profileUpdate: Record<string, unknown> = {
         plan,
         is_restaurant: isRestaurant,
         subscription_tier: tier,
         subscription_status: 'active',
         subscription_id: subscription.id,
         stripe_customer_id: session.customer as string,
-      }).eq('id', uid);
+      };
+      if (businessType) {
+        profileUpdate.business_type = businessType;
+      }
+
+      await supabase.from('profiles').update(profileUpdate).eq('id', uid);
 
       break;
     }

@@ -5,12 +5,14 @@ export interface MapFilters {
   timeRange: 'today' | 'this_week' | 'this_month' | 'all_time';
   minRating: number;
   recipeOnly: boolean;
+  mapCategory: 'all' | 'food' | 'health' | 'meals';
 }
 
 const defaultMapFilters: MapFilters = {
   timeRange: 'all_time',
   minRating: 0,
   recipeOnly: false,
+  mapCategory: 'all',
 };
 
 interface AppState {

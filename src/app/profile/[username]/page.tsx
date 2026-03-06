@@ -7,7 +7,7 @@ import { StatsRow } from '@/components/profile/StatsRow';
 import { BadgeRow } from '@/components/profile/BadgeRow';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import { ProfileViewTracker } from '@/components/profile/ProfileViewTracker';
-import type { PublicProfile, UserBadge, ProfileStats } from '@/types/database';
+import type { PublicProfile, UserBadge, ProfileStats, BusinessProfile } from '@/types/database';
 
 interface Props {
   params: Promise<{ username: string }>;
@@ -53,6 +53,17 @@ export default async function PublicProfilePage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (user && user.id === profile.id) {
     redirect('/profile');
+  }
+
+  // Fetch business profile if applicable
+  let businessProfile: BusinessProfile | null = null;
+  if (profile.plan === 'business') {
+    const { data: bp } = await supabase
+      .from('business_profiles')
+      .select('*')
+      .eq('id', profile.id)
+      .single();
+    businessProfile = bp as BusinessProfile | null;
   }
 
   // Fetch stats, badges, initial meals, and follow state in parallel
@@ -113,12 +124,14 @@ export default async function PublicProfilePage({ params }: Props) {
           location_city: profile.location_city,
           location_country: profile.location_country,
           is_restaurant: profile.is_restaurant,
+          plan: profile.plan,
           subscription_status: profile.subscription_status,
           show_location: profile.show_location,
           show_streak: profile.show_streak,
           follower_count: profile.follower_count,
           following_count: profile.following_count,
         }}
+        businessProfile={businessProfile}
         isOwnProfile={false}
         isFollowing={isFollowing}
       />
@@ -137,6 +150,7 @@ export default async function PublicProfilePage({ params }: Props) {
         meals={meals}
         isRestaurant={profile.is_restaurant}
         username={profile.username}
+        businessType={businessProfile?.business_type ?? null}
       />
     </div>
   );

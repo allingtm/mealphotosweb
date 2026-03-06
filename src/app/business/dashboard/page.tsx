@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardClient } from '@/components/business/DashboardClient';
+import type { BusinessType } from '@/types/database';
 
 interface PageProps {
   searchParams: Promise<{ session_id?: string; toast?: string }>;
@@ -18,13 +19,20 @@ export default async function RestaurantDashboardPage({ searchParams }: PageProp
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username, display_name, is_restaurant, subscription_tier, subscription_status')
+    .select('username, display_name, is_restaurant, subscription_tier, subscription_status, business_type, plan')
     .eq('id', user.id)
     .single();
 
   if (!profile || !profile.is_restaurant || profile.subscription_status !== 'active') {
     redirect('/business');
   }
+
+  // Fetch business profile if exists
+  const { data: businessProfile } = await supabase
+    .from('business_profiles')
+    .select('business_type, business_name')
+    .eq('id', user.id)
+    .single();
 
   const { data: meals } = await supabase
     .from('meals')
@@ -44,6 +52,8 @@ export default async function RestaurantDashboardPage({ searchParams }: PageProp
         subscription_tier: profile.subscription_tier,
         subscription_status: profile.subscription_status,
         is_restaurant: profile.is_restaurant,
+        business_type: (businessProfile?.business_type ?? profile.business_type ?? null) as BusinessType | null,
+        business_name: businessProfile?.business_name ?? null,
       }}
       meals={meals ?? []}
       showWelcome={showWelcome}

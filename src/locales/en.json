@@ -167,7 +167,8 @@
     "uploadAMeal": "Upload a Meal",
     "unavailable": "Map unavailable",
     "unavailableDesc": "We couldn't load the map. Please try again.",
-    "restaurant": "Restaurant"
+    "restaurant": "Restaurant",
+    "viewProfile": "View Profile"
   },
   "profile": {
     "settings": "Settings",

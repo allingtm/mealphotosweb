@@ -15,6 +15,9 @@ import { FollowButton } from '@/components/profile/FollowButton';
 import { FollowerFollowingList } from '@/components/profile/FollowerFollowingList';
 import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { Globe, Phone, Menu, CalendarDays, GraduationCap, Tag, MapPin, UserCheck } from 'lucide-react';
+import type { BusinessProfile } from '@/types/database';
+import { BUSINESS_TYPE_LABELS, getBusinessTypeGroup, type BusinessType } from '@/types/database';
 
 interface ProfileHeaderProps {
   profile: {
@@ -26,17 +29,19 @@ interface ProfileHeaderProps {
     location_city: string | null;
     location_country: string | null;
     is_restaurant?: boolean;
+    plan?: string;
     subscription_status?: string;
     show_location?: boolean;
     show_streak?: boolean;
     follower_count?: number;
     following_count?: number;
   };
+  businessProfile?: BusinessProfile | null;
   isOwnProfile: boolean;
   isFollowing?: boolean;
 }
 
-export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, businessProfile, isOwnProfile, isFollowing = false }: ProfileHeaderProps) {
   const t = useTranslations('profile');
   const router = useRouter();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -48,14 +53,20 @@ export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: Pr
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
 
-  const isVerified = profile.is_restaurant && profile.subscription_status === 'active';
+  const isBusiness = profile.plan === 'business' && profile.subscription_status === 'active';
+  const isVerified = isBusiness || (profile.is_restaurant && profile.subscription_status === 'active');
   const followerCount = profile.follower_count ?? 0;
   const followingCount = profile.following_count ?? 0;
 
-  // For restaurants, show full address; for users, show city only
-  const locationParts = profile.is_restaurant
-    ? [profile.location_city, profile.location_country].filter(Boolean)
-    : [profile.location_city].filter(Boolean);
+  const bp = businessProfile;
+  const bpGroup = bp ? getBusinessTypeGroup(bp.business_type as BusinessType) : null;
+
+  // For businesses with address, show that; for users, show city only
+  const locationParts = bp?.address_city
+    ? [bp.address_city, bp.address_postcode].filter(Boolean)
+    : profile.is_restaurant
+      ? [profile.location_city, profile.location_country].filter(Boolean)
+      : [profile.location_city].filter(Boolean);
   const location = locationParts.join(', ');
 
   return (
@@ -219,6 +230,20 @@ export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: Pr
           @{profile.username}
         </p>
 
+        {/* Business type label */}
+        {bp && (
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              color: 'var(--text-secondary)',
+              margin: '-4px 0 0',
+            }}
+          >
+            {BUSINESS_TYPE_LABELS[bp.business_type as BusinessType]}
+          </p>
+        )}
+
         {/* Location */}
         {location && (
           <p
@@ -230,6 +255,20 @@ export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: Pr
             }}
           >
             📍 {location}
+          </p>
+        )}
+
+        {/* Health & Nutrition: accepting clients */}
+        {bp && bpGroup === 'health_nutrition' && (
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              color: bp.accepts_clients ? 'var(--status-success)' : 'var(--text-secondary)',
+              margin: '-4px 0 0',
+            }}
+          >
+            {bp.accepts_clients ? '✅ Accepting new clients' : 'Fully booked'}
           </p>
         )}
 
@@ -248,6 +287,141 @@ export function ProfileHeader({ profile, isOwnProfile, isFollowing = false }: Pr
           >
             {profile.bio}
           </p>
+        )}
+
+        {/* Business details: Health & Nutrition */}
+        {bp && bpGroup === 'health_nutrition' && (
+          <div className="flex flex-col items-center gap-2" style={{ marginTop: 4 }}>
+            {bp.qualifications && bp.qualifications.length > 0 && (
+              <div className="flex items-start gap-2">
+                <GraduationCap size={16} strokeWidth={1.5} style={{ color: 'var(--text-secondary)', marginTop: 2, flexShrink: 0 }} />
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
+                  {bp.qualifications.join(', ')}
+                </span>
+              </div>
+            )}
+            {bp.specialisms && bp.specialisms.length > 0 && (
+              <div className="flex flex-wrap items-center justify-center gap-1">
+                <Tag size={14} strokeWidth={1.5} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+                {bp.specialisms.map((s) => (
+                  <span
+                    key={s}
+                    className="rounded-full"
+                    style={{
+                      padding: '2px 10px',
+                      fontSize: 12,
+                      fontFamily: 'var(--font-body)',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+            {bp.consultation_type && bp.consultation_type.length > 0 && (
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                💻 {bp.consultation_type.map(t => t === 'in_person' ? 'In-person' : t === 'online' ? 'Online' : 'Both').join(' & ')}
+              </p>
+            )}
+            {bp.service_area && (
+              <div className="flex items-center gap-1">
+                <MapPin size={14} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
+                <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
+                  {bp.service_area}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Business action buttons */}
+        {bp && (
+          <div className="flex items-center gap-3" style={{ marginTop: 8 }}>
+            {bp.website_url && (
+              <a
+                href={bp.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 rounded-full"
+                style={{
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--bg-elevated)',
+                  textDecoration: 'none',
+                }}
+              >
+                <Globe size={14} strokeWidth={1.5} />
+                Website
+              </a>
+            )}
+            {bp.phone && (
+              <a
+                href={`tel:${bp.phone}`}
+                className="flex items-center gap-1 rounded-full"
+                style={{
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--bg-elevated)',
+                  textDecoration: 'none',
+                }}
+              >
+                <Phone size={14} strokeWidth={1.5} />
+                Call
+              </a>
+            )}
+            {bpGroup === 'food_drink' && bp.menu_url && (
+              <a
+                href={bp.menu_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 rounded-full"
+                style={{
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--bg-elevated)',
+                  textDecoration: 'none',
+                }}
+              >
+                <Menu size={14} strokeWidth={1.5} />
+                Menu
+              </a>
+            )}
+            {bp.booking_url && (
+              <a
+                href={bp.booking_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 rounded-full"
+                style={{
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-body)',
+                  fontWeight: 600,
+                  backgroundColor: bpGroup === 'health_nutrition' ? 'var(--accent-primary)' : 'var(--bg-surface)',
+                  color: bpGroup === 'health_nutrition' ? '#121212' : 'var(--text-primary)',
+                  border: bpGroup === 'health_nutrition' ? 'none' : '1px solid var(--bg-elevated)',
+                  textDecoration: 'none',
+                }}
+              >
+                <CalendarDays size={14} strokeWidth={1.5} />
+                Book
+              </a>
+            )}
+          </div>
         )}
 
         {/* Follower / Following counts */}

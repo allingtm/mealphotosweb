@@ -7,16 +7,45 @@ import mapboxgl from 'mapbox-gl';
 import posthog from 'posthog-js';
 import { useAppStore } from '@/lib/store';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
-import type { MapPin } from '@/types/database';
+import type { MapPin, MapBusinessPin } from '@/types/database';
+import { FOOD_DRINK_TYPES, type BusinessType } from '@/types/database';
 import { PinBottomSheet } from './PinBottomSheet';
 import { MapSearchBar } from './MapSearchBar';
 import { MapFilterDrawer } from './MapFilterDrawer';
 import { MapEmptyOverlay } from './MapEmptyOverlay';
+import { MapCategoryPills } from './MapCategoryPills';
+import { createFoodDrinkIcon, createHealthNutritionIcon } from '@/lib/map-icons';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 const DEFAULT_CENTER: [number, number] = [0, 20];
 const DEFAULT_ZOOM = 2;
+
+function businessPinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: pins.map((pin) => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [pin.lng, pin.lat],
+      },
+      properties: {
+        id: pin.id,
+        business_name: pin.business_name,
+        business_type: pin.business_type,
+        avatar_url: pin.avatar_url,
+        avg_rating: pin.avg_rating,
+        accepts_clients: pin.accepts_clients,
+        address_city: pin.address_city,
+        username: pin.username,
+        group: FOOD_DRINK_TYPES.includes(pin.business_type as (typeof FOOD_DRINK_TYPES)[number])
+          ? 'food_drink'
+          : 'health_nutrition',
+      },
+    })),
+  };
+}
 
 function pinsToGeoJSON(pins: MapPin[]): GeoJSON.FeatureCollection {
   return {
@@ -56,11 +85,14 @@ export function MapView() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
+  const [selectedBusinessPin, setSelectedBusinessPin] = useState<MapBusinessPin | null>(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [mapCenter, setMapCenterLocal] = useState<[number, number] | null>(null);
   const explorePinsRef = useRef<MapPin[]>([]);
+  const businessPinsRef = useRef<MapBusinessPin[]>([]);
   const sourceAddedRef = useRef(false);
+  const iconsLoadedRef = useRef(false);
 
   const mapFilters = useAppStore((s) => s.mapFilters);
   const savedCenter = useAppStore((s) => s.mapCenter);
@@ -121,6 +153,32 @@ export function MapView() {
       }
     } catch {
       // Non-critical
+    }
+  }, []);
+
+  const fetchBusinessPins = useCallback(async (map: mapboxgl.Map) => {
+    const bounds = map.getBounds();
+    if (!bounds) return;
+
+    const params = new URLSearchParams({
+      min_lng: bounds.getWest().toString(),
+      min_lat: bounds.getSouth().toString(),
+      max_lng: bounds.getEast().toString(),
+      max_lat: bounds.getNorth().toString(),
+    });
+
+    try {
+      const res = await fetch(`/api/map/business-pins?${params}`);
+      const data = await res.json();
+      if (!data.pins) return;
+
+      businessPinsRef.current = data.pins;
+      const source = map.getSource('businesses') as mapboxgl.GeoJSONSource | undefined;
+      if (source) {
+        source.setData(businessPinsToGeoJSON(data.pins));
+      }
+    } catch (err) {
+      console.error('Failed to fetch business pins:', err);
     }
   }, []);
 
@@ -254,6 +312,59 @@ export function MapView() {
       },
     });
 
+    // Business pins source (non-clustered)
+    map.addSource('businesses', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    });
+
+    // Load custom icons for business pins
+    if (!iconsLoadedRef.current) {
+      try {
+        const foodCanvas = createFoodDrinkIcon();
+        const healthCanvas = createHealthNutritionIcon();
+        const foodCtx = foodCanvas.getContext('2d')!;
+        const healthCtx = healthCanvas.getContext('2d')!;
+        const foodData = foodCtx.getImageData(0, 0, foodCanvas.width, foodCanvas.height);
+        const healthData = healthCtx.getImageData(0, 0, healthCanvas.width, healthCanvas.height);
+        if (!map.hasImage('food-drink-icon')) {
+          map.addImage('food-drink-icon', { width: foodCanvas.width, height: foodCanvas.height, data: foodData.data }, { pixelRatio: 2 });
+        }
+        if (!map.hasImage('health-nutrition-icon')) {
+          map.addImage('health-nutrition-icon', { width: healthCanvas.width, height: healthCanvas.height, data: healthData.data }, { pixelRatio: 2 });
+        }
+        iconsLoadedRef.current = true;
+      } catch (err) {
+        console.error('Failed to load business pin icons:', err);
+      }
+    }
+
+    // Food & Drink business layer
+    map.addLayer({
+      id: 'food-business-point',
+      type: 'symbol',
+      source: 'businesses',
+      filter: ['==', ['get', 'group'], 'food_drink'],
+      layout: {
+        'icon-image': 'food-drink-icon',
+        'icon-size': 0.75,
+        'icon-allow-overlap': true,
+      },
+    });
+
+    // Health & Nutrition business layer
+    map.addLayer({
+      id: 'health-business-point',
+      type: 'symbol',
+      source: 'businesses',
+      filter: ['==', ['get', 'group'], 'health_nutrition'],
+      layout: {
+        'icon-image': 'health-nutrition-icon',
+        'icon-size': 0.75,
+        'icon-allow-overlap': true,
+      },
+    });
+
     sourceAddedRef.current = true;
   }, []);
 
@@ -284,12 +395,16 @@ export function MapView() {
       applyCustomStyle(map);
       addSourceAndLayers(map);
 
-      // Fetch explore pins once, then initial viewport pins
-      fetchExplorePins().then(() => fetchPins(map));
+      // Fetch explore pins once, then initial viewport pins + business pins
+      fetchExplorePins().then(() => {
+        fetchPins(map);
+        fetchBusinessPins(map);
+      });
     });
 
     map.on('moveend', () => {
       debouncedFetch();
+      fetchBusinessPins(map);
       const center = map.getCenter();
       const zoom = map.getZoom();
       setMapPosition([center.lng, center.lat], zoom);
@@ -340,6 +455,7 @@ export function MapView() {
         pin.lat = geometry.coordinates[1];
       }
 
+      setSelectedBusinessPin(null);
       setSelectedPin(pin);
 
       posthog.capture(ANALYTICS_EVENTS.MAP_PIN_TAPPED, {
@@ -349,11 +465,54 @@ export function MapView() {
       });
     });
 
+    // Business pin click handlers
+    const handleBusinessPinClick = (e: mapboxgl.MapLayerMouseEvent) => {
+      const feature = e.features?.[0];
+      if (!feature || !feature.properties) return;
+
+      const props = feature.properties;
+      const geometry = feature.geometry;
+      let lng = 0, lat = 0;
+      if (geometry.type === 'Point') {
+        lng = geometry.coordinates[0];
+        lat = geometry.coordinates[1];
+      }
+
+      const businessPin: MapBusinessPin = {
+        id: props.id as string,
+        business_name: props.business_name as string,
+        business_type: props.business_type as BusinessType,
+        avatar_url: props.avatar_url as string | null,
+        avg_rating: props.avg_rating != null ? Number(props.avg_rating) : null,
+        accepts_clients: props.accepts_clients === true || props.accepts_clients === 'true',
+        address_city: props.address_city as string | null,
+        username: props.username as string,
+        lng,
+        lat,
+      };
+
+      setSelectedPin(null);
+      setSelectedBusinessPin(businessPin);
+
+      posthog.capture(ANALYTICS_EVENTS.DISCOVER_BUSINESS_TAPPED, {
+        business_id: businessPin.id,
+        business_type: businessPin.business_type,
+        zoom_level: map.getZoom(),
+      });
+    };
+
+    map.on('click', 'food-business-point', handleBusinessPinClick);
+    map.on('click', 'health-business-point', handleBusinessPinClick);
+
     // Cursor on hover
     map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
     map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
+    map.on('mouseenter', 'food-business-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'food-business-point', () => { map.getCanvas().style.cursor = ''; });
+    map.on('mouseenter', 'health-business-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'health-business-point', () => { map.getCanvas().style.cursor = ''; });
 
     // Request geolocation (only if no saved position)
     if (!savedCenter) {
@@ -390,6 +549,30 @@ export function MapView() {
     }
   }, [mapFilters, fetchPins]);
 
+  // Toggle layer visibility based on map category
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !sourceAddedRef.current) return;
+
+    const category = mapFilters.mapCategory;
+    const showMeals = category === 'all' || category === 'meals';
+    const showFood = category === 'all' || category === 'food';
+    const showHealth = category === 'all' || category === 'health';
+
+    const mealLayers = ['clusters', 'cluster-count', 'unclustered-point'];
+    for (const layer of mealLayers) {
+      if (map.getLayer(layer)) {
+        map.setLayoutProperty(layer, 'visibility', showMeals ? 'visible' : 'none');
+      }
+    }
+    if (map.getLayer('food-business-point')) {
+      map.setLayoutProperty('food-business-point', 'visibility', showFood ? 'visible' : 'none');
+    }
+    if (map.getLayer('health-business-point')) {
+      map.setLayoutProperty('health-business-point', 'visibility', showHealth ? 'visible' : 'none');
+    }
+  }, [mapFilters.mapCategory]);
+
   const handleFlyTo = useCallback((lng: number, lat: number) => {
     mapRef.current?.flyTo({ center: [lng, lat], zoom: 12, duration: 2000 });
   }, []);
@@ -409,13 +592,25 @@ export function MapView() {
         hasActiveFilters={hasActiveFilters}
       />
 
+      {/* Category pills below search bar */}
+      <div
+        className="absolute z-10"
+        style={{ top: 64, left: 0, right: 0 }}
+      >
+        <MapCategoryPills />
+      </div>
+
       {isEmpty && (
         <MapEmptyOverlay center={mapCenter} />
       )}
 
       <PinBottomSheet
         pin={selectedPin}
-        onClose={() => setSelectedPin(null)}
+        businessPin={selectedBusinessPin}
+        onClose={() => {
+          setSelectedPin(null);
+          setSelectedBusinessPin(null);
+        }}
       />
 
       {isFilterOpen && (
