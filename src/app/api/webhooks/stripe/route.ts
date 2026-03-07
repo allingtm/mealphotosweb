@@ -124,7 +124,7 @@ export async function POST(req: Request) {
     case 'price.updated':
     case 'price.created':
     case 'price.deleted': {
-      revalidateTag('stripe-prices');
+      revalidateTag('stripe-prices', { expire: 0 });
       break;
     }
 
