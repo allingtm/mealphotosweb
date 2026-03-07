@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
 export const revalidate = 3600; // 1 hour ISR
 
@@ -18,6 +19,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: 'https://meal.photos/leaderboard',
       changeFrequency: 'daily',
       priority: 0.7,
+    },
+    {
+      url: 'https://meal.photos/explore',
+      changeFrequency: 'daily',
+      priority: 0.8,
     },
   ];
 
@@ -51,5 +57,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  return [...staticPages, ...mealPages, ...profilePages];
+  // Explore pages (location, cuisine, combos)
+  const serviceClient = createServiceRoleClient();
+  const { data: exploreSlugs } = await serviceClient.rpc('get_explore_slugs');
+
+  const explorePages: MetadataRoute.Sitemap = (
+    (exploreSlugs ?? []) as unknown as { slug_type: string; slug_value: string; meal_count: number }[]
+  ).map((s) => {
+    const path = s.slug_type === 'cuisine'
+      ? `/explore/cuisine/${s.slug_value}`
+      : `/explore/${s.slug_value}`;
+    return {
+      url: `https://meal.photos${path}`,
+      changeFrequency: 'weekly' as const,
+      priority: s.slug_type === 'city' ? 0.7 : s.slug_type === 'country' ? 0.7 : 0.6,
+    };
+  });
+
+  return [...staticPages, ...mealPages, ...profilePages, ...explorePages];
 }

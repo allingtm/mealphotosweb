@@ -517,7 +517,7 @@
     "faqTitle": "Häufig gestellte Fragen",
     "freeDetailFeatures": ["5 Uploads pro Tag", "1 Foto pro Gericht", "5 private Feed-Mitglieder", "Gerichte bewerten & Rezepte anfragen", "Upload-Serien & Abzeichen", "Gerichte auf der Weltkarte"],
     "personalDetailFeatures": ["15 Uploads pro Tag", "Bis zu 4 Fotos pro Gericht", "25 private Feed-Mitglieder", "Bevorzugter Support"],
-    "businessDetailFeatures": ["Unbegrenzte Gericht-Uploads", "Verifiziertes Geschäftsprofil & Abzeichen", "Eigener Kartenpin für dein Lokal", "Feed-Promotion in deiner Region", "Vollständiges Analyse-Dashboard", "Anonymes Gericht-Testen", "Bevorzugte Kartenplatzierung", "„Top Bewertet"-Abzeichen", "Inhalts-Beiträge auf deinem Profil", "100 private Feed-Mitglieder"],
+    "businessDetailFeatures": ["Unbegrenzte Gericht-Uploads", "Verifiziertes Geschäftsprofil & Abzeichen", "Eigener Kartenpin für dein Lokal", "Feed-Promotion in deiner Region", "Vollständiges Analyse-Dashboard", "Anonymes Gericht-Testen", "Bevorzugte Kartenplatzierung", "\u201ETop Bewertet\u201C-Abzeichen", "Inhalts-Beiträge auf deinem Profil", "100 private Feed-Mitglieder"],
     "comparison": {
       "uploading": "Hochladen",
       "dailyUploads": "Tägliche Uploads",
@@ -556,7 +556,7 @@
       "q6": "Brauche ich einen Business-Plan, um auf der Karte zu erscheinen?",
       "a6": "Nein — die Gerichte jedes Nutzers erscheinen auf der Weltkarte. Der Business-Plan gibt dir einen eigenen Venue-Pin, damit Kunden deinen Standort direkt finden können.",
       "q7": "Wie kündige ich mein Abonnement?",
-      "a7": "Gehe zu den Einstellungen und tippe auf „Abonnement verwalten". Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
+      "a7": "Gehe zu den Einstellungen und tippe auf \u201EAbonnement verwalten\u201C. Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
     }
   },
   "privateFeed": {

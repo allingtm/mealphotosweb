@@ -86,6 +86,41 @@ export default async function RootLayout({
           fontFamily: 'var(--font-body)',
         }}
       >
+        {/* Organization + WebSite structured data for AEO/GEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'meal.photos',
+              url: 'https://meal.photos',
+              logo: 'https://meal.photos/icons/icon-512.png',
+              description:
+                'A global stage for food culture. Upload meals, get community ratings, discover restaurants worldwide.',
+              sameAs: [],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'meal.photos',
+              url: 'https://meal.photos',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: 'https://meal.photos/explore/{search_term_string}',
+                },
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-(--accent-primary) focus:text-(--bg-primary) focus:text-sm focus:font-semibold"

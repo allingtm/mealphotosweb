@@ -7,6 +7,7 @@ import { Lock, MapPin, UtensilsCrossed } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 import { timeAgo } from '@/lib/utils/time';
+import { slugify } from '@/lib/validations/explore';
 import { ShareButton } from '@/components/feed/ShareButton';
 import { ScoreBadge } from '@/components/feed/ScoreBadge';
 import { BlurHashCanvas } from '@/components/feed/BlurHashCanvas';
@@ -372,17 +373,19 @@ export default async function MealDetailPage({
               @{profile.username}
             </Link>
             {(profile.location_city || meal.location_city) && (
-              <span
+              <Link
+                href={`/explore/${slugify(profile.location_city || meal.location_city || '')}`}
                 className="flex items-center gap-0.5"
                 style={{
                   fontFamily: 'var(--font-body)',
                   fontSize: 12,
                   color: 'var(--text-secondary)',
+                  textDecoration: 'none',
                 }}
               >
                 <MapPin size={14} strokeWidth={1.5} />
                 {profile.location_city || meal.location_city}
-              </span>
+              </Link>
             )}
           </div>
 
@@ -427,6 +430,43 @@ export default async function MealDetailPage({
           >
             {timeAgo(meal.created_at)} &middot; {meal.rating_count} ratings
           </p>
+
+          {/* Cuisine & tags — linked to explore pages */}
+          {(meal.cuisine || (meal.tags && meal.tags.length > 0)) && (
+            <div className="flex flex-wrap gap-2" style={{ marginBottom: 16 }}>
+              {meal.cuisine && (
+                <Link
+                  href={`/explore/cuisine/${meal.cuisine}`}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 12,
+                    color: 'var(--accent-primary)',
+                    backgroundColor: 'var(--bg-elevated)',
+                    padding: '4px 12px',
+                    borderRadius: 999,
+                    textDecoration: 'none',
+                  }}
+                >
+                  {meal.cuisine.charAt(0).toUpperCase() + meal.cuisine.slice(1)}
+                </Link>
+              )}
+              {meal.tags?.map((tag: string) => (
+                <span
+                  key={tag}
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'var(--bg-elevated)',
+                    padding: '4px 12px',
+                    borderRadius: 999,
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Interactive section */}
           <MealDetailClient

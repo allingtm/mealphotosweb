@@ -91,6 +91,25 @@ export default async function RestaurantVenuePage({
     ? meals.reduce((sum, m) => sum + Number(m.avg_rating) * m.rating_count, 0) / (totalRatings || 1)
     : 0;
 
+  // LocalBusiness JSON-LD for AEO/GEO
+  const restaurantJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Restaurant',
+    name: venueName,
+    ...(venueAddress ? { address: venueAddress } : {}),
+    ...(meals[0].location_city ? { addressLocality: meals[0].location_city } : {}),
+    url: `https://meal.photos/restaurant/${encodeURIComponent(decodedId)}`,
+    ...(totalRatings > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avgScore.toFixed(1),
+        ratingCount: totalRatings,
+        bestRating: 10,
+        worstRating: 1,
+      },
+    }),
+  };
+
   return (
     <div
       style={{
@@ -98,6 +117,10 @@ export default async function RestaurantVenuePage({
         backgroundColor: 'var(--bg-primary)',
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd) }}
+      />
       {/* Header */}
       <div
         className="flex items-center gap-3 px-4"
