@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Lock, MapPin, UtensilsCrossed } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
 import { useAppStore } from '@/lib/store';
@@ -30,7 +31,9 @@ interface MealCardProps {
 
 export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowingIndicator, onRated }: MealCardProps) {
   const t = useTranslations('feed');
+  const router = useRouter();
   const user = useAppStore((s) => s.user);
+  const openAuthModal = useAppStore((s) => s.openAuthModal);
   const requireAuth = useRequireAuth();
   const isOwnMeal = user?.id === meal.user_id;
   const isPrivate = meal.visibility === 'private';
@@ -114,10 +117,28 @@ export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowin
           onImageLoad={() => setImageLoaded(true)}
         />
       ) : (
-        <Link
-          href={`/meal/${meal.id}`}
-          className="absolute inset-0 z-0"
+        <div
+          role="button"
+          tabIndex={0}
+          className="absolute inset-0 z-0 cursor-pointer"
           aria-label={t('mealPhotoAlt', { title: meal.title, username: meal.username })}
+          onClick={() => {
+            if (!user) {
+              openAuthModal();
+              return;
+            }
+            router.push(`/meal/${meal.id}`);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (!user) {
+                openAuthModal();
+                return;
+              }
+              router.push(`/meal/${meal.id}`);
+            }
+          }}
         >
           <Image
             src={meal.photo_url}
@@ -135,7 +156,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowin
               transition: 'opacity 200ms',
             }}
           />
-        </Link>
+        </div>
       )}
 
       {/* Lock icon for private posts */}
