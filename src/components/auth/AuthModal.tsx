@@ -315,8 +315,8 @@ export function AuthModal() {
               </div>
             )}
 
-            {/* Google OAuth */}
-            <button
+            {/* Google OAuth — hidden during invite-only beta */}
+            {/* <button
               onClick={async () => {
                 setLoading(true);
                 const supabase = createClient();
@@ -344,10 +344,10 @@ export function AuthModal() {
             >
               <GoogleIcon />
               {t('continueWithGoogle')}
-            </button>
+            </button> */}
 
-            {/* Apple OAuth */}
-            <button
+            {/* Apple OAuth — hidden during invite-only beta */}
+            {/* <button
               onClick={() => {
                 showToast('Apple sign-in coming soon — use email for now.', 'info');
               }}
@@ -364,16 +364,16 @@ export function AuthModal() {
             >
               <AppleIcon />
               {t('continueWithApple')}
-            </button>
+            </button> */}
 
-            {/* Divider */}
-            <div className="mb-4 flex items-center gap-3">
+            {/* Divider — hidden during invite-only beta */}
+            {/* <div className="mb-4 flex items-center gap-3">
               <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
               <span style={{ color: 'var(--text-secondary)', fontSize: 14, fontFamily: 'var(--font-body)' }}>
                 {tCommon('or')}
               </span>
               <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
-            </div>
+            </div> */}
 
             {/* Password form */}
             <form onSubmit={mode === 'signup' ? handleSignUp : handleSignIn} autoComplete="on">
