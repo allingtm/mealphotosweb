@@ -16,6 +16,7 @@ import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BackButton } from '@/components/ui/BackButton';
 import { MealDetailCarousel } from '@/components/meal/MealDetailCarousel';
 import { CommentsSection } from '@/components/comments/CommentsSection';
+import { MealAuthGate } from '@/components/meal/MealAuthGate';
 import type { Recipe, Ingredient, MealImage } from '@/types/database';
 
 // Cache the meal fetch so generateMetadata and the page share the same data
@@ -156,6 +157,11 @@ export default async function MealDetailPage({
   // Fetch meal (cached — shared with generateMetadata)
   const meal = await getMeal(id);
   if (!meal) notFound();
+
+  // Gate: unauthenticated users see the auth modal
+  if (!user) {
+    return <MealAuthGate />;
+  }
 
   const profile = meal.profiles as unknown as {
     username: string;
