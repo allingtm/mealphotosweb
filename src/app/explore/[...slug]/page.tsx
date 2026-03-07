@@ -190,11 +190,20 @@ export async function generateMetadata({
       url: canonicalPath,
       siteName: 'meal.photos',
       type: 'website',
+      images: [
+        {
+          url: `/api/og/explore?slug=${slug.join('/')}`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [`/api/og/explore?slug=${slug.join('/')}`],
     },
   };
 }
