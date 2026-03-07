@@ -50,7 +50,7 @@ export async function PATCH(
     if (error) {
       console.error('Business post update error:', error);
       return NextResponse.json(
-        { error: 'Failed to update post', details: error.message },
+        { error: 'Failed to update post' },
         { status: 500 }
       );
     }
@@ -94,7 +94,7 @@ export async function DELETE(
     if (error) {
       console.error('Business post delete error:', error);
       return NextResponse.json(
-        { error: 'Failed to delete post', details: error.message },
+        { error: 'Failed to delete post' },
         { status: 500 }
       );
     }

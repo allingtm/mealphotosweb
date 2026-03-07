@@ -18,50 +18,31 @@ function formatPrice(amount: number, currency: string): string {
   return `${symbol}${formatted}`;
 }
 
-function buildPlans(prices?: { personal: { amount: number; currency: string }; business: { amount: number; currency: string } }) {
+function buildPlans(
+  t: (key: string, values?: Record<string, string>) => string,
+  tRaw: (key: string) => string[],
+  prices?: { personal: { amount: number; currency: string }; business: { amount: number; currency: string } },
+) {
   return [
     {
       key: 'free' as const,
       price: null,
-      subtitle: 'For casual food lovers',
-      features: [
-        '5 uploads per day',
-        '1 photo per meal',
-        '5 private feed members',
-        'Rate meals & request recipes',
-        'Upload streaks & badges',
-        'Meals shown on global map',
-      ],
+      subtitle: t('freeSubtitle'),
+      features: tRaw('freeDetailFeatures') as string[],
     },
     {
       key: 'personal' as const,
       price: prices ? formatPrice(prices.personal.amount, prices.personal.currency) : null,
-      subtitle: 'For dedicated foodies',
-      includesFrom: 'Free',
-      features: [
-        '15 uploads per day',
-        'Up to 4 photos per meal',
-        '25 private feed members',
-        'Priority support',
-      ],
+      subtitle: t('personalSubtitle'),
+      includesFrom: t('free'),
+      features: tRaw('personalDetailFeatures') as string[],
     },
     {
       key: 'business' as const,
       price: prices ? formatPrice(prices.business.amount, prices.business.currency) : null,
-      subtitle: 'For restaurants & food businesses',
-      includesFrom: 'Personal',
-      features: [
-        'Unlimited dish uploads',
-        'Verified business profile & badge',
-        'Dedicated map pin for your venue',
-        'Feed promotion in your local area',
-        'Full analytics dashboard',
-        'Anonymous dish testing',
-        'Priority map placement',
-        '"Top Rated" badges',
-        'Content posts on your profile',
-        '100 private feed members',
-      ],
+      subtitle: t('businessSubtitle'),
+      includesFrom: t('personal'),
+      features: tRaw('businessDetailFeatures') as string[],
     },
   ];
 }
@@ -82,84 +63,67 @@ interface ComparisonSection {
   rows: ComparisonRow[];
 }
 
-const COMPARISON: ComparisonSection[] = [
-  {
-    title: 'Uploading',
-    rows: [
-      { label: 'Daily uploads', free: '5', personal: '15', business: 'Unlimited' },
-      { label: 'Photos per meal', free: '1', personal: '4', business: '4' },
-    ],
-  },
-  {
-    title: 'Community',
-    rows: [
-      { label: 'Rate meals', free: '✓', personal: '✓', business: '✓' },
-      { label: 'Request recipes', free: '✓', personal: '✓', business: '✓' },
-      { label: 'Private feed members', free: '5', personal: '25', business: '100' },
-      { label: 'Streaks & badges', free: '✓', personal: '✓', business: '✓' },
-    ],
-  },
-  {
-    title: 'Visibility',
-    rows: [
-      { label: 'Meals on global map', free: '✓', personal: '✓', business: '✓' },
-      { label: 'Verified business badge', free: '—', personal: '—', business: '✓' },
-      { label: 'Dedicated map pin', free: '—', personal: '—', business: '✓' },
-      { label: 'Feed promotion', free: '—', personal: '—', business: '✓' },
-      { label: 'Priority map placement', free: '—', personal: '—', business: '✓' },
-    ],
-  },
-  {
-    title: 'Insights',
-    rows: [
-      { label: 'Basic rating stats', free: '✓', personal: '✓', business: '✓' },
-      { label: 'Full analytics dashboard', free: '—', personal: '—', business: '✓' },
-      { label: 'Anonymous dish testing', free: '—', personal: '—', business: '✓' },
-    ],
-  },
-  {
-    title: 'Support',
-    rows: [
-      { label: 'Community support', free: '✓', personal: '✓', business: '✓' },
-      { label: 'Priority support', free: '—', personal: '✓', business: '✓' },
-    ],
-  },
-];
+function buildComparison(tc: (key: string) => string): ComparisonSection[] {
+  return [
+    {
+      title: tc('uploading'),
+      rows: [
+        { label: tc('dailyUploads'), free: '5', personal: '15', business: tc('unlimited') },
+        { label: tc('photosPerMeal'), free: '1', personal: '4', business: '4' },
+      ],
+    },
+    {
+      title: tc('community'),
+      rows: [
+        { label: tc('rateMeals'), free: '✓', personal: '✓', business: '✓' },
+        { label: tc('requestRecipes'), free: '✓', personal: '✓', business: '✓' },
+        { label: tc('privateFeedMembers'), free: '5', personal: '25', business: '100' },
+        { label: tc('streaksBadges'), free: '✓', personal: '✓', business: '✓' },
+      ],
+    },
+    {
+      title: tc('visibility'),
+      rows: [
+        { label: tc('mealsOnMap'), free: '✓', personal: '✓', business: '✓' },
+        { label: tc('verifiedBadge'), free: '—', personal: '—', business: '✓' },
+        { label: tc('dedicatedPin'), free: '—', personal: '—', business: '✓' },
+        { label: tc('feedPromotion'), free: '—', personal: '—', business: '✓' },
+        { label: tc('priorityPlacement'), free: '—', personal: '—', business: '✓' },
+      ],
+    },
+    {
+      title: tc('insights'),
+      rows: [
+        { label: tc('basicStats'), free: '✓', personal: '✓', business: '✓' },
+        { label: tc('fullAnalytics'), free: '—', personal: '—', business: '✓' },
+        { label: tc('anonTesting'), free: '—', personal: '—', business: '✓' },
+      ],
+    },
+    {
+      title: tc('support'),
+      rows: [
+        { label: tc('communitySupport'), free: '✓', personal: '✓', business: '✓' },
+        { label: tc('prioritySupport'), free: '—', personal: '✓', business: '✓' },
+      ],
+    },
+  ];
+}
 
 /* ------------------------------------------------------------------ */
 /*  FAQ data                                                           */
 /* ------------------------------------------------------------------ */
 
-const FAQ = [
-  {
-    q: 'Can I use meal.photos for free?',
-    a: 'Yes — meal.photos is free forever. Upload meals, rate others, and appear on the global map at no cost. Upgrade only when you want more.',
-  },
-  {
-    q: 'What happens if I cancel my subscription?',
-    a: 'All your meals, ratings, and profile stay exactly as they are. You simply revert to Free plan limits.',
-  },
-  {
-    q: 'Can I change plans later?',
-    a: 'Absolutely. Upgrade or downgrade anytime from Settings. Changes take effect immediately.',
-  },
-  {
-    q: 'What is a private feed?',
-    a: 'A private feed lets you share meals with a select group of friends or family. Only invited members can see and rate your private meals.',
-  },
-  {
-    q: 'How does anonymous dish testing work?',
-    a: 'Business subscribers can upload dishes without their restaurant name attached. The community rates them honestly — then you reveal your identity when you\'re ready.',
-  },
-  {
-    q: 'Do I need a Business plan to appear on the map?',
-    a: 'No — every user\'s meals appear on the global map. The Business plan gives you a dedicated venue pin so customers can find your location directly.',
-  },
-  {
-    q: 'How do I cancel my subscription?',
-    a: 'Go to Settings and tap "Manage Subscription". This opens Stripe\'s Customer Portal where you can cancel, update payment, or switch plans.',
-  },
-];
+function buildFaq(tf: (key: string) => string) {
+  return [
+    { q: tf('q1'), a: tf('a1') },
+    { q: tf('q2'), a: tf('a2') },
+    { q: tf('q3'), a: tf('a3') },
+    { q: tf('q4'), a: tf('a4') },
+    { q: tf('q5'), a: tf('a5') },
+    { q: tf('q6'), a: tf('a6') },
+    { q: tf('q7'), a: tf('a7') },
+  ];
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -167,6 +131,8 @@ const FAQ = [
 
 export default function PricingPage() {
   const t = useTranslations('pricing');
+  const tc = useTranslations('pricing.comparison');
+  const tf = useTranslations('pricing.faq');
   const router = useRouter();
   const userPlan = useAppStore((s) => s.userPlan);
   const user = useAppStore((s) => s.user);
@@ -183,7 +149,10 @@ export default function PricingPage() {
       .catch(() => {});
   }, []);
 
-  const PLANS = buildPlans(prices ?? undefined);
+  const tRaw = (key: string) => t.raw(key) as string[];
+  const PLANS = buildPlans(t, tRaw, prices ?? undefined);
+  const COMPARISON = buildComparison(tc);
+  const FAQ = buildFaq(tf);
 
   const handleSubscribe = async (plan: 'personal' | 'business') => {
     if (!user) {
@@ -298,7 +267,7 @@ export default function PricingPage() {
 
               {plan.key === 'free' ? (
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>
-                  £0
+                  {t('freePrice')}
                 </p>
               ) : plan.price ? (
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--accent-primary)', marginBottom: 16 }}>
@@ -323,7 +292,7 @@ export default function PricingPage() {
                     marginBottom: 8,
                   }}
                 >
-                  Everything in {plan.includesFrom}, plus:
+                  {t('includesFrom', { plan: plan.includesFrom })}
                 </p>
               )}
 
@@ -407,7 +376,7 @@ export default function PricingPage() {
             cursor: 'pointer',
           }}
         >
-          Compare all features
+          {t('compareAll')}
           <ChevronDown
             size={20}
             strokeWidth={1.5}
@@ -438,7 +407,7 @@ export default function PricingPage() {
               }}
             >
               <span />
-              {['Free', 'Personal', 'Business'].map((label) => (
+              {[t('free'), t('personal'), t('business')].map((label) => (
                 <span
                   key={label}
                   style={{
@@ -542,7 +511,7 @@ export default function PricingPage() {
             marginBottom: 24,
           }}
         >
-          Frequently asked questions
+          {t('faqTitle')}
         </h2>
 
         <div

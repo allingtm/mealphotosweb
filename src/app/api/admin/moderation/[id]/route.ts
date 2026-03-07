@@ -15,13 +15,13 @@ export async function PATCH(
     }
 
     // Check admin
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
       .single();
 
-    if (!profile?.is_admin) {
+    if (profileError || !profile?.is_admin) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 

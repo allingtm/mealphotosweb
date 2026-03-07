@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
+    console.error('Following feed error:', error);
     return NextResponse.json(
-      { error: 'Failed to load following feed', details: error.message },
+      { error: 'Failed to load following feed' },
       { status: 500 }
     );
   }

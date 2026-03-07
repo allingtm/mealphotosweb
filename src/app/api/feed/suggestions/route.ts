@@ -31,8 +31,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
+    console.error('Follow suggestions error:', error);
     return NextResponse.json(
-      { error: 'Failed to load suggestions', details: error.message },
+      { error: 'Failed to load suggestions' },
       { status: 500 }
     );
   }

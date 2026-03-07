@@ -17,8 +17,9 @@ export async function GET(req: NextRequest, context: RouteContext) {
     .order('position', { ascending: true });
 
   if (error) {
+    console.error('Meal images fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to load images', details: error.message },
+      { error: 'Failed to load images' },
       { status: 500 }
     );
   }

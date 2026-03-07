@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('get_map_pins error:', error);
       return NextResponse.json(
-        { error: 'Failed to load map pins', details: error.message },
+        { error: 'Failed to load map pins' },
         { status: 500 }
       );
     }

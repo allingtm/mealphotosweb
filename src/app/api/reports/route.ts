@@ -14,19 +14,19 @@ const ratelimit = new Ratelimit({
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
-    const { success } = await ratelimit.limit(ip);
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    // Rate limit by user ID (more reliable than IP for authenticated routes)
+    const { success } = await ratelimit.limit(user.id);
     if (!success) {
       return NextResponse.json(
         { error: 'Too many reports. Try again tomorrow.' },
         { status: 429 }
       );
-    }
-
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const body = await request.json();

@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     if (error) {
       console.error('Business post insert error:', error);
       return NextResponse.json(
-        { error: 'Failed to create post', details: error.message },
+        { error: 'Failed to create post' },
         { status: 500 }
       );
     }
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('Business posts fetch error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch posts', details: error.message },
+        { error: 'Failed to fetch posts' },
         { status: 500 }
       );
     }

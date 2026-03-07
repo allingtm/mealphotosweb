@@ -266,7 +266,18 @@
     "public": "Public",
     "private": "Private",
     "privateHelper": "Only your private feed list members can see this meal.",
-    "upgradeMultiPhoto": "Upgrade for multi-photo"
+    "upgradeMultiPhoto": "Upgrade for multi-photo",
+    "cuisines": {
+      "italian": "Italian",
+      "asian": "Asian",
+      "mexican": "Mexican",
+      "british": "British",
+      "indian": "Indian",
+      "middle_eastern": "Middle Eastern",
+      "american": "American",
+      "french": "French",
+      "other": "Other"
+    }
   },
   "restaurant": {
     "mealsTagged": "{count} meals tagged here",
@@ -413,7 +424,9 @@
     "manageSubscription": "Manage Subscription",
     "privateFeed": "Private Feed",
     "manageFeedList": "Manage Feed List",
-    "viewInvitations": "View Invitations"
+    "viewInvitations": "View Invitations",
+    "language": "Language",
+    "languageLabel": "App language"
   },
   "footer": {
     "privacy": "Privacy",
@@ -494,7 +507,57 @@
     "getBusiness": "Get Business",
     "freeFeatures": ["5 uploads/day", "1 photo per meal", "5 private feed members", "Rate & request recipes"],
     "personalFeatures": ["15 uploads/day", "Up to 4 photos per meal", "25 private feed members", "Priority support"],
-    "businessFeatures": ["20 uploads/day", "Up to 4 photos per meal", "100 private feed members", "Anonymous dish testing", "Restaurant analytics"]
+    "businessFeatures": ["20 uploads/day", "Up to 4 photos per meal", "100 private feed members", "Anonymous dish testing", "Restaurant analytics"],
+    "freeSubtitle": "For casual food lovers",
+    "personalSubtitle": "For dedicated foodies",
+    "businessSubtitle": "For restaurants & food businesses",
+    "freePrice": "£0",
+    "includesFrom": "Everything in {plan}, plus:",
+    "compareAll": "Compare all features",
+    "faqTitle": "Frequently asked questions",
+    "freeDetailFeatures": ["5 uploads per day", "1 photo per meal", "5 private feed members", "Rate meals & request recipes", "Upload streaks & badges", "Meals shown on global map"],
+    "personalDetailFeatures": ["15 uploads per day", "Up to 4 photos per meal", "25 private feed members", "Priority support"],
+    "businessDetailFeatures": ["Unlimited dish uploads", "Verified business profile & badge", "Dedicated map pin for your venue", "Feed promotion in your local area", "Full analytics dashboard", "Anonymous dish testing", "Priority map placement", "\"Top Rated\" badges", "Content posts on your profile", "100 private feed members"],
+    "comparison": {
+      "uploading": "Uploading",
+      "dailyUploads": "Daily uploads",
+      "photosPerMeal": "Photos per meal",
+      "community": "Community",
+      "rateMeals": "Rate meals",
+      "requestRecipes": "Request recipes",
+      "privateFeedMembers": "Private feed members",
+      "streaksBadges": "Streaks & badges",
+      "visibility": "Visibility",
+      "mealsOnMap": "Meals on global map",
+      "verifiedBadge": "Verified business badge",
+      "dedicatedPin": "Dedicated map pin",
+      "feedPromotion": "Feed promotion",
+      "priorityPlacement": "Priority map placement",
+      "insights": "Insights",
+      "basicStats": "Basic rating stats",
+      "fullAnalytics": "Full analytics dashboard",
+      "anonTesting": "Anonymous dish testing",
+      "support": "Support",
+      "communitySupport": "Community support",
+      "prioritySupport": "Priority support",
+      "unlimited": "Unlimited"
+    },
+    "faq": {
+      "q1": "Can I use meal.photos for free?",
+      "a1": "Yes — meal.photos is free forever. Upload meals, rate others, and appear on the global map at no cost. Upgrade only when you want more.",
+      "q2": "What happens if I cancel my subscription?",
+      "a2": "All your meals, ratings, and profile stay exactly as they are. You simply revert to Free plan limits.",
+      "q3": "Can I change plans later?",
+      "a3": "Absolutely. Upgrade or downgrade anytime from Settings. Changes take effect immediately.",
+      "q4": "What is a private feed?",
+      "a4": "A private feed lets you share meals with a select group of friends or family. Only invited members can see and rate your private meals.",
+      "q5": "How does anonymous dish testing work?",
+      "a5": "Business subscribers can upload dishes without their restaurant name attached. The community rates them honestly — then you reveal your identity when you're ready.",
+      "q6": "Do I need a Business plan to appear on the map?",
+      "a6": "No — every user's meals appear on the global map. The Business plan gives you a dedicated venue pin so customers can find your location directly.",
+      "q7": "How do I cancel my subscription?",
+      "a7": "Go to Settings and tap \"Manage Subscription\". This opens Stripe's Customer Portal where you can cancel, update payment, or switch plans."
+    }
   },
   "privateFeed": {
     "title": "Private Feed List",

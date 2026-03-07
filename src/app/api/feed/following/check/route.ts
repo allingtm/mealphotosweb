@@ -33,8 +33,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
+    console.error('Following feed check error:', error);
     return NextResponse.json(
-      { error: 'Failed to check new meals', details: error.message },
+      { error: 'Failed to check new meals' },
       { status: 500 }
     );
   }

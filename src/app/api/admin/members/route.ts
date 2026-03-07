@@ -11,13 +11,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
       .single();
 
-    if (!profile?.is_admin) {
+    if (profileError || !profile?.is_admin) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
@@ -42,7 +42,9 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + per_page - 1);
 
     if (search) {
-      query = query.or(`username.ilike.%${search}%,display_name.ilike.%${search}%`);
+      // Escape Postgres LIKE special characters to prevent DoS via wildcard abuse
+      const escapedSearch = search.replace(/[%_\\]/g, '\\$&');
+      query = query.or(`username.ilike.%${escapedSearch}%,display_name.ilike.%${escapedSearch}%`);
     }
 
     const { data: members, count, error } = await query;

@@ -53,8 +53,9 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
         .eq('id', id);
 
       if (error) {
+        console.error('Private feed accept error:', error);
         return NextResponse.json(
-          { error: 'Failed to accept invitation', details: error.message },
+          { error: 'Failed to accept invitation' },
           { status: 500 }
         );
       }
@@ -128,8 +129,9 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       .eq('id', id);
 
     if (error) {
+      console.error('Private feed list remove error:', error);
       return NextResponse.json(
-        { error: 'Failed to remove entry', details: error.message },
+        { error: 'Failed to remove entry' },
         { status: 500 }
       );
     }

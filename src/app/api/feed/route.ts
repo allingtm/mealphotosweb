@@ -41,8 +41,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
+    console.error('Feed RPC error:', error);
     return NextResponse.json(
-      { error: 'Failed to load feed', details: error.message },
+      { error: 'Failed to load feed' },
       { status: 500 }
     );
   }

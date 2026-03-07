@@ -34,8 +34,9 @@ export async function GET() {
     .order('invited_at', { ascending: false });
 
   if (error) {
+    console.error('Private feed list fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to load private feed list', details: error.message },
+      { error: 'Failed to load private feed list' },
       { status: 500 }
     );
   }

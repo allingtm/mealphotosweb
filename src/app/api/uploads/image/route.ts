@@ -176,7 +176,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 7. Validate Turnstile token (skip in dev if not configured)
-    if (TURNSTILE_SECRET && turnstileToken !== 'dev-bypass') {
+    const isDevBypass = process.env.NODE_ENV === 'development' && turnstileToken === 'dev-bypass';
+    if (TURNSTILE_SECRET && !isDevBypass) {
       const turnstileRes = await fetch(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',
         {

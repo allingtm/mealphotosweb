@@ -40,8 +40,9 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
 
   if (error) {
+    console.error('Notifications query error:', error);
     return NextResponse.json(
-      { error: 'Failed to load notifications', details: error.message },
+      { error: 'Failed to load notifications' },
       { status: 500 }
     );
   }
@@ -82,8 +83,9 @@ export async function PATCH(request: NextRequest) {
     .in('id', notification_ids);
 
   if (error) {
+    console.error('Mark notifications read error:', error);
     return NextResponse.json(
-      { error: 'Failed to mark notifications as read', details: error.message },
+      { error: 'Failed to mark notifications as read' },
       { status: 500 }
     );
   }

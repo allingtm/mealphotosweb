@@ -23,13 +23,13 @@ export async function GET(
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: adminProfile } = await supabase
+    const { data: adminProfile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
       .single();
 
-    if (!adminProfile?.is_admin) {
+    if (profileError || !adminProfile?.is_admin) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
@@ -84,13 +84,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: adminProfile } = await supabase
+    const { data: adminProfile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
       .single();
 
-    if (!adminProfile?.is_admin) {
+    if (profileError || !adminProfile?.is_admin) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
@@ -163,13 +163,13 @@ export async function DELETE(
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const { data: adminProfile } = await supabase
+    const { data: adminProfile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')
       .eq('id', user.id)
       .single();
 
-    if (!adminProfile?.is_admin) {
+    if (profileError || !adminProfile?.is_admin) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 

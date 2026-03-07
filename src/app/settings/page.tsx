@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download, CreditCard, Users, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
+import { LanguagePicker } from '@/components/settings/LanguagePicker';
 import { createClient } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
@@ -56,6 +57,29 @@ export default function SettingsPage() {
           {t('title')}
         </h1>
       </div>
+
+      {/* Language section */}
+      <section className="mb-8">
+        <h2
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            marginBottom: 12,
+          }}
+        >
+          {t('languageLabel')}
+        </h2>
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ backgroundColor: 'var(--bg-surface)' }}
+        >
+          <LanguagePicker />
+        </div>
+      </section>
 
       {/* Legal section */}
       <section className="mb-8">

@@ -31,7 +31,10 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
+              // unsafe-inline: required by Next.js inline scripts + Cloudflare Turnstile
+              // unsafe-eval: required by OneSignal SDK — remove when they support nonce-based CSP
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.onesignal.com",
+              // unsafe-inline for styles: required by Next.js / Tailwind CSS
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://imagedelivery.net https://api.mapbox.com https://lh3.googleusercontent.com https://*.googleusercontent.com data: blob:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.tiles.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://app.posthog.com",

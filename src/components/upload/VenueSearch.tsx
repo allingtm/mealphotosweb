@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Search, X, MapPin, Loader2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export interface VenueData {
   name: string;
@@ -30,6 +30,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 export default function VenueSearch({ value, onChange, proximity }: VenueSearchProps) {
   const t = useTranslations('upload');
+  const locale = useLocale();
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +63,7 @@ export default function VenueSearch({ value, onChange, proximity }: VenueSearchP
         `?q=${encodeURIComponent(q)}` +
         `&types=poi` +
         `&limit=5` +
-        `&language=en` +
+        `&language=${locale}` +
         `&session_token=${sessionTokenRef.current}` +
         `&access_token=${MAPBOX_TOKEN}`;
 

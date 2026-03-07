@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('search_businesses error:', error);
       return NextResponse.json(
-        { error: 'Failed to search businesses', details: error.message },
+        { error: 'Failed to search businesses' },
         { status: 500 }
       );
     }

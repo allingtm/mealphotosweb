@@ -24,8 +24,9 @@ export async function GET() {
     .order('invited_at', { ascending: false });
 
   if (error) {
+    console.error('Private feed invitations fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to load invitations', details: error.message },
+      { error: 'Failed to load invitations' },
       { status: 500 }
     );
   }

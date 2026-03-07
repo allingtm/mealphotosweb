@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import type { BusinessPost } from '@/types/database';
 
 interface BusinessPostGridProps {
@@ -9,6 +10,7 @@ interface BusinessPostGridProps {
 }
 
 export function BusinessPostGrid({ username }: BusinessPostGridProps) {
+  const locale = useLocale();
   const [posts, setPosts] = useState<BusinessPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -121,7 +123,7 @@ export function BusinessPostGrid({ username }: BusinessPostGridProps) {
               marginTop: 8,
             }}
           >
-            {new Date(post.created_at).toLocaleDateString('en-GB', {
+            {new Date(post.created_at).toLocaleDateString(locale, {
               day: 'numeric',
               month: 'short',
               year: 'numeric',

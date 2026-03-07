@@ -45,6 +45,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(id)) {
+    return NextResponse.json({ error: 'Invalid meal ID' }, { status: 400 });
+  }
+
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') ?? 'square';
 
@@ -68,6 +75,11 @@ export async function GET(
 
   if (error || !meal) {
     return NextResponse.json({ error: 'Meal not found' }, { status: 404 });
+  }
+
+  // Prevent scorecard generation for private meals
+  if (meal.visibility === 'private') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
   const profile = meal.profiles as unknown as {
@@ -316,9 +328,9 @@ export async function GET(
       },
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Render failed';
+    console.error('Scorecard render error:', err);
     return NextResponse.json(
-      { error: 'Failed to generate scorecard', details: message },
+      { error: 'Failed to generate scorecard' },
       { status: 500 }
     );
   }
