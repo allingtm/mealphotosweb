@@ -9,6 +9,12 @@ export const signUpSchema = z
       .string()
       .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`),
     confirmPassword: z.string(),
+    inviteCode: z
+      .string()
+      .trim()
+      .min(1, 'Invite code is required')
+      .max(20, 'Invalid invite code')
+      .transform((v) => v.toUpperCase()),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

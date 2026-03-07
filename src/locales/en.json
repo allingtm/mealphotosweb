@@ -139,7 +139,11 @@
     "confirmEmail": "Check your email to confirm your account, then sign in.",
     "setNewPasswordTitle": "Set new password",
     "authError": "Something went wrong. Please try again.",
-    "legalFooter": "By continuing, you agree to our"
+    "legalFooter": "By continuing, you agree to our",
+    "inviteCodeLabel": "Invite code",
+    "inviteCodePlaceholder": "e.g. A3F7B2C1",
+    "inviteCodeRequired": "An invite code is required to join the beta",
+    "inviteCodeInvalid": "Invalid or expired invite code"
   },
   "notifications": {
     "title": "Notifications",

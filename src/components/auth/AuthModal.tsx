@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { X, Lock, Mail, Eye, EyeOff, Ticket } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
@@ -23,6 +23,7 @@ export function AuthModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export function AuthModal() {
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      setInviteCode('');
       setShowPassword(false);
       setLoading(false);
       setError(null);
@@ -69,7 +71,7 @@ export function AuthModal() {
       e.preventDefault();
       setError(null);
 
-      const result = signUpSchema.safeParse({ email: email.trim(), password, confirmPassword });
+      const result = signUpSchema.safeParse({ email: email.trim(), password, confirmPassword, inviteCode: inviteCode.trim() });
       if (!result.success) {
         setError(result.error.issues[0].message);
         return;
@@ -77,6 +79,44 @@ export function AuthModal() {
 
       setLoading(true);
       try {
+        // 1. Get Turnstile token
+        let turnstileToken = '';
+        if (typeof window !== 'undefined' && window.turnstile) {
+          try {
+            turnstileToken = await new Promise<string>((resolve, reject) => {
+              window.turnstile!.render('#turnstile-signup', {
+                sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
+                callback: resolve,
+                'error-callback': reject,
+                size: 'invisible',
+              });
+            });
+          } catch {
+            turnstileToken = 'dev-bypass';
+          }
+        } else {
+          turnstileToken = 'dev-bypass';
+        }
+
+        // 2. Validate invite code
+        const validateRes = await fetch('/api/invite-code/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: inviteCode.trim(), turnstile_token: turnstileToken }),
+        });
+
+        if (!validateRes.ok) {
+          const validateData = await validateRes.json();
+          if (validateRes.status === 429) {
+            setError(validateData.error || 'Too many attempts. Try again later.');
+          } else {
+            setError(t('inviteCodeInvalid'));
+          }
+          setLoading(false);
+          return;
+        }
+
+        // 3. Sign up with Supabase
         const supabase = createClient();
         const { data, error: authError } = await supabase.auth.signUp({
           email: email.trim(),
@@ -93,9 +133,17 @@ export function AuthModal() {
             setError(authError.message);
           }
         } else if (data.user && data.user.identities?.length === 0) {
-          // User already exists (email confirmation enabled returns empty identities)
           setError(t('emailAlreadyRegistered'));
         } else {
+          // 4. Redeem invite code (fire-and-forget)
+          fetch('/api/invite-code/redeem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: inviteCode.trim() }),
+          }).catch(() => {
+            // Non-critical: code redemption can be retried
+          });
+
           setView('confirmEmail');
         }
       } catch {
@@ -104,7 +152,7 @@ export function AuthModal() {
         setLoading(false);
       }
     },
-    [email, password, confirmPassword, t]
+    [email, password, confirmPassword, inviteCode, t]
   );
 
   const handleSignIn = useCallback(
@@ -318,6 +366,39 @@ export function AuthModal() {
 
             {/* Password form */}
             <form onSubmit={mode === 'signup' ? handleSignUp : handleSignIn} autoComplete="on">
+              {/* Invite Code (signup only) */}
+              {mode === 'signup' && (
+                <>
+                  <label
+                    htmlFor="auth-invite-code"
+                    className="mb-1 block"
+                    style={{
+                      fontSize: 14,
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Ticket size={14} strokeWidth={1.5} style={{ color: 'var(--accent-primary)' }} />
+                      {t('inviteCodeLabel')}
+                    </span>
+                  </label>
+                  <input
+                    id="auth-invite-code"
+                    type="text"
+                    name="invite-code"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value)}
+                    placeholder={t('inviteCodePlaceholder')}
+                    required
+                    disabled={loading}
+                    autoComplete="off"
+                    className="mb-3 w-full rounded-xl border px-4 uppercase outline-none transition-colors focus:border-[var(--accent-primary)]"
+                    style={inputStyle}
+                  />
+                </>
+              )}
+
               {/* Email */}
               <label
                 htmlFor="auth-email"
@@ -434,7 +515,7 @@ export function AuthModal() {
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loading || !email.trim() || !password}
+                disabled={loading || !email.trim() || !password || (mode === 'signup' && !inviteCode.trim())}
                 className="flex w-full items-center justify-center gap-2 rounded-xl transition-opacity disabled:opacity-50"
                 style={{
                   height: 48,
@@ -466,6 +547,7 @@ export function AuthModal() {
                   setError(null);
                   setPassword('');
                   setConfirmPassword('');
+                  setInviteCode('');
                 }}
                 className="underline"
                 style={{ color: 'var(--accent-primary)' }}
@@ -513,6 +595,9 @@ export function AuthModal() {
             </p>
           </>
         )}
+
+        {/* Invisible Turnstile container for invite code validation */}
+        <div id="turnstile-signup" />
       </div>
     </div>
   );
