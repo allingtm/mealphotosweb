@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { revalidateTag } from 'next/cache';
 import { stripe } from '@/lib/stripe';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
@@ -117,6 +118,13 @@ export async function POST(req: Request) {
         subscription_id: null,
       }).eq('id', uid);
 
+      break;
+    }
+
+    case 'price.updated':
+    case 'price.created':
+    case 'price.deleted': {
+      revalidateTag('stripe-prices');
       break;
     }
 

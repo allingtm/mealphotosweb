@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, ChevronDown, Loader2, Minus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -10,51 +10,61 @@ import { useAppStore } from '@/lib/store';
 /*  Plan definitions                                                   */
 /* ------------------------------------------------------------------ */
 
-const PLANS = [
-  {
-    key: 'free' as const,
-    price: null,
-    subtitle: 'For casual food lovers',
-    features: [
-      '5 uploads per day',
-      '1 photo per meal',
-      '5 private feed members',
-      'Rate meals & request recipes',
-      'Upload streaks & badges',
-      'Meals shown on global map',
-    ],
-  },
-  {
-    key: 'personal' as const,
-    price: '£4.99',
-    subtitle: 'For dedicated foodies',
-    includesFrom: 'Free',
-    features: [
-      '15 uploads per day',
-      'Up to 4 photos per meal',
-      '25 private feed members',
-      'Priority support',
-    ],
-  },
-  {
-    key: 'business' as const,
-    price: '£79',
-    subtitle: 'For restaurants & food businesses',
-    includesFrom: 'Personal',
-    features: [
-      'Unlimited dish uploads',
-      'Verified business profile & badge',
-      'Dedicated map pin for your venue',
-      'Feed promotion in your local area',
-      'Full analytics dashboard',
-      'Anonymous dish testing',
-      'Priority map placement',
-      '"Top Rated" badges',
-      'Content posts on your profile',
-      '100 private feed members',
-    ],
-  },
-];
+const CURRENCY_SYMBOLS: Record<string, string> = { gbp: '£', usd: '$', eur: '€' };
+
+function formatPrice(amount: number, currency: string): string {
+  const symbol = CURRENCY_SYMBOLS[currency] ?? `${currency.toUpperCase()} `;
+  const formatted = amount % 1 === 0 ? amount.toString() : amount.toFixed(2);
+  return `${symbol}${formatted}`;
+}
+
+function buildPlans(prices?: { personal: { amount: number; currency: string }; business: { amount: number; currency: string } }) {
+  return [
+    {
+      key: 'free' as const,
+      price: null,
+      subtitle: 'For casual food lovers',
+      features: [
+        '5 uploads per day',
+        '1 photo per meal',
+        '5 private feed members',
+        'Rate meals & request recipes',
+        'Upload streaks & badges',
+        'Meals shown on global map',
+      ],
+    },
+    {
+      key: 'personal' as const,
+      price: prices ? formatPrice(prices.personal.amount, prices.personal.currency) : null,
+      subtitle: 'For dedicated foodies',
+      includesFrom: 'Free',
+      features: [
+        '15 uploads per day',
+        'Up to 4 photos per meal',
+        '25 private feed members',
+        'Priority support',
+      ],
+    },
+    {
+      key: 'business' as const,
+      price: prices ? formatPrice(prices.business.amount, prices.business.currency) : null,
+      subtitle: 'For restaurants & food businesses',
+      includesFrom: 'Personal',
+      features: [
+        'Unlimited dish uploads',
+        'Verified business profile & badge',
+        'Dedicated map pin for your venue',
+        'Feed promotion in your local area',
+        'Full analytics dashboard',
+        'Anonymous dish testing',
+        'Priority map placement',
+        '"Top Rated" badges',
+        'Content posts on your profile',
+        '100 private feed members',
+      ],
+    },
+  ];
+}
 
 /* ------------------------------------------------------------------ */
 /*  Feature comparison data                                            */
@@ -164,6 +174,16 @@ export default function PricingPage() {
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [prices, setPrices] = useState<{ personal: { amount: number; currency: string }; business: { amount: number; currency: string } } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/prices')
+      .then((res) => res.json())
+      .then((data) => { if (data.personal) setPrices(data); })
+      .catch(() => {});
+  }, []);
+
+  const PLANS = buildPlans(prices ?? undefined);
 
   const handleSubscribe = async (plan: 'personal' | 'business') => {
     if (!user) {
@@ -276,7 +296,11 @@ export default function PricingPage() {
                 {plan.subtitle}
               </p>
 
-              {plan.price ? (
+              {plan.key === 'free' ? (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>
+                  £0
+                </p>
+              ) : plan.price ? (
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--accent-primary)', marginBottom: 16 }}>
                   {plan.price}
                   <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-secondary)' }}>
@@ -284,8 +308,8 @@ export default function PricingPage() {
                   </span>
                 </p>
               ) : (
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 }}>
-                  £0
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 28, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 16 }}>
+                  —
                 </p>
               )}
 
