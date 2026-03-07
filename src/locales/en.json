@@ -26,6 +26,7 @@
     "directory": "Directory",
     "recipes": "Recipes",
     "business": "Business",
+    "pricing": "Pricing",
     "menu": "Menu",
     "myMeals": "My Meals",
     "uploadMealPhoto": "Upload meal photo"
@@ -422,6 +423,7 @@
   "menu": {
     "title": "Menu",
     "business": "For Restaurants",
+    "pricing": "Pricing",
     "about": "About",
     "contactUs": "Contact Us",
     "feedback": "Feedback",
@@ -481,8 +483,8 @@
     "removeLocation": "Remove location"
   },
   "pricing": {
-    "title": "Choose your plan",
-    "subtitle": "Upgrade for more uploads, multi-photo, and a larger private feed list.",
+    "title": "Unlock more from meal.photos",
+    "subtitle": "Free forever for food lovers. Upgrade when you want more.",
     "free": "Free",
     "personal": "Personal",
     "business": "Business",

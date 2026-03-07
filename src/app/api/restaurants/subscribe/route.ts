@@ -5,8 +5,7 @@ import { subscribeSchema } from '@/lib/validations';
 
 const PRICE_IDS: Record<string, string> = {
   personal: process.env.STRIPE_PERSONAL_PRICE_ID!,
-  basic: process.env.STRIPE_BASIC_PRICE_ID!,
-  premium: process.env.STRIPE_PREMIUM_PRICE_ID!,
+  business: process.env.STRIPE_PREMIUM_PRICE_ID!,
 };
 
 export async function POST(req: Request) {
@@ -31,11 +30,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const { plan, tier, business_type } = parsed.data;
+    const { plan, business_type } = parsed.data;
 
     // Determine the price ID
-    const priceKey = plan === 'personal' ? 'personal' : (tier ?? 'basic');
-    const priceId = PRICE_IDS[priceKey];
+    const priceId = PRICE_IDS[plan];
 
     // 3. Check if already subscribed
     const { data: profile } = await supabase
@@ -70,9 +68,7 @@ export async function POST(req: Request) {
     const successUrl = plan === 'personal'
       ? `${baseUrl}/settings?upgraded=personal`
       : `${baseUrl}/business/dashboard?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = plan === 'personal'
-      ? `${baseUrl}/pricing`
-      : `${baseUrl}/business`;
+    const cancelUrl = `${baseUrl}/pricing`;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

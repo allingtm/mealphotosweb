@@ -15,7 +15,7 @@ interface MenuDrawerProps {
 }
 
 const menuItems = [
-  { href: '/business', icon: Store, labelKey: 'business' },
+  { href: '/pricing', icon: Store, labelKey: 'pricing' },
   { href: '/about', icon: Info, labelKey: 'about' },
   { href: '/contact', icon: Mail, labelKey: 'contactUs' },
   { href: '/feedback', icon: MessageSquare, labelKey: 'feedback' },

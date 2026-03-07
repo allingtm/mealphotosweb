@@ -317,8 +317,19 @@ export function AuthModal() {
 
             {/* Google OAuth */}
             <button
-              onClick={() => {
-                showToast('Google sign-in coming soon — use email for now.', 'info');
+              onClick={async () => {
+                setLoading(true);
+                const supabase = createClient();
+                const { error: oauthError } = await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                  },
+                });
+                if (oauthError) {
+                  setError(oauthError.message);
+                  setLoading(false);
+                }
               }}
               disabled={loading}
               className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"

@@ -10,17 +10,14 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 function getPlanAndTier(priceId: string): {
   plan: 'personal' | 'business' | 'free';
-  tier: 'personal' | 'basic' | 'premium';
+  tier: 'personal' | 'premium';
   isRestaurant: boolean;
 } {
   if (priceId === PERSONAL_PRICE_ID) {
     return { plan: 'personal', tier: 'personal', isRestaurant: false };
   }
-  if (priceId === PREMIUM_PRICE_ID) {
-    return { plan: 'business', tier: 'premium', isRestaurant: true };
-  }
-  // Default to business basic
-  return { plan: 'business', tier: 'basic', isRestaurant: true };
+  // Both premium and legacy basic price IDs map to business plan
+  return { plan: 'business', tier: 'premium', isRestaurant: true };
 }
 
 export async function POST(req: Request) {

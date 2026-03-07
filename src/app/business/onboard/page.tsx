@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import posthog from 'posthog-js';
@@ -12,11 +12,20 @@ import BusinessProfileForm, {
 } from '@/components/business/BusinessProfileForm';
 import { type BusinessType, getBusinessTypeGroup } from '@/types/database';
 
+const BUSINESS_FEATURES = [
+  'Unlimited dish uploads',
+  'Verified business profile & badge',
+  'Dedicated map pin for your venue',
+  'Feed promotion in your local area',
+  'Full analytics dashboard',
+  'Anonymous dish testing',
+  'Priority map placement',
+];
+
 export default function OnboardPage() {
   const requireAuth = useRequireAuth();
-  const [step, setStep] = useState(0); // 0: type, 1: profile, 2: tier
+  const [step, setStep] = useState(0); // 0: type, 1: profile
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
-  const [tier, setTier] = useState<'basic' | 'premium'>('basic');
   const [formData, setFormData] = useState<BusinessFormData>(defaultBusinessFormData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +117,6 @@ export default function OnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan: 'business',
-          tier,
           business_type: businessType,
         }),
       });
@@ -122,7 +130,6 @@ export default function OnboardPage() {
 
       posthog.capture(ANALYTICS_EVENTS.BUSINESS_ONBOARDING_COMPLETED, {
         business_type: businessType,
-        tier,
       });
 
       window.location.href = subData.url;
@@ -140,7 +147,7 @@ export default function OnboardPage() {
       <div className="w-full" style={{ maxWidth: 480, paddingTop: 32 }}>
         {/* Step indicator */}
         <div className="flex items-center gap-2 justify-center" style={{ marginBottom: 32 }}>
-          {[0, 1, 2].map((s) => (
+          {[0, 1].map((s) => (
             <div
               key={s}
               className="rounded-full"
@@ -178,7 +185,7 @@ export default function OnboardPage() {
           </>
         )}
 
-        {/* Step 1: Profile form */}
+        {/* Step 1: Profile form + submit */}
         {step === 1 && businessType && (
           <>
             <BusinessProfileForm
@@ -186,136 +193,67 @@ export default function OnboardPage() {
               data={formData}
               onChange={handleFormChange}
             />
-            <div className="flex gap-3" style={{ marginTop: 24 }}>
-              <button
-                onClick={() => setStep(0)}
-                className="py-3 px-6 rounded-2xl flex items-center gap-2"
-                style={{
-                  backgroundColor: 'var(--bg-surface)',
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 16,
-                  border: '1px solid var(--bg-elevated)',
-                }}
-              >
-                <ArrowLeft size={18} strokeWidth={1.5} />
-                Back
-              </button>
-              <button
-                onClick={() => formData.business_name.trim() && setStep(2)}
-                disabled={!formData.business_name.trim()}
-                className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: formData.business_name.trim()
-                    ? 'var(--accent-primary)'
-                    : 'var(--bg-elevated)',
-                  color: formData.business_name.trim() ? '#121212' : 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                Continue
-                <ArrowRight size={18} strokeWidth={1.5} />
-              </button>
-            </div>
-          </>
-        )}
 
-        {/* Step 2: Tier selection + checkout */}
-        {step === 2 && (
-          <>
-            <h2
+            {/* Plan summary */}
+            <div
+              className="rounded-2xl"
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 28,
-                color: 'var(--text-primary)',
-                textAlign: 'center',
-                marginBottom: 24,
+                marginTop: 24,
+                padding: 16,
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--bg-elevated)',
               }}
             >
-              Choose your plan
-            </h2>
-
-            <div className="flex flex-col gap-4">
-              {([
-                {
-                  key: 'basic' as const,
-                  name: 'Basic',
-                  price: '29',
-                  features: ['Business profile', 'Map pin', '10 dish uploads', 'Basic stats'],
-                },
-                {
-                  key: 'premium' as const,
-                  name: 'Premium',
-                  price: '79',
-                  features: [
-                    'Unlimited uploads',
-                    'Feed promotion',
-                    'Analytics dashboard',
-                    'Priority map placement',
-                    '"Top Rated" badges',
-                  ],
-                },
-              ]).map((t) => (
-                <button
-                  key={t.key}
-                  onClick={() => setTier(t.key)}
-                  className="rounded-2xl text-left"
+              <div className="flex items-baseline justify-between" style={{ marginBottom: 12 }}>
+                <span
                   style={{
-                    padding: 20,
-                    backgroundColor: 'var(--bg-surface)',
-                    border: tier === t.key
-                      ? '2px solid var(--accent-primary)'
-                      : '1px solid var(--bg-elevated)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
                   }}
                 >
-                  <div className="flex items-baseline justify-between" style={{ marginBottom: 12 }}>
+                  Business Plan
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 24,
+                    color: 'var(--accent-primary)',
+                  }}
+                >
+                  £79
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: 'var(--text-secondary)',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    /mo
+                  </span>
+                </span>
+              </div>
+              <ul className="flex flex-col gap-1">
+                {BUSINESS_FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <Check
+                      size={14}
+                      strokeWidth={2}
+                      style={{ color: 'var(--status-success)', marginTop: 3, flexShrink: 0 }}
+                    />
                     <span
                       style={{
                         fontFamily: 'var(--font-body)',
-                        fontSize: 18,
-                        fontWeight: 600,
-                        color: 'var(--text-primary)',
+                        fontSize: 13,
+                        color: 'var(--text-secondary)',
                       }}
                     >
-                      {t.name}
+                      {f}
                     </span>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: 28,
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      £{t.price}
-                      <span
-                        style={{
-                          fontSize: 14,
-                          color: 'var(--text-secondary)',
-                          fontFamily: 'var(--font-body)',
-                        }}
-                      >
-                        /mo
-                      </span>
-                    </span>
-                  </div>
-                  <ul className="flex flex-col gap-1">
-                    {t.features.map((f) => (
-                      <li
-                        key={f}
-                        style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: 14,
-                          color: 'var(--text-secondary)',
-                        }}
-                      >
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </button>
-              ))}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {error && (
@@ -334,7 +272,8 @@ export default function OnboardPage() {
 
             <div className="flex gap-3" style={{ marginTop: 24 }}>
               <button
-                onClick={() => setStep(1)}
+                type="button"
+                onClick={() => setStep(0)}
                 disabled={loading}
                 className="py-3 px-6 rounded-2xl flex items-center gap-2"
                 style={{
@@ -349,12 +288,17 @@ export default function OnboardPage() {
                 Back
               </button>
               <button
+                type="button"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !formData.business_name.trim()}
                 className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: loading ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-                  color: loading ? 'var(--text-secondary)' : '#121212',
+                  backgroundColor: loading || !formData.business_name.trim()
+                    ? 'var(--bg-elevated)'
+                    : 'var(--accent-primary)',
+                  color: loading || !formData.business_name.trim()
+                    ? 'var(--text-secondary)'
+                    : '#121212',
                   fontFamily: 'var(--font-body)',
                   fontSize: 16,
                   fontWeight: 600,

@@ -14,7 +14,7 @@ export default async function RestaurantDashboardPage({ searchParams }: PageProp
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/business');
+    redirect('/pricing');
   }
 
   const { data: profile } = await supabase
@@ -24,7 +24,7 @@ export default async function RestaurantDashboardPage({ searchParams }: PageProp
     .single();
 
   if (!profile || !profile.is_restaurant || profile.subscription_status !== 'active') {
-    redirect('/business');
+    redirect('/pricing');
   }
 
   // Fetch business profile if exists

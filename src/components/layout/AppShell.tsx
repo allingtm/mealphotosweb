@@ -16,7 +16,7 @@ const sideNavItems = [
   { href: '/upload', icon: Camera, label: 'upload' },
   { href: '/leaderboard', icon: Trophy, label: 'rankings' },
   { href: '/recipes', icon: ChefHat, label: 'recipes' },
-  { href: '/business', icon: Store, label: 'business' },
+  { href: '/pricing', icon: Store, label: 'pricing' },
   { href: '/profile', icon: User, label: 'profile' },
 ] as const;
 
