@@ -30,6 +30,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://meal.photos'),
   title: 'meal.photos — Rate Real Meals',
   description:
     'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
@@ -41,6 +42,20 @@ export const metadata: Metadata = {
   },
   icons: {
     apple: '/icons/icon-192.png',
+  },
+  openGraph: {
+    title: 'meal.photos — Rate Real Meals',
+    description:
+      'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
+    siteName: 'meal.photos',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'meal.photos — Rate Real Meals',
+    description:
+      'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
   },
 };
 
