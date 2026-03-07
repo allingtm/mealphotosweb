@@ -1,14 +1,13 @@
 export default function LeaderboardLoading() {
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        maxWidth: 640,
-        margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
-        padding: 16,
       }}
     >
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: 16 }}>
       {/* Header */}
       <div className="skeleton" style={{ width: 180, height: 28, marginBottom: 24 }} />
 
@@ -35,6 +34,7 @@ export default function LeaderboardLoading() {
           <div className="skeleton" style={{ width: 48, height: 24 }} />
         </div>
       ))}
+      </div>
     </div>
   );
 }

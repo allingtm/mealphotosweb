@@ -194,9 +194,12 @@ export default function PricingPage() {
 
   return (
     <div
-      className="mx-auto px-4 pb-24 pt-8 md:pt-12"
-      style={{ maxWidth: 960 }}
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
     >
+      <div
+        className="mx-auto px-4 pb-24 pt-8 md:pt-12"
+        style={{ maxWidth: 960 }}
+      >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <button
@@ -576,6 +579,7 @@ export default function PricingPage() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -39,22 +39,23 @@ export default async function LeaderboardPage() {
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        maxWidth: 640,
-        margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
         paddingBottom: 72,
       }}
     >
-      <AppBar />
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+        <AppBar />
 
-      <LeaderboardClient
-        initialEntries={entries}
-        currentUserId={user?.id ?? null}
-        userCountry={userProfile?.location_country ?? null}
-        userCity={userProfile?.location_city ?? null}
-      />
+        <LeaderboardClient
+          initialEntries={entries}
+          currentUserId={user?.id ?? null}
+          userCountry={userProfile?.location_country ?? null}
+          userCity={userProfile?.location_city ?? null}
+        />
+      </div>
     </div>
   );
 }
