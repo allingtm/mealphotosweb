@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://meal.photos'),
   title: 'meal.photos — Rate Real Meals',
   description:
-    'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
+    'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -44,18 +44,18 @@ export const metadata: Metadata = {
     apple: '/icons/icon-192.png',
   },
   openGraph: {
-    title: 'meal.photos — Rate Real Meals',
+    title: 'meal.photos — A global stage for food culture',
     description:
-      'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
+      'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
     siteName: 'meal.photos',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'meal.photos — Rate Real Meals',
+    title: 'meal.photos — A global stage for food culture',
     description:
-      'Upload meal photos, rate dishes 1–10, unlock crowd-requested recipes, and explore food culture on a global map.',
+      'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
   },
 };
 

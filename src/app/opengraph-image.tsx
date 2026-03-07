@@ -69,23 +69,8 @@ export default async function Image() {
               fontWeight: 500,
             }}
           >
-            Rate Real Meals
+            A global stage for food culture.
           </div>
-        </div>
-
-        {/* Tagline */}
-        <div
-          style={{
-            fontSize: 22,
-            color: '#888888',
-            marginTop: 24,
-            maxWidth: 700,
-            textAlign: 'center',
-            lineHeight: 1.4,
-          }}
-        >
-          Upload meal photos, rate dishes 1-10, unlock recipes, and explore food
-          culture worldwide.
         </div>
       </div>
     ),
