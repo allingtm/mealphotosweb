@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { AppBar } from '@/components/layout/AppBar';
 
 interface Invitation {
   id: string;
@@ -18,7 +18,6 @@ interface Invitation {
 
 export default function InvitationsPage() {
   const t = useTranslations('privateFeed');
-  const router = useRouter();
 
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,30 +58,9 @@ export default function InvitationsPage() {
   };
 
   return (
-    <div className="mx-auto px-4 pb-24 pt-8 md:pt-12" style={{ maxWidth: 720 }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center justify-center"
-          style={{ width: 40, height: 40, borderRadius: 'var(--radius-full)', color: 'var(--text-secondary)' }}
-          aria-label="Go back"
-        >
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        </button>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 24,
-            color: 'var(--accent-primary)',
-            margin: 0,
-          }}
-        >
-          {t('invitationsTitle')}
-        </h1>
-      </div>
-
+    <div className="mx-auto pb-24" style={{ maxWidth: 960 }}>
+      <AppBar title={t('invitationsTitle')} />
+      <div className="px-4 pt-4">
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
@@ -174,6 +152,7 @@ export default function InvitationsPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

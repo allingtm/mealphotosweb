@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download, CreditCard, Users, Mail } from 'lucide-react';
+import { ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download, CreditCard, Users, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { LanguagePicker } from '@/components/settings/LanguagePicker';
+import { AppBar } from '@/components/layout/AppBar';
 import { createClient } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
@@ -29,42 +30,15 @@ export default function SettingsPage() {
     <div
       className="w-full flex-1 min-h-0 overflow-y-auto"
       style={{
-        maxWidth: 720,
+        maxWidth: 960,
         margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
         paddingBottom: 72,
       }}
     >
-    <div className="px-4 pt-8 md:pt-12">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center justify-center"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 'var(--radius-full)',
-            color: 'var(--text-secondary)',
-          }}
-          aria-label="Go back"
-        >
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        </button>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 28,
-            color: 'var(--accent-primary)',
-            margin: 0,
-          }}
-        >
-          {t('title')}
-        </h1>
-      </div>
-
+    <AppBar title={t('title')} />
+    <div className="px-4 pt-4 md:pt-8">
       {/* Language section */}
       <section className="mb-8">
         <h2

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import { StatsRow } from '@/components/profile/StatsRow';
+import { AppBar } from '@/components/layout/AppBar';
 import type { Meal } from '@/types/database';
 
 export default async function MyMealsPage() {
@@ -54,13 +55,14 @@ export default async function MyMealsPage() {
   return (
     <div
       style={{
-        maxWidth: 640,
+        maxWidth: 960,
         margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
         paddingBottom: 72,
       }}
     >
+      <AppBar title="My Meals" />
       <div style={{ padding: '0 16px', paddingTop: 16 }}>
         <StatsRow
           mealCount={mealCount}

@@ -1,6 +1,7 @@
 import { Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+import { AppBar } from '@/components/layout/AppBar';
 
 export async function generateMetadata() {
   const t = await getTranslations('contact');
@@ -19,39 +20,49 @@ function ContactContent() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center"
       style={{
-        minHeight: '60vh',
-        padding: '48px 24px',
-        textAlign: 'center',
+        maxWidth: 960,
+        margin: '0 auto',
+        minHeight: '100dvh',
+        backgroundColor: 'var(--bg-primary)',
       }}
     >
-      <Mail
-        size={48}
-        strokeWidth={1}
-        color="var(--text-secondary)"
-      />
-      <h1
+      <AppBar title={t('title')} />
+      <div
+        className="flex flex-col items-center justify-center"
         style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 28,
-          fontWeight: 400,
-          color: 'var(--text-primary)',
-          margin: '16px 0 8px',
+          minHeight: '60vh',
+          padding: '48px 24px',
+          textAlign: 'center',
         }}
       >
-        {t('title')}
-      </h1>
-      <p
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 16,
-          color: 'var(--text-secondary)',
-          maxWidth: 360,
-        }}
-      >
-        {t('comingSoon')} — {t('description')}
-      </p>
+        <Mail
+          size={48}
+          strokeWidth={1}
+          color="var(--text-secondary)"
+        />
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 28,
+            fontWeight: 400,
+            color: 'var(--text-primary)',
+            margin: '16px 0 8px',
+          }}
+        >
+          {t('title')}
+        </h1>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 16,
+            color: 'var(--text-secondary)',
+            maxWidth: 360,
+          }}
+        >
+          {t('comingSoon')} — {t('description')}
+        </p>
+      </div>
     </div>
   );
 }

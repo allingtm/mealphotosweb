@@ -12,6 +12,7 @@ import { ExploreFAQ } from '@/components/explore/ExploreFAQ';
 import { RelatedPages } from '@/components/explore/RelatedPages';
 import { BlurHashCanvas } from '@/components/feed/BlurHashCanvas';
 import { ScoreBadge } from '@/components/feed/ScoreBadge';
+import { AppBar } from '@/components/layout/AppBar';
 
 export const revalidate = 300; // ISR: 5 minutes
 
@@ -324,6 +325,7 @@ export default async function ExplorePage({
         backgroundColor: 'var(--bg-primary)',
       }}
     >
+      <AppBar title={resolved.displayName} />
       {/* JSON-LD */}
       <script
         type="application/ld+json"

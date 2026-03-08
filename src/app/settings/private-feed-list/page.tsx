@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, UserPlus, Trash2, Loader2 } from 'lucide-react';
+import { UserPlus, Trash2, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
+import { AppBar } from '@/components/layout/AppBar';
 
 interface Member {
   id: string;
@@ -97,46 +98,29 @@ export default function PrivateFeedListPage() {
   const activeCount = members.filter((m) => m.status === 'pending' || m.status === 'accepted').length;
 
   return (
-    <div className="mx-auto px-4 pb-24 pt-8 md:pt-12" style={{ maxWidth: 720 }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center justify-center"
-          style={{ width: 40, height: 40, borderRadius: 'var(--radius-full)', color: 'var(--text-secondary)' }}
-          aria-label="Go back"
-        >
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        </button>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 24,
-            color: 'var(--accent-primary)',
-            margin: 0,
-            flex: 1,
-          }}
-        >
-          {t('title')}
-        </h1>
-        <button
-          type="button"
-          onClick={() => setShowInviteModal(true)}
-          disabled={activeCount >= limit}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{
-            backgroundColor: activeCount >= limit ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-            color: activeCount >= limit ? 'var(--text-secondary)' : '#121212',
-            fontFamily: 'var(--font-body)',
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <UserPlus size={14} strokeWidth={1.5} />
-          {t('invite')}
-        </button>
-      </div>
+    <div className="mx-auto pb-24" style={{ maxWidth: 960 }}>
+      <AppBar
+        title={t('title')}
+        rightAction={
+          <button
+            type="button"
+            onClick={() => setShowInviteModal(true)}
+            disabled={activeCount >= limit}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+            style={{
+              backgroundColor: activeCount >= limit ? 'var(--bg-elevated)' : 'var(--accent-primary)',
+              color: activeCount >= limit ? 'var(--text-secondary)' : '#121212',
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            <UserPlus size={14} strokeWidth={1.5} />
+            {t('invite')}
+          </button>
+        }
+      />
+      <div className="px-4 pt-4">
 
       {/* Member count */}
       <p
@@ -287,6 +271,7 @@ export default function PrivateFeedListPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

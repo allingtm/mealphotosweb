@@ -7,10 +7,11 @@ import { NotificationPanel } from '@/components/notifications/NotificationPanel'
 import { MenuButton } from '@/components/layout/MenuButton';
 
 interface AppBarProps {
+  title?: string;
   rightAction?: React.ReactNode;
 }
 
-export function AppBar({ rightAction }: AppBarProps) {
+export function AppBar({ title, rightAction }: AppBarProps) {
   const t = useTranslations('feed');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -33,7 +34,7 @@ export function AppBar({ rightAction }: AppBarProps) {
             color: 'var(--text-primary)',
           }}
         >
-          {t('title')}
+          {title ?? t('title')}
         </span>
         <div className="flex items-center gap-1">
           {rightAction}

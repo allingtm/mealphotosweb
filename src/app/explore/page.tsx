@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { MapPin, UtensilsCrossed } from 'lucide-react';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
+import { AppBar } from '@/components/layout/AppBar';
 
 export const revalidate = 300;
 
@@ -43,9 +44,10 @@ export default async function ExploreIndexPage() {
       style={{
         minHeight: 'calc(100dvh - 56px)',
         backgroundColor: 'var(--bg-primary)',
-        padding: '16px',
       }}
     >
+      <AppBar title="Explore" />
+      <div style={{ padding: '16px' }}>
       <h1
         style={{
           fontFamily: 'var(--font-display)',
@@ -215,6 +217,7 @@ export default async function ExploreIndexPage() {
       )}
 
       <div style={{ height: 56 }} />
+      </div>
     </div>
   );
 }

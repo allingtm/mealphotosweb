@@ -70,7 +70,7 @@ export default async function MyMealDetailPage({
   return (
     <div
       style={{
-        maxWidth: 640,
+        maxWidth: 960,
         margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',

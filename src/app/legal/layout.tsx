@@ -12,7 +12,7 @@ export default async function LegalLayout({
   return (
     <div
       className="mx-auto px-4 pb-24 pt-8 md:pt-12"
-      style={{ maxWidth: 720 }}
+      style={{ maxWidth: 960 }}
     >
       <Link
         href="/"

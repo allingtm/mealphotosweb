@@ -3,7 +3,7 @@ export default function MealDetailLoading() {
     <div
       className="w-full flex-1 min-h-0 overflow-y-auto"
       style={{
-        maxWidth: 720,
+        maxWidth: 960,
         margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
