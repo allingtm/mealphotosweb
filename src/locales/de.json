@@ -442,7 +442,8 @@
     "feedback": "Feedback",
     "signIn": "Anmelden",
     "profile": "Profil",
-    "myMeals": "Meine Gerichte"
+    "myMeals": "Meine Gerichte",
+    "settings": "Einstellungen"
   },
   "directory": {
     "title": "Verzeichnis",
@@ -582,6 +583,18 @@
     "inviteFailed": "Einladung konnte nicht gesendet werden",
     "memberRemoved": "Mitglied entfernt",
     "listLeft": "Privaten Feed verlassen"
+  },
+  "sidebar": {
+    "uploadMeal": "Gericht hochladen",
+    "leaderboard": "Bestenliste",
+    "leaderboardDesc": "Sieh, wer diese Woche die bestbewerteten Gerichte kocht.",
+    "viewLeaderboard": "Bestenliste ansehen",
+    "trending": "Im Trend",
+    "trendingDesc": "Entdecke angesagte Küchen und beliebte Gerichte auf der Karte.",
+    "openMap": "Karte öffnen",
+    "discover": "Entdecken",
+    "discoverDesc": "Finde Restaurants, Ernährungsberater und Gastronomieprofis in deiner Nähe.",
+    "browseBusiness": "Betriebe durchsuchen"
   },
   "errors": {
     "somethingWentWrong": "Etwas ist schiefgelaufen",

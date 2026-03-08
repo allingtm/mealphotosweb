@@ -442,7 +442,8 @@
     "feedback": "Avis",
     "signIn": "Se connecter",
     "profile": "Profil",
-    "myMeals": "Mes repas"
+    "myMeals": "Mes repas",
+    "settings": "Paramètres"
   },
   "directory": {
     "title": "Annuaire",
@@ -582,6 +583,18 @@
     "inviteFailed": "Impossible d'envoyer l'invitation",
     "memberRemoved": "Membre supprimé",
     "listLeft": "Fil privé quitté"
+  },
+  "sidebar": {
+    "uploadMeal": "Publier un repas",
+    "leaderboard": "Classement",
+    "leaderboardDesc": "Découvrez qui cuisine les repas les mieux notés cette semaine.",
+    "viewLeaderboard": "Voir le classement",
+    "trending": "Tendances",
+    "trendingDesc": "Explorez les cuisines tendance et les repas populaires sur la carte.",
+    "openMap": "Ouvrir la carte",
+    "discover": "Découvrir",
+    "discoverDesc": "Trouvez des restaurants, nutritionnistes et professionnels de la cuisine près de chez vous.",
+    "browseBusiness": "Parcourir les établissements"
   },
   "errors": {
     "somethingWentWrong": "Une erreur est survenue",

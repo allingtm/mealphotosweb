@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut, UtensilsCrossed, AlertTriangle } from 'lucide-react';
+import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut, UtensilsCrossed, AlertTriangle, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -205,6 +205,31 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
                 }}
               >
                 {t('myMeals')}
+              </span>
+            </Link>
+          )}
+
+          {/* Settings — only when logged in */}
+          {user && (
+            <Link
+              href="/settings"
+              onClick={onClose}
+              className="flex items-center gap-3 w-full"
+              style={{
+                padding: '14px 16px',
+                textDecoration: 'none',
+              }}
+            >
+              <Settings size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {t('settings')}
               </span>
             </Link>
           )}

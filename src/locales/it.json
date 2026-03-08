@@ -442,7 +442,8 @@
     "feedback": "Feedback",
     "signIn": "Accedi",
     "profile": "Profilo",
-    "myMeals": "I miei piatti"
+    "myMeals": "I miei piatti",
+    "settings": "Impostazioni"
   },
   "directory": {
     "title": "Directory",
@@ -582,6 +583,18 @@
     "inviteFailed": "Impossibile inviare l'invito",
     "memberRemoved": "Membro rimosso",
     "listLeft": "Hai lasciato il feed privato"
+  },
+  "sidebar": {
+    "uploadMeal": "Carica un piatto",
+    "leaderboard": "Classifica",
+    "leaderboardDesc": "Scopri chi cucina i piatti più apprezzati questa settimana.",
+    "viewLeaderboard": "Vedi classifica",
+    "trending": "Di tendenza",
+    "trendingDesc": "Esplora le cucine di tendenza e i piatti più popolari sulla mappa.",
+    "openMap": "Apri mappa",
+    "discover": "Scopri",
+    "discoverDesc": "Trova ristoranti, nutrizionisti e professionisti della ristorazione vicino a te.",
+    "browseBusiness": "Esplora attività"
   },
   "errors": {
     "somethingWentWrong": "Qualcosa \u00e8 andato storto",

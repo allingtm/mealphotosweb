@@ -27,9 +27,16 @@ export default function SettingsPage() {
 
   return (
     <div
-      className="mx-auto px-4 pb-24 pt-8 md:pt-12"
-      style={{ maxWidth: 720 }}
+      className="w-full flex-1 min-h-0 overflow-y-auto"
+      style={{
+        maxWidth: 720,
+        margin: '0 auto',
+        backgroundColor: 'var(--bg-primary)',
+        minHeight: '100dvh',
+        paddingBottom: 72,
+      }}
     >
+    <div className="px-4 pt-8 md:pt-12">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button
@@ -300,6 +307,7 @@ export default function SettingsPage() {
           </p>
         </section>
       )}
+    </div>
     </div>
   );
 }

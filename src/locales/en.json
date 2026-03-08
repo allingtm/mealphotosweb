@@ -442,7 +442,8 @@
     "feedback": "Feedback",
     "signIn": "Sign In",
     "profile": "Profile",
-    "myMeals": "My Meals"
+    "myMeals": "My Meals",
+    "settings": "Settings"
   },
   "directory": {
     "title": "Directory",
@@ -582,6 +583,18 @@
     "inviteFailed": "Failed to send invitation",
     "memberRemoved": "Member removed",
     "listLeft": "Left private feed"
+  },
+  "sidebar": {
+    "uploadMeal": "Upload a meal",
+    "leaderboard": "Leaderboard",
+    "leaderboardDesc": "See who is cooking the highest-rated meals this week.",
+    "viewLeaderboard": "View leaderboard",
+    "trending": "Trending",
+    "trendingDesc": "Explore trending cuisines and popular meals on the map.",
+    "openMap": "Open map",
+    "discover": "Discover",
+    "discoverDesc": "Find restaurants, nutritionists, and food professionals near you.",
+    "browseBusiness": "Browse businesses"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",

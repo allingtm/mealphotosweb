@@ -8,6 +8,7 @@ export function DesktopSidebar() {
   const tFooter = useTranslations('footer');
   const tDir = useTranslations('directory');
   const tRec = useTranslations('recipes');
+  const t = useTranslations('sidebar');
 
   return (
     <aside
@@ -36,7 +37,7 @@ export function DesktopSidebar() {
             fontWeight: 600,
           }}
         >
-          Upload a meal
+          {t('uploadMeal')}
         </span>
       </Link>
 
@@ -57,7 +58,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Leaderboard
+            {t('leaderboard')}
           </h3>
         </div>
         <p
@@ -68,7 +69,7 @@ export function DesktopSidebar() {
             marginBottom: 12,
           }}
         >
-          See who is cooking the highest-rated meals this week.
+          {t('leaderboardDesc')}
         </p>
         <Link
           href="/leaderboard"
@@ -79,7 +80,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          View leaderboard
+          {t('viewLeaderboard')}
         </Link>
       </div>
 
@@ -100,7 +101,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Trending
+            {t('trending')}
           </h3>
         </div>
         <p
@@ -110,7 +111,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Explore trending cuisines and popular meals on the map.
+          {t('trendingDesc')}
         </p>
         <Link
           href="/map"
@@ -122,7 +123,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          Open map
+          {t('openMap')}
         </Link>
       </div>
 
@@ -143,7 +144,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Discover
+            {t('discover')}
           </h3>
         </div>
         <p
@@ -154,7 +155,7 @@ export function DesktopSidebar() {
             marginBottom: 12,
           }}
         >
-          Find restaurants, nutritionists, and food professionals near you.
+          {t('discoverDesc')}
         </p>
         <Link
           href="/map?view=list"
@@ -165,7 +166,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          Browse businesses
+          {t('browseBusiness')}
         </Link>
       </div>
 

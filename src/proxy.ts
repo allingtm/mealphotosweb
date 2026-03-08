@@ -28,10 +28,12 @@ function negotiateLocale(acceptLanguage: string | null): Locale {
 
 export async function proxy(request: NextRequest) {
   // CSRF protection: validate Origin header on state-changing requests
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
+  // Skip for webhook endpoints (they use their own signature verification)
+  const isWebhook = request.nextUrl.pathname.startsWith('/api/webhooks/');
+  if (!isWebhook && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
     const origin = request.headers.get('origin');
 
-    if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
       return NextResponse.json(
         { error: 'Invalid origin' },
         { status: 403 }
