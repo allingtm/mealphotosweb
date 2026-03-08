@@ -68,10 +68,10 @@ export function FeedPageClient({ initialMeals, initialCursor }: FeedPageClientPr
 
   return (
     <div
-      className="md:overflow-y-auto md:flex-1 md:min-h-0"
-      style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}
+      className="h-dvh overflow-hidden flex flex-col"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
     >
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden" style={{ maxWidth: 960, margin: '0 auto', width: '100%' }}>
         <FeedHeader />
         {user && (
           <FeedTabBar activeTab={activeTab} onTabChange={handleTabChange} />

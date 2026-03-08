@@ -373,8 +373,8 @@ export function FollowingFeed({ onSwitchToDiscover }: FollowingFeedProps) {
       <NewMealsPill count={newMealCount} onTap={scrollToTopAndRefresh} />
       <div
         ref={scrollContainerRef}
-        className="snap-y-mandatory overflow-y-scroll w-full mx-auto md:h-auto! md:flex-1 md:min-h-0"
-        style={{ height: 'var(--feed-card-height)', maxWidth: 'var(--feed-max-width)' }}
+        className="snap-y-mandatory overflow-y-scroll w-full mx-auto flex-1 min-h-0"
+        style={{ maxWidth: 'var(--feed-max-width)' }}
       >
         {meals.map((meal, index) => (
           <div
