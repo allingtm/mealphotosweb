@@ -58,6 +58,7 @@ export default function InvitationsPage() {
   };
 
   return (
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}>
     <div className="mx-auto pb-24" style={{ maxWidth: 960 }}>
       <AppBar title={t('invitationsTitle')} />
       <div className="px-4 pt-4">
@@ -153,6 +154,7 @@ export default function InvitationsPage() {
         </div>
       )}
       </div>
+    </div>
     </div>
   );
 }

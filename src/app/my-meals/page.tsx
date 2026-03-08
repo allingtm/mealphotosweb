@@ -54,23 +54,24 @@ export default async function MyMealsPage() {
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        maxWidth: 960,
-        margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
         paddingBottom: 72,
       }}
     >
-      <AppBar title="My Meals" />
-      <div style={{ padding: '0 16px', paddingTop: 16 }}>
-        <StatsRow
-          mealCount={mealCount}
-          avgRating={Number(avgRating.toFixed(1))}
-          streak={profileResult.data?.streak_current ?? 0}
-        />
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+        <AppBar title="My Meals" />
+        <div style={{ padding: '0 16px', paddingTop: 16 }}>
+          <StatsRow
+            mealCount={mealCount}
+            avgRating={Number(avgRating.toFixed(1))}
+            streak={profileResult.data?.streak_current ?? 0}
+          />
+        </div>
+        <ProfileTabs meals={meals} savedMeals={savedMeals} showSavedTab authorView />
       </div>
-      <ProfileTabs meals={meals} savedMeals={savedMeals} showSavedTab authorView />
     </div>
   );
 }

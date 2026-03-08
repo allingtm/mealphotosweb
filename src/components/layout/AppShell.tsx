@@ -30,8 +30,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
 
-  // Full-bleed pages (map) don't get the sidebar
-  const isFullBleed = pathname === '/map';
+  // Full-bleed pages don't get the sidebar (none currently)
+  const isFullBleed = false;
 
   return (
     <>

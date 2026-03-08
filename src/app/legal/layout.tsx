@@ -10,6 +10,7 @@ export default async function LegalLayout({
   const t = await getTranslations('legal');
 
   return (
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}>
     <div
       className="mx-auto px-4 pb-24 pt-8 md:pt-12"
       style={{ maxWidth: 960 }}
@@ -38,6 +39,7 @@ export default async function LegalLayout({
       >
         {children}
       </article>
+    </div>
     </div>
   );
 }

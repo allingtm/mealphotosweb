@@ -320,11 +320,13 @@ export default async function ExplorePage({
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        minHeight: 'calc(100dvh - 56px)',
+        minHeight: '100dvh',
         backgroundColor: 'var(--bg-primary)',
       }}
     >
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
       <AppBar title={resolved.displayName} />
       {/* JSON-LD */}
       <script
@@ -523,6 +525,7 @@ export default async function ExplorePage({
 
       {/* Bottom padding for nav bar */}
       <div style={{ height: 56 }} />
+      </div>
     </div>
   );
 }

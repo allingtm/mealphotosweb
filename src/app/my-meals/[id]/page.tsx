@@ -69,13 +69,13 @@ export default async function MyMealDetailPage({
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        maxWidth: 960,
-        margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
       }}
     >
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
       {/* Header bar */}
       <div
         className="flex items-center gap-3"
@@ -163,6 +163,7 @@ export default async function MyMealDetailPage({
           initialLocationCity={meal.location_city}
           initialLocationCountry={meal.location_country}
         />
+      </div>
       </div>
     </div>
   );

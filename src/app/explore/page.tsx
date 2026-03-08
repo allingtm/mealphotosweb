@@ -41,11 +41,13 @@ export default async function ExploreIndexPage() {
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        minHeight: 'calc(100dvh - 56px)',
+        minHeight: '100dvh',
         backgroundColor: 'var(--bg-primary)',
       }}
     >
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
       <AppBar title="Explore" />
       <div style={{ padding: '16px' }}>
       <h1
@@ -217,6 +219,7 @@ export default async function ExploreIndexPage() {
       )}
 
       <div style={{ height: 56 }} />
+      </div>
       </div>
     </div>
   );

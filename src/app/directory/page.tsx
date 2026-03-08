@@ -20,13 +20,13 @@ function DirectoryContent() {
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        maxWidth: 960,
-        margin: '0 auto',
         minHeight: '100dvh',
         backgroundColor: 'var(--bg-primary)',
       }}
     >
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
       <AppBar title={t('title')} />
       <div
         className="flex flex-col items-center justify-center"
@@ -62,6 +62,7 @@ function DirectoryContent() {
         >
           {t('comingSoon')} — {t('comingSoonDesc')}
         </p>
+      </div>
       </div>
     </div>
   );

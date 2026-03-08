@@ -98,6 +98,7 @@ export default function PrivateFeedListPage() {
   const activeCount = members.filter((m) => m.status === 'pending' || m.status === 'accepted').length;
 
   return (
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}>
     <div className="mx-auto pb-24" style={{ maxWidth: 960 }}>
       <AppBar
         title={t('title')}
@@ -272,6 +273,7 @@ export default function PrivateFeedListPage() {
         </div>
       )}
       </div>
+    </div>
     </div>
   );
 }

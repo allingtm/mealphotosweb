@@ -67,17 +67,22 @@ export function FeedPageClient({ initialMeals, initialCursor }: FeedPageClientPr
   }, [handleTabChange]);
 
   return (
-    <>
-      <FeedHeader />
-      {user && (
-        <FeedTabBar activeTab={activeTab} onTabChange={handleTabChange} />
-      )}
-      <div style={{ display: activeTab === 'discover' ? 'contents' : 'none' }}>
-        <FeedContainer initialMeals={initialMeals} initialCursor={initialCursor} />
+    <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
+      style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}
+    >
+      <div style={{ maxWidth: 960, margin: '0 auto' }}>
+        <FeedHeader />
+        {user && (
+          <FeedTabBar activeTab={activeTab} onTabChange={handleTabChange} />
+        )}
+        <div style={{ display: activeTab === 'discover' ? 'contents' : 'none' }}>
+          <FeedContainer initialMeals={initialMeals} initialCursor={initialCursor} />
+        </div>
+        {user && activeTab === 'following' && (
+          <FollowingFeed onSwitchToDiscover={switchToDiscover} />
+        )}
       </div>
-      {user && activeTab === 'following' && (
-        <FollowingFeed onSwitchToDiscover={switchToDiscover} />
-      )}
-    </>
+    </div>
   );
 }

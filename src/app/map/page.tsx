@@ -35,7 +35,8 @@ export default function MapPage() {
   const [view, setView] = useState<'map' | 'list'>(initialView);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-56px)] md:h-full md:flex-1">
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}>
+    <div className="flex flex-col h-[calc(100dvh-56px)] md:h-full md:flex-1" style={{ maxWidth: 960, margin: '0 auto' }}>
       <AppBar
         rightAction={
           <button
@@ -59,6 +60,7 @@ export default function MapPage() {
         }
       />
       {view === 'map' ? <MapView /> : <DiscoverClient />}
+    </div>
     </div>
   );
 }
