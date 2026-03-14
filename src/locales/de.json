@@ -52,7 +52,12 @@
     "followPrompt": "Folge @{username}",
     "followPromptRated": "Du hast @{username}s Gericht mit {score} bewertet",
     "suggestionsTitle": "Personen zum Folgen",
-    "suggestionStats": "{count} Gerichte \u00b7 {rating} Durchschnitt"
+    "suggestionStats": "{count} Gerichte \u00b7 {rating} Durchschnitt",
+    "journal": "Journal",
+    "emptyJournal": "Dein Journal ist leer",
+    "emptyJournalDesc": "Private Mahlzeiten, die du hochl\u00e4dst, erscheinen hier. Nur du kannst sie sehen.",
+    "uploadPrivateMeal": "Private Mahlzeit hochladen",
+    "endOfJournal": "Das ist alles in deinem Journal"
   },
   "rating": {
     "rateThisMeal": "Dieses Gericht bewerten",

@@ -52,7 +52,12 @@
     "followPrompt": "Follow @{username}",
     "followPromptRated": "You rated @{username}'s meal {score}",
     "suggestionsTitle": "People to follow",
-    "suggestionStats": "{count} meals \u00b7 {rating} avg"
+    "suggestionStats": "{count} meals \u00b7 {rating} avg",
+    "journal": "Journal",
+    "emptyJournal": "Your journal is empty",
+    "emptyJournalDesc": "Private meals you upload will appear here. Only you can see them.",
+    "uploadPrivateMeal": "Upload a private meal",
+    "endOfJournal": "That's everything in your journal"
   },
   "rating": {
     "rateThisMeal": "Rate this meal",

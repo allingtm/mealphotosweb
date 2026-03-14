@@ -27,6 +27,8 @@ export const ANALYTICS_EVENTS = {
   FOLLOWING_FEED_VIEWED: 'following_feed_viewed',
   DISCOVER_FEED_VIEWED: 'discover_feed_viewed',
   FOLLOWING_FEED_EMPTY: 'following_feed_empty',
+  JOURNAL_FEED_VIEWED: 'journal_feed_viewed',
+  JOURNAL_FEED_EMPTY: 'journal_feed_empty',
   FOLLOW_SUGGESTION_SHOWN: 'follow_suggestion_shown',
   FOLLOW_SUGGESTION_TAPPED: 'follow_suggestion_tapped',
   FOLLOW_PROMPT_AFTER_RATING: 'follow_prompt_after_rating',

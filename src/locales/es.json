@@ -52,7 +52,12 @@
     "followPrompt": "Seguir a @{username}",
     "followPromptRated": "Puntuaste el plato de @{username} con {score}",
     "suggestionsTitle": "Personas a quienes seguir",
-    "suggestionStats": "{count} platos \u00b7 {rating} media"
+    "suggestionStats": "{count} platos \u00b7 {rating} media",
+    "journal": "Diario",
+    "emptyJournal": "Tu diario est\u00e1 vac\u00edo",
+    "emptyJournalDesc": "Las comidas privadas que subas aparecer\u00e1n aqu\u00ed. Solo t\u00fa puedes verlas.",
+    "uploadPrivateMeal": "Subir una comida privada",
+    "endOfJournal": "Eso es todo en tu diario"
   },
   "rating": {
     "rateThisMeal": "Puntuar este plato",

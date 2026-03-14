@@ -10,8 +10,9 @@ import { FeedTabBar } from './FeedTabBar';
 import { FeedContainer } from './FeedContainer';
 import { FeedHeader } from './FeedHeader';
 import { FollowingFeed } from './FollowingFeed';
+import { JournalFeed } from './JournalFeed';
 
-type FeedTab = 'following' | 'discover';
+type FeedTab = 'following' | 'discover' | 'journal';
 
 interface FeedPageClientProps {
   initialMeals: FeedItem[];
@@ -25,14 +26,16 @@ export function FeedPageClient({ initialMeals, initialCursor }: FeedPageClientPr
   const [activeTab, setActiveTab] = useState<FeedTab>(() => {
     if (typeof window === 'undefined') return 'discover';
     if (!user) return 'discover';
-    return (localStorage.getItem('feed_tab') as FeedTab) || 'discover';
+    const saved = localStorage.getItem('feed_tab') as FeedTab | null;
+    if (saved === 'following' || saved === 'discover' || saved === 'journal') return saved;
+    return 'discover';
   });
 
   // Re-check localStorage when user signs in
   useEffect(() => {
     if (user) {
       const saved = localStorage.getItem('feed_tab') as FeedTab | null;
-      if (saved === 'following' || saved === 'discover') {
+      if (saved === 'following' || saved === 'discover' || saved === 'journal') {
         setActiveTab(saved);
       }
     } else {
@@ -81,6 +84,9 @@ export function FeedPageClient({ initialMeals, initialCursor }: FeedPageClientPr
         </div>
         {user && activeTab === 'following' && (
           <FollowingFeed onSwitchToDiscover={switchToDiscover} />
+        )}
+        {user && activeTab === 'journal' && (
+          <JournalFeed onSwitchToDiscover={switchToDiscover} />
         )}
       </div>
     </div>

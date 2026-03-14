@@ -35,6 +35,9 @@ interface AppState {
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
 
+  profileAvatarUrl: string | null;
+  setProfileAvatarUrl: (url: string | null) => void;
+
   isCookieBannerVisible: boolean;
   isCookiePreferencesOpen: boolean;
   showCookieBanner: () => void;
@@ -62,6 +65,9 @@ export const useAppStore = create<AppState>((set) => ({
 
   isAdmin: false,
   setIsAdmin: (isAdmin) => set({ isAdmin }),
+
+  profileAvatarUrl: null,
+  setProfileAvatarUrl: (url) => set({ profileAvatarUrl: url }),
 
   mapFilters: { ...defaultMapFilters },
   mapCenter: null,

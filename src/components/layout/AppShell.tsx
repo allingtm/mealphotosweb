@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const user = useAppStore((s) => s.user);
   const isAdmin = useAppStore((s) => s.isAdmin);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
+  const profileAvatarUrl = useAppStore((s) => s.profileAvatarUrl);
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
@@ -79,9 +80,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   style={{ minWidth: 48, minHeight: 48 }}
                   aria-current={isActive(href) ? 'page' : undefined}
                 >
-                  {user?.user_metadata?.avatar_url ? (
+                  {profileAvatarUrl ? (
                     <Image
-                      src={user.user_metadata.avatar_url}
+                      src={profileAvatarUrl!}
                       alt="Profile"
                       width={24}
                       height={24}
@@ -150,9 +151,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               style={{ minWidth: 48, minHeight: 48 }}
               aria-current={isActive(href) ? 'page' : undefined}
             >
-              {label === 'profile' && user?.user_metadata?.avatar_url ? (
+              {label === 'profile' && profileAvatarUrl ? (
                 <Image
-                  src={user.user_metadata.avatar_url}
+                  src={profileAvatarUrl!}
                   alt="Profile"
                   width={24}
                   height={24}

@@ -162,7 +162,7 @@ export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowin
       {/* Lock icon for private posts */}
       {isPrivate && (
         <div
-          className="absolute top-4 left-4 z-20 flex items-center justify-center"
+          className="absolute top-4 right-4 z-20 flex items-center justify-center"
           style={{
             width: 32,
             height: 32,
@@ -210,17 +210,19 @@ export function MealCard({ meal, index, isVisible, ratingStartTime, showFollowin
               <Image
                 src={meal.avatar_url}
                 alt={meal.username}
-                width={28}
-                height={28}
+                width={36}
+                height={36}
                 className="rounded-full"
+                style={{ border: '2px solid rgba(255, 255, 255, 0.2)' }}
               />
             ) : (
               <div
                 className="rounded-full"
                 style={{
-                  width: 28,
-                  height: 28,
+                  width: 36,
+                  height: 36,
                   backgroundColor: 'var(--bg-elevated)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
                 }}
               />
             )}

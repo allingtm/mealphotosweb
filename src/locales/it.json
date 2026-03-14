@@ -52,7 +52,12 @@
     "followPrompt": "Segui @{username}",
     "followPromptRated": "Hai valutato il piatto di @{username} {score}",
     "suggestionsTitle": "Persone da seguire",
-    "suggestionStats": "{count} piatti \u00b7 {rating} media"
+    "suggestionStats": "{count} piatti \u00b7 {rating} media",
+    "journal": "Diario",
+    "emptyJournal": "Il tuo diario \u00e8 vuoto",
+    "emptyJournalDesc": "I pasti privati che carichi appariranno qui. Solo tu puoi vederli.",
+    "uploadPrivateMeal": "Carica un pasto privato",
+    "endOfJournal": "Hai visto tutto nel tuo diario"
   },
   "rating": {
     "rateThisMeal": "Valuta questo piatto",

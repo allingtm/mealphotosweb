@@ -10,6 +10,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAppStore((s) => s.setUser);
   const setIsAdmin = useAppStore((s) => s.setIsAdmin);
   const setUserPlan = useAppStore((s) => s.setUserPlan);
+  const setProfileAvatarUrl = useAppStore((s) => s.setProfileAvatarUrl);
 
   useEffect(() => {
     const supabase = createClient();
@@ -17,11 +18,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function fetchProfileFlags(userId: string) {
       const { data } = await supabase
         .from('profiles')
-        .select('is_admin, plan')
+        .select('is_admin, plan, avatar_url')
         .eq('id', userId)
         .single();
       setIsAdmin(data?.is_admin ?? false);
       setUserPlan((data?.plan as 'free' | 'personal' | 'business') ?? 'free');
+      setProfileAvatarUrl(data?.avatar_url ?? null);
     }
 
     // Hydrate the current session on mount
@@ -59,13 +61,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         posthog.reset();
         setIsAdmin(false);
         setUserPlan('free');
+        setProfileAvatarUrl(null);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser, setIsAdmin, setUserPlan]);
+  }, [setUser, setIsAdmin, setUserPlan, setProfileAvatarUrl]);
 
   return <>{children}</>;
 }

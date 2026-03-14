@@ -1,8 +1,9 @@
 'use client';
 
+import { Lock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-type FeedTab = 'following' | 'discover';
+type FeedTab = 'following' | 'discover' | 'journal';
 
 interface FeedTabBarProps {
   activeTab: FeedTab;
@@ -11,6 +12,12 @@ interface FeedTabBarProps {
 
 export function FeedTabBar({ activeTab, onTabChange }: FeedTabBarProps) {
   const t = useTranslations('feed');
+
+  const tabs: { key: FeedTab; label: string; icon?: React.ReactNode }[] = [
+    { key: 'discover', label: t('discover') },
+    { key: 'following', label: t('following') },
+    { key: 'journal', label: t('journal'), icon: <Lock size={14} strokeWidth={1.5} /> },
+  ];
 
   return (
     <div
@@ -21,32 +28,23 @@ export function FeedTabBar({ activeTab, onTabChange }: FeedTabBarProps) {
         zIndex: 40,
       }}
     >
-      <button
-        onClick={() => onTabChange('discover')}
-        className="flex-1 flex items-center justify-center"
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 14,
-          fontWeight: activeTab === 'discover' ? 600 : 400,
-          color: activeTab === 'discover' ? 'var(--text-primary)' : 'var(--text-secondary)',
-          borderBottom: activeTab === 'discover' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-        }}
-      >
-        {t('discover')}
-      </button>
-      <button
-        onClick={() => onTabChange('following')}
-        className="flex-1 flex items-center justify-center"
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 14,
-          fontWeight: activeTab === 'following' ? 600 : 400,
-          color: activeTab === 'following' ? 'var(--text-primary)' : 'var(--text-secondary)',
-          borderBottom: activeTab === 'following' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-        }}
-      >
-        {t('following')}
-      </button>
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          onClick={() => onTabChange(tab.key)}
+          className="flex-1 flex items-center justify-center gap-1"
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 14,
+            fontWeight: activeTab === tab.key ? 600 : 400,
+            color: activeTab === tab.key ? 'var(--text-primary)' : 'var(--text-secondary)',
+            borderBottom: activeTab === tab.key ? '2px solid var(--accent-primary)' : '2px solid transparent',
+          }}
+        >
+          {tab.icon}
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }
