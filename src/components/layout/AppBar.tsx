@@ -21,7 +21,6 @@ export function AppBar({ title, rightAction }: AppBarProps) {
         className="flex items-center justify-between"
         style={{
           padding: '8px 16px',
-          paddingTop: 'calc(8px + env(safe-area-inset-top, 0px))',
           height: 48,
           backgroundColor: 'var(--bg-primary)',
           borderBottom: '1px solid var(--bg-elevated)',

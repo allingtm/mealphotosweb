@@ -11,10 +11,10 @@ export function FeedHeader() {
   return (
     <>
       <header
-        className="sticky top-0 z-40 flex items-center justify-between px-4"
+        className="sticky z-40 flex items-center justify-between px-4"
         style={{
+          top: 'env(safe-area-inset-top, 0px)',
           height: 56,
-          paddingTop: 'env(safe-area-inset-top, 0px)',
           backgroundColor: 'var(--bg-primary)',
           borderBottom: '1px solid var(--bg-elevated)',
         }}
