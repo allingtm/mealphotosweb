@@ -133,7 +133,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <main
         id="main-content"
-        className="pb-14 md:pb-0 md:pl-18 md:h-dvh md:overflow-hidden md:flex md:flex-col lg:pr-80"
+        className="pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-0 md:pl-18 md:h-dvh md:overflow-hidden md:flex md:flex-col lg:pr-80"
       >
         {children}
       </main>
