@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   // Check comments_enabled
   const { data: dish } = await supabase
     .from('dishes')
-    .select('comments_enabled, business_id')
+    .select('comments_enabled, business_id, title')
     .eq('id', dish_id)
     .single();
 
@@ -45,6 +45,24 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const isBusinessReply = user.id === dish.business_id;
+
+  // Push notification to dish owner (fire-and-forget, skip if self-commenting)
+  if (!isBusinessReply) {
+    fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-push-notification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        'x-edge-secret': process.env.EDGE_FUNCTION_SECRET!,
+      },
+      body: JSON.stringify({
+        user_id: dish.business_id,
+        title: `New comment on ${dish.title}`,
+        body: text.substring(0, 100),
+        url: `/dish/${dish_id}`,
+      }),
+    }).catch(() => {});
+  }
 
   return NextResponse.json({
     ...comment,

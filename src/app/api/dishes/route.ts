@@ -165,5 +165,40 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({ dish_id: dish.id, photo_url: uploadedImages[0].photo_url }),
   }).catch(() => {});
 
+  // Push notifications to followers (fire-and-forget)
+  (async () => {
+    try {
+      const { data: bizProfile } = await supabase
+        .from('business_profiles')
+        .select('business_name')
+        .eq('id', user.id)
+        .single();
+
+      const { data: followers } = await supabase
+        .from('follows')
+        .select('follower_id')
+        .eq('following_id', user.id);
+
+      if (followers?.length && bizProfile?.business_name) {
+        const pushRequests = followers.map((f) => ({
+          user_id: f.follower_id,
+          title: `${bizProfile.business_name} posted a new dish`,
+          body: dish.title,
+          url: `/dish/${dish.id}`,
+        }));
+
+        fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-push-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+            'x-edge-secret': process.env.EDGE_FUNCTION_SECRET!,
+          },
+          body: JSON.stringify(pushRequests),
+        }).catch(() => {});
+      }
+    } catch { /* push failure is non-critical */ }
+  })();
+
   return NextResponse.json({ dish }, { status: 201 });
 }

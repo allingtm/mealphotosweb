@@ -9,7 +9,7 @@ export const ANALYTICS_EVENTS = {
   FEED_SCROLLED: 'feed_scrolled',
   MAP_PIN_TAPPED: 'map_pin_tapped',
   AUTH_COMPLETED: 'auth_completed',
-  STREAK_MILESTONE: 'streak_milestone',
+
   RESTAURANT_SUBSCRIBED: 'restaurant_subscribed',
   RESTAURANT_REVEALED: 'restaurant_revealed',
   MEAL_DELETED: 'meal_deleted',

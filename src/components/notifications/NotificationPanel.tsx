@@ -15,7 +15,7 @@ import {
 import { useTranslations } from 'next-intl';
 import posthog from 'posthog-js';
 import type { Notification } from '@/types/database';
-import { ANALYTICS_EVENTS } from '@/lib/analytics';
+
 import { timeAgo } from '@/lib/utils/timeAgo';
 
 interface NotificationPanelProps {
@@ -81,16 +81,6 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
       const data = await res.json();
 
       const newNotifications = (data.notifications ?? []) as Notification[];
-
-      // Track streak milestone analytics
-      for (const n of newNotifications) {
-        if (n.type === 'streak_milestone' && !n.read) {
-          const streakDays = (n.data as Record<string, unknown>).streak_days;
-          posthog.capture(ANALYTICS_EVENTS.STREAK_MILESTONE, {
-            streak_days: streakDays,
-          });
-        }
-      }
 
       if (reset) {
         setNotifications(newNotifications);

@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>meal.photos — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-primary: #121212;
+    --bg-surface: #1E1E1E;
+    --bg-elevated: #2A2A2A;
+    --accent: #E8A838;
+    --accent-dim: rgba(232, 168, 56, 0.15);
+    --text-primary: #F5F0E8;
+    --text-secondary: #888888;
+    --text-muted: #555555;
+    --success: #4CAF50;
+    --error: #D4553A;
+    --font-display: 'Instrument Serif', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  /* Slide base */
+  .slide {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    position: relative;
+  }
+
+  .slide-inner {
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* Typography */
+  h1 { font-family: var(--font-display); color: var(--accent); }
+  h2 { font-family: var(--font-display); color: var(--accent); font-size: 42px; margin-bottom: 32px; font-weight: 400; }
+  h3 { font-family: var(--font-display); color: var(--text-primary); font-size: 26px; margin-bottom: 12px; font-weight: 400; }
+  p { font-size: 18px; line-height: 1.7; color: var(--text-secondary); }
+  strong { color: var(--text-primary); font-weight: 600; }
+
+  /* Slide number */
+  .slide-number {
+    position: absolute;
+    bottom: 24px;
+    right: 40px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+
+  /* Cards */
+  .card {
+    background: var(--bg-surface);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid var(--bg-elevated);
+  }
+  .card.accent-border { border-color: var(--accent); }
+  .card h3 { font-size: 22px; margin-bottom: 10px; }
+  .card p { font-size: 15px; line-height: 1.6; }
+
+  /* Icon circles */
+  .icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* Stats */
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+  }
+
+  /* Table */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .comp-table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--bg-elevated);
+  }
+  .comp-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(42,42,42,0.5);
+    color: var(--text-secondary);
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table .highlight-row td {
+    background: var(--accent-dim);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .comp-table .check { color: var(--success); font-weight: 700; }
+  .comp-table .cross { color: var(--error); }
+
+  /* Bullet list */
+  .bullet-list { list-style: none; padding: 0; }
+  .bullet-list li {
+    padding: 10px 0;
+    font-size: 17px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.5;
+  }
+  .bullet-list li::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  /* Flow arrow */
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 28px;
+    padding: 0 8px;
+  }
+
+  /* Revenue bar */
+  .revenue-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .revenue-label {
+    width: 140px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .revenue-bar {
+    height: 40px;
+    background: linear-gradient(90deg, var(--accent), #D4943A);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--bg-primary);
+    white-space: nowrap;
+  }
+
+  /* Tech pill */
+  .tech-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--bg-elevated);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 15px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  /* Subtitle */
+  .subtitle {
+    font-size: 20px;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  /* Divider */
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 24px 0;
+  }
+
+  /* Navigation dots */
+  .nav-dots {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+  }
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
+  }
+  .nav-dot.active {
+    background: var(--accent);
+    transform: scale(1.3);
+  }
+
+  /* Price highlight */
+  .price-big {
+    font-family: var(--font-display);
+    font-size: 64px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .price-period {
+    font-size: 20px;
+    color: var(--text-secondary);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .slide { padding: 40px 24px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    h2 { font-size: 32px; }
+    .stat-value { font-size: 36px; }
+    .price-big { font-size: 48px; }
+    .nav-dots { display: none; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation Dots -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- ============================================ -->
+<!-- SLIDE 1: Title -->
+<!-- ============================================ -->
+<section class="slide" id="slide-1">
+  <div class="slide-inner" style="text-align: center;">
+    <div style="margin-bottom: 24px;">
+      <span style="font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted);">Introducing</span>
+    </div>
+    <h1 style="font-size: 80px; margin-bottom: 16px; font-weight: 400;">meal.photos</h1>
+    <p style="font-size: 28px; color: var(--text-primary); font-family: var(--font-display); margin-bottom: 8px; font-style: italic;">
+      See what's being served right now.
+    </p>
+    <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 48px;">
+      A global stage for food culture
+    </p>
+    <div class="divider" style="margin: 0 auto;"></div>
+    <p style="font-size: 14px; color: var(--text-muted); margin-top: 24px;">
+      March 2026
+    </p>
+  </div>
+  <span class="slide-number">01 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 2: The Problem -->
+<!-- ============================================ -->
+<section class="slide" id="slide-2">
+  <div class="slide-inner">
+    <h2>The Problem</h2>
+    <p class="subtitle">Discovering great food nearby is broken.</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="icon-circle">&#128247;</div>
+        <h3>Stale Content</h3>
+        <p>Restaurant listings show stock photos and menus from months ago. Consumers can't see what's <strong>actually being served today</strong>.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128176;</div>
+        <h3>Commission Trap</h3>
+        <p>Platforms like Deliveroo and Just Eat take <strong>20&ndash;30% commission</strong> on every order, destroying margins for small businesses.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128200;</div>
+        <h3>Algorithm Gatekeeping</h3>
+        <p>Instagram buries local businesses under algorithmic noise. <strong>Organic reach is near zero</strong> unless you pay to play.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128269;</div>
+        <h3>No Dish-Level Search</h3>
+        <p>Want to find the best fish &amp; chips nearby? Google shows restaurants, not dishes. <strong>You can't search for food itself.</strong></p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">02 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 3: The Solution -->
+<!-- ============================================ -->
+<section class="slide" id="slide-3">
+  <div class="slide-inner">
+    <h2>The Solution</h2>
+    <p class="subtitle">A live food feed where businesses post real photos of real dishes &mdash; and consumers discover what's being served right now.</p>
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <ul class="bullet-list">
+          <li><strong>Real-time content</strong> &mdash; fresh dish photos posted by businesses daily</li>
+          <li><strong>Zero commission</strong> &mdash; businesses keep 100% of their customer relationships</li>
+          <li><strong>Global food map</strong> &mdash; explore food culture anywhere in the world</li>
+          <li><strong>Positive-only reactions</strong> &mdash; "I'd eat that" builds genuine social proof</li>
+          <li><strong>Dish-level discovery</strong> &mdash; search by dish, cuisine, or business</li>
+        </ul>
+      </div>
+      <div class="card accent-border" style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
+        <p style="font-family: var(--font-display); font-size: 28px; color: var(--text-primary); margin-bottom: 12px;">
+          Not another review site.
+        </p>
+        <p style="font-size: 16px;">
+          A <strong style="color: var(--accent);">dedicated platform</strong> purpose-built for food businesses to showcase their craft &mdash; and for consumers to find their next meal.
+        </p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">03 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 4: How It Works -->
+<!-- ============================================ -->
+<section class="slide" id="slide-4">
+  <div class="slide-inner">
+    <h2>How It Works</h2>
+    <p class="subtitle">Three simple steps. No complexity, no commission.</p>
+    <div style="display: flex; align-items: stretch; gap: 0; justify-content: center;">
+      <div class="card" style="flex: 1; text-align: center; max-width: 280px;">
+        <div class="icon-circle" style="margin: 0 auto 16px;">&#127860;</div>
+        <h3 style="color: var(--accent);">Post</h3>
+        <p>Businesses snap a photo of today's dish and post it in seconds. Title, price, done.</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="card" style="flex: 1; text-align: center; max-width: 280px;">
+        <div class="icon-circle" style="margin: 0 auto 16px;">&#128270;</div>
+        <h3 style="color: var(--accent);">Discover</h3>
+        <p>Consumers browse the live feed, explore the map, or search by dish and cuisine.</p>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="card" style="flex: 1; text-align: center; max-width: 280px;">
+        <div class="icon-circle" style="margin: 0 auto 16px;">&#128293;</div>
+        <h3 style="color: var(--accent);">Engage</h3>
+        <p>React, save, follow, and comment. Businesses see real demand signals.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">04 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 5: Key Features -->
+<!-- ============================================ -->
+<section class="slide" id="slide-5">
+  <div class="slide-inner">
+    <h2>Key Features</h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon-circle">&#128240;</div>
+        <h3>Live Feed</h3>
+        <p>Three tabs: <strong>Following</strong>, <strong>Nearby</strong>, and <strong>Trending</strong>. Chronological, honest, no algorithm gaming.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#127758;</div>
+        <h3>Global Map</h3>
+        <p>Explore food businesses worldwide with colour-coded pins. Filter by type. Tap for details.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128269;</div>
+        <h3>Search &amp; Requests</h3>
+        <p>Search by dish or cuisine. <strong>Dish requests</strong> let consumers signal demand &mdash; businesses see what people want.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#129302;</div>
+        <h3>AI Menu Scan</h3>
+        <p>Photograph a paper menu. AI extracts items, prices, and descriptions automatically. Powered by Claude.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128202;</div>
+        <h3>Analytics Dashboard</h3>
+        <p>Track reactions, saves, followers, and top dishes. See dish requests in your area. Real-time insights.</p>
+      </div>
+      <div class="card">
+        <div class="icon-circle">&#128172;</div>
+        <h3>Comments Q&amp;A</h3>
+        <p>Consumers ask questions, businesses reply directly on dishes. Builds trust and transparency.</p>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">05 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 6: Market Opportunity -->
+<!-- ============================================ -->
+<section class="slide" id="slide-6">
+  <div class="slide-inner">
+    <h2>Market Opportunity</h2>
+    <p class="subtitle">Food service is one of the largest consumer markets &mdash; and discovery is ripe for disruption.</p>
+    <div class="grid-4" style="margin-bottom: 40px;">
+      <div style="text-align: center;">
+        <div class="stat-value">&pound;90B+</div>
+        <div class="stat-label">UK food service<br>market (annual)</div>
+      </div>
+      <div style="text-align: center;">
+        <div class="stat-value">500K+</div>
+        <div class="stat-label">Food businesses<br>in the UK</div>
+      </div>
+      <div style="text-align: center;">
+        <div class="stat-value">13+</div>
+        <div class="stat-label">Business types<br>we serve</div>
+      </div>
+      <div style="text-align: center;">
+        <div class="stat-value">&pound;0</div>
+        <div class="stat-label">Commission<br>charged</div>
+      </div>
+    </div>
+    <div class="card" style="text-align: center;">
+      <p style="font-size: 16px;">
+        Beyond traditional restaurants: <strong>cafes, bakeries, food trucks, delis, farm shops, catering, meal prep, cooking schools, nutritionists, dietitians</strong>, and more. We serve the entire food ecosystem.
+      </p>
+    </div>
+  </div>
+  <span class="slide-number">06 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 7: Business Model -->
+<!-- ============================================ -->
+<section class="slide" id="slide-7">
+  <div class="slide-inner">
+    <h2>Business Model</h2>
+    <p class="subtitle">Simple, predictable SaaS revenue. Consumers always free.</p>
+    <div class="grid-2">
+      <div class="card" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <p style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">Business Subscription</p>
+        <div class="price-big">&pound;49.95</div>
+        <div class="price-period">/month</div>
+        <div class="divider" style="margin: 20px auto;"></div>
+        <ul class="bullet-list" style="text-align: left;">
+          <li>Business profile &amp; map pin</li>
+          <li>Unlimited dish posts</li>
+          <li>Full analytics dashboard</li>
+          <li>Comments &amp; Q&amp;A</li>
+          <li>Menu digitisation &amp; AI scan</li>
+        </ul>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="card">
+          <h3 style="color: var(--accent);">Zero Commission</h3>
+          <p>Unlike marketplaces that take 20&ndash;30% of every order, businesses pay a flat monthly fee and <strong>keep every customer</strong>.</p>
+        </div>
+        <div class="card">
+          <h3 style="color: var(--accent);">High Gross Margins</h3>
+          <p>Pure software platform. No logistics, no drivers, no warehouses. <strong>90%+ gross margin</strong> at scale.</p>
+        </div>
+        <div class="card">
+          <h3 style="color: var(--accent);">Premium Upsell</h3>
+          <p>Future premium tier (&pound;79/mo) with feed promotion, priority map placement, and featured badges.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">07 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 8: Competitive Landscape -->
+<!-- ============================================ -->
+<section class="slide" id="slide-8">
+  <div class="slide-inner">
+    <h2>Competitive Landscape</h2>
+    <p class="subtitle">We're not competing with delivery &mdash; we're replacing broken discovery.</p>
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Live Content</th>
+          <th>Dish Search</th>
+          <th>Zero Commission</th>
+          <th>Dedicated</th>
+          <th>Business Tools</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Google Maps</strong></td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+          <td class="check">&#10003;</td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+        </tr>
+        <tr>
+          <td><strong>TripAdvisor</strong></td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+          <td class="check">&#10003;</td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+        </tr>
+        <tr>
+          <td><strong>Instagram</strong></td>
+          <td class="check">&#10003;</td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+          <td class="cross">&#10007;</td>
+        </tr>
+        <tr>
+          <td><strong>Deliveroo / Just Eat</strong></td>
+          <td class="cross">&#10007;</td>
+          <td class="check">&#10003;</td>
+          <td class="cross">&#10007;</td>
+          <td class="check">&#10003;</td>
+          <td class="check">&#10003;</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong style="color: var(--accent);">meal.photos</strong></td>
+          <td class="check">&#10003;</td>
+          <td class="check">&#10003;</td>
+          <td class="check">&#10003;</td>
+          <td class="check">&#10003;</td>
+          <td class="check">&#10003;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="slide-number">08 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 9: Growth Strategy -->
+<!-- ============================================ -->
+<section class="slide" id="slide-9">
+  <div class="slide-inner">
+    <h2>Growth Strategy</h2>
+    <p class="subtitle">Warm, inbound acquisition powered by real social proof.</p>
+    <div class="grid-2">
+      <div>
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="color: var(--accent);">1. Consumers Tag Venues</h3>
+          <p>Users upload meal photos and tag where they ate. The platform aggregates mentions and reactions by venue &mdash; building social proof organically.</p>
+        </div>
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="color: var(--accent);">2. Warm Outreach</h3>
+          <p>When a venue hits 3+ consumer posts or 20+ reactions, we reach out with real data: <strong>"Your dishes got 47 reactions this week."</strong></p>
+        </div>
+        <div class="card">
+          <h3 style="color: var(--accent);">3. Easy Onboarding</h3>
+          <p>Businesses claim their profile, see existing social proof, and start posting. Pre-built audience from day one.</p>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 24px; justify-content: center;">
+        <div style="text-align: center;">
+          <div class="stat-value">20&ndash;30%</div>
+          <div class="stat-label">Expected warm conversion rate</div>
+        </div>
+        <div style="text-align: center; margin-top: 16px;">
+          <div class="stat-value" style="font-size: 36px; color: var(--text-muted); text-decoration: line-through;">5%</div>
+          <div class="stat-label">Typical cold outreach conversion</div>
+        </div>
+        <div style="text-align: center; margin-top: 16px;">
+          <div class="stat-value">3%</div>
+          <div class="stat-label">Expected monthly churn<br>(vs 5% cold-acquired)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">09 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 10: Product Status -->
+<!-- ============================================ -->
+<section class="slide" id="slide-10">
+  <div class="slide-inner">
+    <h2>Product Status</h2>
+    <p class="subtitle">v3.0 in active development. Core platform built and functional.</p>
+    <div class="grid-3">
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 12px;">&#9989;</div>
+        <h3>Built</h3>
+        <ul class="bullet-list" style="font-size: 14px;">
+          <li>Authentication (Google, Apple, Magic Link)</li>
+          <li>Live feed with tabs</li>
+          <li>Reactions, saves, follows</li>
+          <li>Business profiles</li>
+          <li>Dish posting with moderation</li>
+          <li>Interactive map</li>
+          <li>Comments system</li>
+        </ul>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 12px;">&#128736;</div>
+        <h3>In Progress</h3>
+        <ul class="bullet-list" style="font-size: 14px;">
+          <li>Menu management</li>
+          <li>AI menu scan</li>
+          <li>Analytics dashboard</li>
+          <li>Search &amp; discovery</li>
+          <li>Dish requests</li>
+          <li>Push notifications</li>
+          <li>Business onboarding flow</li>
+        </ul>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 12px;">&#128205;</div>
+        <h3>Roadmap</h3>
+        <ul class="bullet-list" style="font-size: 14px;">
+          <li>Premium tier launch</li>
+          <li>Inbound acquisition pipeline</li>
+          <li>Booking integrations</li>
+          <li>Advanced analytics</li>
+          <li>Multi-location support</li>
+          <li>SEO optimisation</li>
+          <li>Native mobile app</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="text-align: center; margin-top: 24px;">
+      <p><strong>60&ndash;70% code reuse</strong> from v2.0 &mdash; not starting from scratch. Production-grade infrastructure already in place.</p>
+    </div>
+  </div>
+  <span class="slide-number">10 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 11: Tech Stack -->
+<!-- ============================================ -->
+<section class="slide" id="slide-11">
+  <div class="slide-inner" style="text-align: center;">
+    <h2>Tech Stack</h2>
+    <p class="subtitle">Modern, scalable, cost-efficient. Built on best-in-class infrastructure.</p>
+    <div style="margin-bottom: 32px;">
+      <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">Framework &amp; Hosting</p>
+      <div class="tech-grid">
+        <span class="tech-pill">&#9650; Next.js 16+</span>
+        <span class="tech-pill">&#9654; TypeScript</span>
+        <span class="tech-pill">&#9660; Tailwind CSS</span>
+        <span class="tech-pill">&#9670; Vercel</span>
+      </div>
+    </div>
+    <div style="margin-bottom: 32px;">
+      <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">Data &amp; Services</p>
+      <div class="tech-grid">
+        <span class="tech-pill">&#128000; Supabase (PostgreSQL + PostGIS)</span>
+        <span class="tech-pill">&#128179; Stripe Billing</span>
+        <span class="tech-pill">&#127759; Mapbox GL JS</span>
+        <span class="tech-pill">&#9729; Cloudflare Images</span>
+      </div>
+    </div>
+    <div style="margin-bottom: 32px;">
+      <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">AI &amp; Intelligence</p>
+      <div class="tech-grid">
+        <span class="tech-pill">&#129302; Claude API (Menu Scan)</span>
+        <span class="tech-pill">&#128065; Google Vision (Moderation)</span>
+        <span class="tech-pill">&#128202; PostHog (Analytics)</span>
+      </div>
+    </div>
+    <div>
+      <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">Security &amp; Infrastructure</p>
+      <div class="tech-grid">
+        <span class="tech-pill">&#128274; Row Level Security</span>
+        <span class="tech-pill">&#128737; Upstash Redis</span>
+        <span class="tech-pill">&#128272; Cloudflare Turnstile</span>
+        <span class="tech-pill">&#128231; Resend Email</span>
+      </div>
+    </div>
+  </div>
+  <span class="slide-number">11 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 12: Revenue Projections -->
+<!-- ============================================ -->
+<section class="slide" id="slide-12">
+  <div class="slide-inner">
+    <h2>Revenue Projections</h2>
+    <p class="subtitle">Illustrative annual recurring revenue at &pound;49.95/month per business.</p>
+    <div style="max-width: 700px; margin: 0 auto 40px;">
+      <div class="revenue-row">
+        <div class="revenue-label"><strong>100</strong> businesses</div>
+        <div class="revenue-bar" style="width: 15%;">&pound;60K</div>
+      </div>
+      <div class="revenue-row">
+        <div class="revenue-label"><strong>500</strong> businesses</div>
+        <div class="revenue-bar" style="width: 35%;">&pound;300K</div>
+      </div>
+      <div class="revenue-row">
+        <div class="revenue-label"><strong>1,000</strong> businesses</div>
+        <div class="revenue-bar" style="width: 55%;">&pound;600K</div>
+      </div>
+      <div class="revenue-row">
+        <div class="revenue-label"><strong>2,000</strong> businesses</div>
+        <div class="revenue-bar" style="width: 80%;">&pound;1.2M</div>
+      </div>
+      <div class="revenue-row">
+        <div class="revenue-label"><strong>5,000</strong> businesses</div>
+        <div class="revenue-bar" style="width: 100%;">&pound;3.0M</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card" style="text-align: center;">
+        <div class="stat-value" style="font-size: 36px;">&pound;599</div>
+        <div class="stat-label">Annual revenue per business</div>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div class="stat-value" style="font-size: 36px;">90%+</div>
+        <div class="stat-label">Gross margin at scale</div>
+      </div>
+    </div>
+    <p style="text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 24px;">
+      Premium tier (&pound;79/mo) adds significant upsell opportunity. UK alone has 500K+ potential businesses.
+    </p>
+  </div>
+  <span class="slide-number">12 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 13: Vision -->
+<!-- ============================================ -->
+<section class="slide" id="slide-13">
+  <div class="slide-inner" style="text-align: center;">
+    <h2>The Vision</h2>
+    <p style="font-family: var(--font-display); font-size: 32px; color: var(--text-primary); line-height: 1.5; max-width: 700px; margin: 0 auto 40px;">
+      Become the default way<br>people discover food.
+    </p>
+    <div class="divider" style="margin: 0 auto 40px;"></div>
+    <div class="grid-3">
+      <div>
+        <h3 style="color: var(--accent); font-size: 20px;">Phase 1</h3>
+        <p style="font-size: 15px;"><strong>UK Launch</strong><br>Build density in key cities. Prove the inbound acquisition model. Reach 1,000 businesses.</p>
+      </div>
+      <div>
+        <h3 style="color: var(--accent); font-size: 20px;">Phase 2</h3>
+        <p style="font-size: 15px;"><strong>Scale &amp; Expand</strong><br>Premium tier. Advanced analytics. Booking integrations. Multi-city expansion.</p>
+      </div>
+      <div>
+        <h3 style="color: var(--accent); font-size: 20px;">Phase 3</h3>
+        <p style="font-size: 15px;"><strong>Global Platform</strong><br>International expansion. Native mobile apps. API partnerships. The world's food map.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 40px;">
+      <p style="font-size: 16px; text-align: center;">
+        <strong>The Team:</strong> [Your team details here] &mdash; combining deep product, engineering, and food industry expertise.
+      </p>
+    </div>
+  </div>
+  <span class="slide-number">13 / 14</span>
+</section>
+
+<!-- ============================================ -->
+<!-- SLIDE 14: Ask / Contact -->
+<!-- ============================================ -->
+<section class="slide" id="slide-14">
+  <div class="slide-inner" style="text-align: center;">
+    <h1 style="font-size: 64px; margin-bottom: 16px; font-weight: 400;">meal.photos</h1>
+    <p style="font-family: var(--font-display); font-size: 24px; color: var(--text-primary); font-style: italic; margin-bottom: 48px;">
+      See what's being served right now.
+    </p>
+    <div class="card accent-border" style="max-width: 500px; margin: 0 auto 40px; text-align: center;">
+      <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 16px;">The Ask</p>
+      <div class="price-big" style="font-size: 48px;">[Amount]</div>
+      <p style="font-size: 16px; margin-top: 12px;">Seed round to fund UK launch, team growth, and first 1,000 business acquisitions.</p>
+    </div>
+    <div class="divider" style="margin: 0 auto 32px;"></div>
+    <p style="font-size: 18px; color: var(--text-primary); margin-bottom: 8px;">
+      <strong>[Your Name]</strong>
+    </p>
+    <p style="font-size: 16px; color: var(--text-secondary); margin-bottom: 4px;">
+      [your@email.com]
+    </p>
+    <p style="font-size: 16px; color: var(--accent);">
+      meal.photos
+    </p>
+  </div>
+  <span class="slide-number">14 / 14</span>
+</section>
+
+<script>
+  // Build navigation dots
+  const totalSlides = 14;
+  const navDots = document.getElementById('navDots');
+  for (let i = 1; i <= totalSlides; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.dataset.slide = i;
+    dot.setAttribute('aria-label', `Go to slide ${i}`);
+    dot.addEventListener('click', () => {
+      document.getElementById(`slide-${i}`).scrollIntoView({ behavior: 'smooth' });
+    });
+    navDots.appendChild(dot);
+  }
+
+  // Track active slide
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const slideNum = entry.target.id.replace('slide-', '');
+        document.querySelectorAll('.nav-dot').forEach(d => d.classList.remove('active'));
+        const activeDot = document.querySelector(`.nav-dot[data-slide="${slideNum}"]`);
+        if (activeDot) activeDot.classList.add('active');
+      }
+    });
+  }, { threshold: 0.5 });
+
+  for (let i = 1; i <= totalSlides; i++) {
+    observer.observe(document.getElementById(`slide-${i}`));
+  }
+
+  // Keyboard navigation
+  let currentSlide = 1;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        document.getElementById(`slide-${currentSlide}`).scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (currentSlide > 1) {
+        currentSlide--;
+        document.getElementById(`slide-${currentSlide}`).scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+
+  // Sync currentSlide with scroll
+  const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        currentSlide = parseInt(entry.target.id.replace('slide-', ''));
+      }
+    });
+  }, { threshold: 0.5 });
+
+  for (let i = 1; i <= totalSlides; i++) {
+    scrollObserver.observe(document.getElementById(`slide-${i}`));
+  }
+</script>
+
+</body>
+</html>

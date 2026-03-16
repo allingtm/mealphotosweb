@@ -27,12 +27,24 @@ export async function GET(req: NextRequest) {
     .order('reaction_count', { ascending: false })
     .limit(5);
 
-  // Dish requests nearby (fetch all for now — location filtering in V3-16)
-  const { data: dishRequests } = await supabase
+  // Dish requests filtered by business city
+  const { data: bizProfile } = await supabase
+    .from('business_profiles')
+    .select('address_city')
+    .eq('id', user.id)
+    .single();
+
+  let dishRequestsQuery = supabase
     .from('dish_requests')
     .select('id, dish_name, upvote_count, location_city')
     .order('upvote_count', { ascending: false })
     .limit(5);
+
+  if (bizProfile?.address_city) {
+    dishRequestsQuery = dishRequestsQuery.ilike('location_city', `%${bizProfile.address_city}%`);
+  }
+
+  const { data: dishRequests } = await dishRequestsQuery;
 
   return NextResponse.json({
     stats: stats ?? {},

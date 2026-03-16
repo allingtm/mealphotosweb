@@ -3,13 +3,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, X, TrendingUp, UtensilsCrossed, Loader2 } from 'lucide-react';
+import { Search, X, TrendingUp, UtensilsCrossed, Loader2, ChevronDown } from 'lucide-react';
 import posthog from 'posthog-js';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BUSINESS_TYPE_LABELS } from '@/types/database';
 import { formatPrice } from '@/lib/utils';
 import cloudflareLoader from '@/lib/cloudflare-loader';
+import { DishRequestCard } from './DishRequestCard';
+import { DishRequestForm } from './DishRequestForm';
 
 const CATEGORIES = [
   { label: 'Italian', emoji: '🍕', value: 'italian' },
@@ -25,6 +27,15 @@ const CATEGORIES = [
   { label: 'Mediterranean', emoji: '🫒', value: 'mediterranean' },
   { label: 'Middle Eastern', emoji: '🧆', value: 'middle_eastern' },
 ];
+
+const DIETARY_OPTIONS = ['V', 'VG', 'GF', 'DF'] as const;
+
+const PRICE_RANGES = [
+  { label: 'Under £5', min: 0, max: 500 },
+  { label: '£5–£10', min: 500, max: 1000 },
+  { label: '£10–£20', min: 1000, max: 2000 },
+  { label: 'Over £20', min: 2000, max: undefined },
+] as const;
 
 interface DishResult {
   id: string;
@@ -44,53 +55,117 @@ interface BusinessResult {
   profiles: { username: string; avatar_url: string | null; plan: string };
 }
 
+interface MenuItemResult {
+  id: string;
+  name: string;
+  price_pence: number | null;
+  dietary_tags: string[] | null;
+  business_profiles: { business_name: string; address_city: string | null } | null;
+  profiles: { username: string } | null;
+}
+
 interface PopularItem {
   name: string;
   count: number;
   total_reactions: number;
 }
 
+interface DishRequestItem {
+  id: string;
+  dish_name: string;
+  location_city: string;
+  upvote_count: number;
+  user_has_upvoted: boolean;
+}
+
+interface Filters {
+  cuisine?: string;
+  dietary?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}
+
 export function SearchClient() {
   const [query, setQuery] = useState('');
   const [dishes, setDishes] = useState<DishResult[]>([]);
   const [businesses, setBusinesses] = useState<BusinessResult[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemResult[]>([]);
   const [popular, setPopular] = useState<PopularItem[]>([]);
+  const [dishRequests, setDishRequests] = useState<DishRequestItem[]>([]);
   const [searching, setSearching] = useState(false);
   const [loadingPopular, setLoadingPopular] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [filters, setFilters] = useState<Filters>({});
+  const [openFilter, setOpenFilter] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load popular on mount
+  // Load popular + dish requests on mount
   useEffect(() => {
     fetch('/api/search/popular')
       .then((r) => r.json())
       .then((data) => setPopular(data.popular ?? []))
       .catch(() => {})
       .finally(() => setLoadingPopular(false));
+
+    fetch('/api/dish-requests?limit=5')
+      .then((r) => r.json())
+      .then((data) => setDishRequests(data.requests ?? []))
+      .catch(() => {});
   }, []);
 
-  // Debounced search
-  const performSearch = useCallback(async (q: string) => {
-    if (!q.trim()) { setHasSearched(false); setDishes([]); setBusinesses([]); return; }
-
-    setSearching(true);
-    setHasSearched(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=20`);
-      const data = await res.json();
-      setDishes(data.dishes ?? []);
-      setBusinesses(data.businesses ?? []);
-      posthog.capture('search_performed', {
-        query: q,
-        results_count: (data.dishes?.length ?? 0) + (data.businesses?.length ?? 0),
-      });
-    } catch {
+  const performSearch = useCallback(async (q: string, activeFilters?: Filters, append?: boolean) => {
+    if (!q.trim()) {
+      setHasSearched(false);
       setDishes([]);
       setBusinesses([]);
+      setMenuItems([]);
+      setNextCursor(null);
+      return;
+    }
+
+    if (!append) setSearching(true);
+    setHasSearched(true);
+
+    const f = activeFilters ?? filters;
+    const params = new URLSearchParams({ q, limit: '20' });
+    if (f.cuisine) params.set('cuisine', f.cuisine);
+    if (f.dietary) params.set('dietary', f.dietary);
+    if (f.minPrice) params.set('minPrice', f.minPrice);
+    if (f.maxPrice) params.set('maxPrice', f.maxPrice);
+
+    try {
+      const res = await fetch(`/api/search?${params}`);
+      const data = await res.json();
+
+      if (append) {
+        setDishes((prev) => [...prev, ...(data.dishes ?? [])]);
+      } else {
+        setDishes(data.dishes ?? []);
+        setBusinesses(data.businesses ?? []);
+        setMenuItems(data.menuItems ?? []);
+      }
+      setNextCursor(data.nextCursor ?? null);
+
+      if (!append) {
+        posthog.capture('search_performed', {
+          query: q,
+          results_count: (data.dishes?.length ?? 0) + (data.businesses?.length ?? 0) + (data.menuItems?.length ?? 0),
+          filters: f,
+        });
+      }
+    } catch {
+      if (!append) {
+        setDishes([]);
+        setBusinesses([]);
+        setMenuItems([]);
+      }
     } finally {
       setSearching(false);
+      setLoadingMore(false);
     }
-  }, []);
+  }, [filters]);
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
@@ -98,13 +173,68 @@ export function SearchClient() {
     debounceRef.current = setTimeout(() => performSearch(value), 300);
   };
 
-  const handleCategoryTap = (cuisine: string) => {
-    setQuery(cuisine);
-    performSearch(cuisine);
+  const handleCategoryTap = (cat: typeof CATEGORIES[number]) => {
+    setQuery(cat.label);
+    const newFilters = { ...filters, cuisine: cat.value };
+    setFilters(newFilters);
+    performSearch(cat.label, newFilters);
   };
 
-  const totalResults = dishes.length + businesses.length;
+  const handlePopularTap = (name: string) => {
+    setQuery(name);
+    performSearch(name);
+  };
+
+  const handleFilterChange = (key: keyof Filters, value: string | undefined) => {
+    const newFilters = { ...filters, [key]: value };
+    if (!value) delete newFilters[key];
+    setFilters(newFilters);
+    setOpenFilter(null);
+    if (query.trim()) performSearch(query, newFilters);
+  };
+
+  const handlePriceFilter = (min: number, max: number | undefined) => {
+    const newFilters = {
+      ...filters,
+      minPrice: min.toString(),
+      maxPrice: max?.toString(),
+    };
+    if (!max) delete newFilters.maxPrice;
+    setFilters(newFilters);
+    setOpenFilter(null);
+    if (query.trim()) performSearch(query, newFilters);
+  };
+
+  const clearAll = () => {
+    setQuery('');
+    setHasSearched(false);
+    setDishes([]);
+    setBusinesses([]);
+    setMenuItems([]);
+    setNextCursor(null);
+    setFilters({});
+  };
+
+  const loadMore = async () => {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    const params = new URLSearchParams({ q: query, limit: '20', cursor: nextCursor });
+    if (filters.cuisine) params.set('cuisine', filters.cuisine);
+    if (filters.minPrice) params.set('minPrice', filters.minPrice);
+    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+
+    try {
+      const res = await fetch(`/api/search?${params}`);
+      const data = await res.json();
+      setDishes((prev) => [...prev, ...(data.dishes ?? [])]);
+      setNextCursor(data.nextCursor ?? null);
+    } catch { /* ignore */ }
+    finally { setLoadingMore(false); }
+  };
+
+  const totalResults = dishes.length + businesses.length + menuItems.length;
   const showDefault = !hasSearched;
+  const hasActiveFilters = Object.keys(filters).length > 0;
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
@@ -122,15 +252,119 @@ export function SearchClient() {
           {query && (
             <button
               type="button"
-              onClick={() => { setQuery(''); setHasSearched(false); setDishes([]); setBusinesses([]); }}
+              onClick={clearAll}
               className="absolute right-3 top-1/2 -translate-y-1/2"
               style={{ color: 'var(--text-secondary)' }}
+              aria-label="Clear search"
             >
               <X size={18} strokeWidth={1.5} />
             </button>
           )}
           </div>
         </div>
+
+        {/* Filter pills — shown when there's a query */}
+        {hasSearched && (
+          <div className="flex gap-2 mb-4 flex-wrap relative">
+            {/* Cuisine filter */}
+            <FilterPill
+              label="Cuisine"
+              active={!!filters.cuisine}
+              activeLabel={CATEGORIES.find((c) => c.value === filters.cuisine)?.label}
+              isOpen={openFilter === 'cuisine'}
+              onToggle={() => setOpenFilter(openFilter === 'cuisine' ? null : 'cuisine')}
+              onClear={() => handleFilterChange('cuisine', undefined)}
+            >
+              <div className="flex flex-col gap-1 p-2">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => handleFilterChange('cuisine', cat.value)}
+                    className="text-left px-3 py-2 rounded-lg"
+                    style={{
+                      backgroundColor: filters.cuisine === cat.value ? 'rgba(232, 168, 56, 0.15)' : 'transparent',
+                      color: filters.cuisine === cat.value ? 'var(--accent-primary)' : 'var(--text-primary)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                    }}
+                  >
+                    {cat.emoji} {cat.label}
+                  </button>
+                ))}
+              </div>
+            </FilterPill>
+
+            {/* Dietary filter */}
+            <FilterPill
+              label="Dietary"
+              active={!!filters.dietary}
+              activeLabel={filters.dietary}
+              isOpen={openFilter === 'dietary'}
+              onToggle={() => setOpenFilter(openFilter === 'dietary' ? null : 'dietary')}
+              onClear={() => handleFilterChange('dietary', undefined)}
+            >
+              <div className="flex flex-col gap-1 p-2">
+                {DIETARY_OPTIONS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleFilterChange('dietary', tag)}
+                    className="text-left px-3 py-2 rounded-lg"
+                    style={{
+                      backgroundColor: filters.dietary === tag ? 'rgba(232, 168, 56, 0.15)' : 'transparent',
+                      color: filters.dietary === tag ? 'var(--accent-primary)' : 'var(--text-primary)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </FilterPill>
+
+            {/* Price filter */}
+            <FilterPill
+              label="Price"
+              active={!!filters.minPrice}
+              activeLabel={PRICE_RANGES.find((r) => r.min.toString() === filters.minPrice)?.label}
+              isOpen={openFilter === 'price'}
+              onToggle={() => setOpenFilter(openFilter === 'price' ? null : 'price')}
+              onClear={() => { setFilters((f) => { const { minPrice: _a, maxPrice: _b, ...rest } = f; return rest; }); setOpenFilter(null); if (query.trim()) performSearch(query, { ...filters, minPrice: undefined, maxPrice: undefined }); }}
+            >
+              <div className="flex flex-col gap-1 p-2">
+                {PRICE_RANGES.map((range) => (
+                  <button
+                    key={range.label}
+                    type="button"
+                    onClick={() => handlePriceFilter(range.min, range.max)}
+                    className="text-left px-3 py-2 rounded-lg"
+                    style={{
+                      backgroundColor: filters.minPrice === range.min.toString() ? 'rgba(232, 168, 56, 0.15)' : 'transparent',
+                      color: filters.minPrice === range.min.toString() ? 'var(--accent-primary)' : 'var(--text-primary)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                    }}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+              </div>
+            </FilterPill>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={() => { setFilters({}); if (query.trim()) performSearch(query, {}); }}
+                className="rounded-full px-3 py-1.5"
+                style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--status-error)' }}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Searching indicator */}
         {searching && (
@@ -157,7 +391,7 @@ export function SearchClient() {
                     <button
                       key={item.name}
                       type="button"
-                      onClick={() => handleCategoryTap(item.name)}
+                      onClick={() => handlePopularTap(item.name)}
                       className="flex items-center gap-2 text-left"
                     >
                       <TrendingUp size={14} style={{ color: 'var(--status-error)' }} />
@@ -185,7 +419,7 @@ export function SearchClient() {
                   <button
                     key={cat.value}
                     type="button"
-                    onClick={() => handleCategoryTap(cat.label)}
+                    onClick={() => handleCategoryTap(cat)}
                     className="flex items-center gap-1.5 rounded-full px-3 py-2"
                     style={{ backgroundColor: 'var(--bg-elevated)', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}
                   >
@@ -195,6 +429,25 @@ export function SearchClient() {
                 ))}
               </div>
             </div>
+
+            {/* Dish requests */}
+            {dishRequests.length > 0 && (
+              <div className="mb-6">
+                <SectionHeader title="Dish requests in your area" />
+                <div className="flex flex-col">
+                  {dishRequests.map((req) => (
+                    <DishRequestCard
+                      key={req.id}
+                      id={req.id}
+                      dishName={req.dish_name}
+                      locationCity={req.location_city}
+                      upvoteCount={req.upvote_count}
+                      userHasUpvoted={req.user_has_upvoted}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -202,13 +455,16 @@ export function SearchClient() {
         {hasSearched && !searching && (
           <>
             {totalResults === 0 ? (
-              <div className="text-center py-12">
-                <p style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--text-primary)', marginBottom: 4 }}>
-                  No results found
-                </p>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)' }}>
-                  Can&apos;t find what you&apos;re looking for?
-                </p>
+              <div className="py-8">
+                <div className="text-center mb-6">
+                  <p style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--text-primary)', marginBottom: 4 }}>
+                    No results found
+                  </p>
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)' }}>
+                    Can&apos;t find what you&apos;re looking for?
+                  </p>
+                </div>
+                <DishRequestForm />
               </div>
             ) : (
               <>
@@ -252,6 +508,19 @@ export function SearchClient() {
                         </Link>
                       ))}
                     </div>
+
+                    {/* Load more */}
+                    {nextCursor && (
+                      <button
+                        type="button"
+                        onClick={loadMore}
+                        disabled={loadingMore}
+                        className="w-full flex items-center justify-center gap-2 py-3 mt-2"
+                        style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--accent-primary)', background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
+                        {loadingMore ? <Loader2 size={16} className="animate-spin" /> : 'Load more dishes'}
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -286,6 +555,51 @@ export function SearchClient() {
                     </div>
                   </div>
                 )}
+
+                {/* Menu item results */}
+                {menuItems.length > 0 && (
+                  <div className="mb-6">
+                    <SectionHeader title={`Menu Items (${menuItems.length})`} />
+                    <div className="flex flex-col gap-1">
+                      {menuItems.map((item) => {
+                        const bp = item.business_profiles as { business_name: string; address_city: string | null } | null;
+                        const prof = item.profiles as { username: string } | null;
+                        return (
+                          <Link
+                            key={item.id}
+                            href={prof?.username ? `/business/${prof.username}` : '#'}
+                            className="flex items-center justify-between py-2"
+                            style={{ textDecoration: 'none' }}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="truncate" style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>
+                                  {item.name}
+                                </span>
+                                {item.dietary_tags && item.dietary_tags.length > 0 && (
+                                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>
+                                    {item.dietary_tags.join(' · ')}
+                                  </span>
+                                )}
+                              </div>
+                              {bp && (
+                                <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
+                                  From {bp.business_name}&apos;s menu
+                                  {bp.address_city && ` · ${bp.address_city}`}
+                                </p>
+                              )}
+                            </div>
+                            {item.price_pence != null && (
+                              <span className="shrink-0 ml-2" style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)' }}>
+                                {formatPrice(item.price_pence)}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </>
@@ -294,6 +608,8 @@ export function SearchClient() {
     </div>
   );
 }
+
+// --- Sub-components ---
 
 function SectionHeader({ title }: { title: string }) {
   return (
@@ -310,5 +626,56 @@ function SectionHeader({ title }: { title: string }) {
     >
       {title}
     </p>
+  );
+}
+
+function FilterPill({
+  label,
+  active,
+  activeLabel,
+  isOpen,
+  onToggle,
+  onClear,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  activeLabel?: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClear: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={active ? onClear : onToggle}
+        className="flex items-center gap-1 rounded-full px-3 py-1.5"
+        style={{
+          backgroundColor: active ? 'rgba(232, 168, 56, 0.15)' : 'var(--bg-elevated)',
+          color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
+          fontFamily: 'var(--font-body)',
+          fontSize: 13,
+          fontWeight: 500,
+        }}
+      >
+        {active ? (activeLabel ?? label) : label}
+        {active ? <X size={12} strokeWidth={2} /> : <ChevronDown size={12} strokeWidth={2} />}
+      </button>
+      {isOpen && (
+        <div
+          className="absolute top-full left-0 mt-1 z-50 rounded-xl shadow-lg overflow-y-auto"
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--bg-elevated)',
+            maxHeight: 240,
+            minWidth: 160,
+          }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
   );
 }

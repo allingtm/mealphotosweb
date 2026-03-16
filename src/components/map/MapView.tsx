@@ -5,6 +5,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import posthog from 'posthog-js';
 import { useAppStore } from '@/lib/store';
+import { createClient as createBrowserSupabase } from '@/lib/supabase/client';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { getBusinessTypeGroup, TYPE_GROUP_COLORS } from '@/types/database';
 import type { MapBusinessPin } from '@/types/database';
@@ -72,6 +73,66 @@ function pinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
       };
     }),
   };
+}
+
+function getDistanceMetres(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function checkProximityNotifications(userLat: number, userLng: number) {
+  try {
+    const supabase = createBrowserSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: saves } = await supabase
+      .from('saves')
+      .select(`
+        dish_id,
+        dishes!inner(title, business_id,
+          business_profiles:business_id(id, business_name, location))
+      `)
+      .eq('user_id', user.id);
+
+    if (!saves?.length) return;
+
+    for (const save of saves) {
+      const dish = save.dishes as unknown as { title: string; business_id: string; business_profiles: { id: string; business_name: string; location: { coordinates: number[] } | null } };
+      const biz = dish?.business_profiles;
+      if (!biz?.location?.coordinates) continue;
+
+      const distance = getDistanceMetres(userLat, userLng, biz.location.coordinates[1], biz.location.coordinates[0]);
+      if (distance > 200) continue;
+
+      const key = `proximity_${biz.id}`;
+      const lastNotified = localStorage.getItem(key);
+      if (lastNotified && Date.now() - parseInt(lastNotified) < 86_400_000) continue;
+
+      fetch('/api/notifications/proximity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          business_id: biz.id,
+          dish_title: dish.title,
+          business_name: biz.business_name,
+        }),
+      }).catch(() => {});
+
+      localStorage.setItem(key, Date.now().toString());
+
+      posthog.capture('proximity_notification_sent', {
+        business_id: biz.id,
+        dish_id: save.dish_id,
+        distance_m: Math.round(distance),
+      });
+    }
+  } catch { /* proximity check is non-critical */ }
 }
 
 export default function MapView() {
@@ -222,10 +283,11 @@ export default function MapView() {
 
     mapRef.current = map;
 
-    // Auto-center on user location
+    // Auto-center on user location + check proximity notifications
     navigator.geolocation?.getCurrentPosition(
       (pos) => {
         map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 12, duration: 2000 });
+        checkProximityNotifications(pos.coords.latitude, pos.coords.longitude);
       },
       () => { /* declined — stay at UK default */ }
     );

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
 
@@ -36,10 +37,19 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({ userId }: BusinessDashboardProps) {
   const userPlan = useAppStore((s) => s.userPlan);
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [topDishes, setTopDishes] = useState<TopDish[]>([]);
   const [dishRequests, setDishRequests] = useState<DishRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('subscription') === 'success') {
+      setShowWelcome(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchDashboard() {
@@ -55,8 +65,94 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
     fetchDashboard();
   }, []);
 
+  const dismissWelcome = () => {
+    setShowWelcome(false);
+    router.replace('/me');
+  };
+
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
+      {/* Welcome modal for new subscribers */}
+      {showWelcome && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+        >
+          <div
+            className="w-full max-w-sm"
+            style={{
+              backgroundColor: 'var(--bg-surface)',
+              borderRadius: 24,
+              padding: '32px 24px',
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 22,
+                color: 'var(--text-primary)',
+                textAlign: 'center',
+                marginBottom: 8,
+              }}
+            >
+              Welcome to meal.photos!
+            </h2>
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                color: 'var(--text-secondary)',
+                textAlign: 'center',
+                marginBottom: 24,
+              }}
+            >
+              Your business is now live. Here&apos;s what to do next:
+            </p>
+
+            <div className="flex flex-col gap-3" style={{ marginBottom: 24 }}>
+              {[
+                { label: 'Post your first dish', href: '/post' },
+                { label: 'Set up your menu', href: '/business/menu' },
+                { label: 'Complete your profile', href: '/settings' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-3">
+                  <div
+                    className="flex items-center justify-center rounded-full"
+                    style={{
+                      width: 24,
+                      height: 24,
+                      backgroundColor: 'var(--bg-elevated)',
+                    }}
+                  >
+                    <Check size={14} strokeWidth={2} style={{ color: 'var(--accent-primary)' }} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={dismissWelcome}
+              className="w-full py-3 rounded-2xl"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                color: '#121212',
+                fontFamily: 'var(--font-body)',
+                fontSize: 16,
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="w-full px-4 pb-24" style={{ maxWidth: 768 }}>
         {/* Post a Dish CTA */}
         <Link
@@ -146,13 +242,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
               </div>
             )}
 
-            {/* Analytics link */}
-            <Link
-              href="/me"
-              style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--accent-primary)' }}
-            >
-              View Full Analytics →
-            </Link>
+            {/* Analytics link — hidden until full analytics page is built */}
           </div>
         )}
       </div>
