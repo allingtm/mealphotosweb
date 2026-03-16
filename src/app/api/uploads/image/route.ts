@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { mealUploadServerSchema } from '@/lib/validations/meal';
+import { z } from 'zod';
+
+// v3: This route is kept for avatar/general image uploads
+// Dish uploads are handled by /api/dishes route
+const imageUploadSchema = z.object({
+  turnstile_token: z.string().optional(),
+});
 
 const CF_ACCOUNT_ID = process.env.CLOUDFLARE_IMAGES_ACCOUNT_ID!;
 const CF_API_TOKEN = process.env.CLOUDFLARE_IMAGES_API_TOKEN!;
@@ -153,14 +159,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Server-side Zod validation
-    const parsed = mealUploadServerSchema.safeParse({
-      title,
-      cuisine,
-      location,
-      tags,
-      venue,
+    const parsed = imageUploadSchema.safeParse({
       turnstile_token: turnstileToken,
-      visibility,
     });
 
     if (!parsed.success) {
@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
         cfForm.append('metadata', JSON.stringify({
           app: 'meal.photos',
           userId: user.id,
-          title: parsed.data.title,
+          title: (title as string) ?? 'upload',
           position: index + 1,
           uploadedAt: new Date().toISOString(),
         }));
@@ -266,39 +266,28 @@ export async function POST(req: NextRequest) {
     let locationCity = null;
     let locationCountry = null;
 
-    if (parsed.data.location) {
-      const lat = Math.round(parsed.data.location.lat * 100) / 100;
-      const lng = Math.round(parsed.data.location.lng * 100) / 100;
-      locationPoint = `SRID=4326;POINT(${lng} ${lat})`;
-      locationCity = parsed.data.location.city || null;
-      locationCountry = parsed.data.location.country || null;
-    } else if (parsed.data.venue?.lat && parsed.data.venue?.lng) {
-      const lat = Math.round(parsed.data.venue.lat * 100) / 100;
-      const lng = Math.round(parsed.data.venue.lng * 100) / 100;
-      locationPoint = `SRID=4326;POINT(${lng} ${lat})`;
-    }
+    // v3: Location handling moved to /api/dishes route
+    // This upload route is kept for avatar uploads only
 
     // 10. Insert meal row
-    const { data: meal, error: mealError } = await supabase
-      .from('meals')
-      .insert({
-        user_id: user.id,
-        title: parsed.data.title,
-        photo_url: `${primaryImage.deliveryUrl}/feed`,
-        cloudflare_image_id: primaryImage.imageId,
-        location: locationPoint,
-        location_city: locationCity,
-        location_country: locationCountry,
-        cuisine: parsed.data.cuisine || null,
-        tags: parsed.data.tags,
-        venue_name: parsed.data.venue?.name ?? null,
-        venue_mapbox_id: parsed.data.venue?.mapbox_id ?? null,
-        venue_address: parsed.data.venue?.address ?? null,
-        visibility: parsed.data.visibility,
-        comments_enabled: commentsEnabled,
-        image_count: files.length,
-        ...(isRestaurantUpload && {
-          is_restaurant_meal: true,
+    // v3: Return uploaded image URLs only — meal/dish creation is in /api/dishes
+    return NextResponse.json({
+      images: uploadResults.map((r) => ({
+        imageId: r.imageId,
+        url: `${r.deliveryUrl}/feed`,
+      })),
+    }, { status: 200 });
+
+    // v2 meal insert and remaining code removed in v3 migration
+  } catch (err) {
+    console.error('Upload error:', err);
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+  }
+}
+
+/* v2 dead code removed:
+    const _unused = {
+      is_restaurant_meal: true,
           restaurant_id: user.id,
           restaurant_revealed: false,
         }),

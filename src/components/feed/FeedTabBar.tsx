@@ -1,48 +1,45 @@
 'use client';
 
-import { Lock } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
+import { useAppStore, type FeedTab } from '@/lib/store';
 
-type FeedTab = 'following' | 'discover' | 'journal';
+const TABS: { value: FeedTab; label: string }[] = [
+  { value: 'following', label: 'Following' },
+  { value: 'nearby', label: 'Nearby' },
+  { value: 'trending', label: 'Trending' },
+];
 
-interface FeedTabBarProps {
-  activeTab: FeedTab;
-  onTabChange: (tab: FeedTab) => void;
-}
+export function FeedTabBar() {
+  const feedTab = useAppStore((s) => s.feedTab);
+  const setFeedTab = useAppStore((s) => s.setFeedTab);
 
-export function FeedTabBar({ activeTab, onTabChange }: FeedTabBarProps) {
-  const t = useTranslations('feed');
-
-  const tabs: { key: FeedTab; label: string; icon?: React.ReactNode }[] = [
-    { key: 'discover', label: t('discover') },
-    { key: 'following', label: t('following') },
-    { key: 'journal', label: t('journal'), icon: <Lock size={14} strokeWidth={1.5} /> },
-  ];
+  const handleTabChange = (tab: FeedTab) => {
+    if (tab === feedTab) return;
+    posthog.capture('feed_tab_switched', { tab });
+    setFeedTab(tab);
+  };
 
   return (
     <div
-      className="flex w-full backdrop-blur-md"
-      style={{
-        backgroundColor: 'rgba(18, 18, 18, 0.8)',
-        height: 44,
-        zIndex: 40,
-      }}
+      className="flex gap-2 px-4 py-3"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+      role="tablist"
+      aria-label="Feed tabs"
     >
-      {tabs.map((tab) => (
+      {TABS.map(({ value, label }) => (
         <button
-          key={tab.key}
-          onClick={() => onTabChange(tab.key)}
-          className="flex-1 flex items-center justify-center gap-1"
+          key={value}
+          type="button"
+          role="tab"
+          aria-selected={feedTab === value ? true : undefined}
+          onClick={() => handleTabChange(value)}
+          className="rounded-full px-4 py-2 text-sm font-medium transition-colors"
           style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 14,
-            fontWeight: activeTab === tab.key ? 600 : 400,
-            color: activeTab === tab.key ? 'var(--text-primary)' : 'var(--text-secondary)',
-            borderBottom: activeTab === tab.key ? '2px solid var(--accent-primary)' : '2px solid transparent',
+            backgroundColor: feedTab === value ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+            color: feedTab === value ? 'var(--bg-primary)' : 'var(--text-secondary)',
           }}
         >
-          {tab.icon}
-          {tab.label}
+          {label}
         </button>
       ))}
     </div>

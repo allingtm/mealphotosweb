@@ -1,23 +1,59 @@
-export { mealUploadSchema, mealUploadServerSchema, mealUpdateSchema, ratingSchema, recipeRequestSchema, CUISINE_OPTIONS, CUISINE_LABELS } from './meal';
-export { ingredientSchema, recipeSchema } from './recipe';
-export { profileUpdateSchema, reportSchema, commentSchema, disputeSchema, followSchema, blockSchema, getReportPriority, COMMENT_REPORT_REASONS } from './profile';
-export type { ReportReason } from './profile';
-export { mapPinsQuerySchema } from './map';
-export { leaderboardQuerySchema } from './leaderboard';
-export { notificationQuerySchema, markReadSchema, NOTIFICATION_TYPES } from './notification';
-export type { NotificationType } from './notification';
-export { subscribeSchema, revealSchema } from './restaurant';
+// v3 validation schemas
+
+// Dish management
+export { createDishSchema, deleteDishSchema } from './dish';
+export type { CreateDishInput } from './dish';
+
+// Reactions & saves
+export { reactionSchema } from './reaction';
+export type { ReactionInput } from './reaction';
+export { saveSchema } from './save';
+export type { SaveInput } from './save';
+
+// Comments
+export { createCommentSchema, deleteCommentSchema } from './comment';
+export type { CreateCommentInput } from './comment';
+
+// Follows
+export { followSchema } from './follow';
+export type { FollowInput } from './follow';
+
+// Menu
+export { createMenuSectionSchema, createMenuItemSchema } from './menu';
+export type { CreateMenuSectionInput, CreateMenuItemInput } from './menu';
+
+// Search
+export { searchSchema } from './search';
+export type { SearchInput } from './search';
+
+// Dish requests
+export { createDishRequestSchema, upvoteDishRequestSchema } from './dish-request';
+export type { CreateDishRequestInput } from './dish-request';
+
+// Map
+export { mapPinsSchema } from './map';
+export type { MapPinsInput } from './map';
+
+// Business
 export {
   businessTypeSchema,
   businessTypeGroupSchema,
   businessProfileCreateSchema,
   businessProfileUpdateSchema,
-  businessPostCreateSchema,
-  businessPostUpdateSchema,
-  discoverQuerySchema,
   businessOnboardSchema,
 } from './business';
-export { inviteSchema, respondSchema } from './private-feed-list';
-export { waitlistSchema } from './waitlist';
-export { inviteCodeSchema, inviteCodeServerSchema, createInviteCodeSchema } from './invite-code';
+export type { BusinessProfileCreateInput, BusinessOnboardInput } from './business';
+
+// Profile & reports
+export { profileUpdateSchema, reportSchema } from './profile';
+export type { ReportReason, ProfileUpdateInput } from './profile';
+
+// Auth
 export { signUpSchema, signInSchema, resetPasswordSchema, updatePasswordSchema, PASSWORD_MIN_LENGTH } from './auth';
+
+// Notifications
+export { notificationQuerySchema, markReadSchema, NOTIFICATION_TYPES } from './notification';
+export type { NotificationType } from './notification';
+
+// Admin
+export { adminMemberSearchSchema, adminMemberUpdateSchema, adminMealUpdateSchema, adminMealsPaginationSchema } from './admin';

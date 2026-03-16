@@ -3,7 +3,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
-import type { MealImage } from '@/types/database';
+import type { DishImage } from '@/types/database';
+
+// Alias for backward compatibility within this component
+type MealImage = DishImage;
 
 interface ImageCarouselProps {
   mealId: string;

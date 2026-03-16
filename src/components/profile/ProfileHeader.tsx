@@ -379,7 +379,7 @@ export function ProfileHeader({ profile, businessProfile, isOwnProfile, isFollow
                 Call
               </a>
             )}
-            {bpGroup === 'food_drink' && bp.menu_url && (
+            {bpGroup === 'food_service' && bp.menu_url && (
               <a
                 href={bp.menu_url}
                 target="_blank"

@@ -9,6 +9,7 @@ import { ANALYTICS_EVENTS } from '@/lib/analytics';
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAppStore((s) => s.setUser);
   const setIsAdmin = useAppStore((s) => s.setIsAdmin);
+  const setIsBusiness = useAppStore((s) => s.setIsBusiness);
   const setUserPlan = useAppStore((s) => s.setUserPlan);
   const setProfileAvatarUrl = useAppStore((s) => s.setProfileAvatarUrl);
 
@@ -18,11 +19,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function fetchProfileFlags(userId: string) {
       const { data } = await supabase
         .from('profiles')
-        .select('is_admin, plan, avatar_url')
+        .select('is_admin, is_business, plan, avatar_url')
         .eq('id', userId)
         .single();
       setIsAdmin(data?.is_admin ?? false);
-      setUserPlan((data?.plan as 'free' | 'personal' | 'business') ?? 'free');
+      setIsBusiness(data?.is_business ?? false);
+      setUserPlan((data?.plan as 'free' | 'basic' | 'premium') ?? 'free');
       setProfileAvatarUrl(data?.avatar_url ?? null);
     }
 
@@ -45,7 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         posthog.identify(session.user.id);
         fetchProfileFlags(session.user.id);
 
-        // Determine auth method from provider
         const provider = session.user.app_metadata?.provider;
         const method =
           provider === 'google'
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_OUT') {
         posthog.reset();
         setIsAdmin(false);
+        setIsBusiness(false);
         setUserPlan('free');
         setProfileAvatarUrl(null);
       }
@@ -68,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser, setIsAdmin, setUserPlan, setProfileAvatarUrl]);
+  }, [setUser, setIsAdmin, setIsBusiness, setUserPlan, setProfileAvatarUrl]);
 
   return <>{children}</>;
 }

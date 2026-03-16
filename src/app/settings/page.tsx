@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const userPlan = useAppStore((s) => s.userPlan);
-  const planLabel = userPlan === 'personal' ? t('personalPlan') : userPlan === 'business' ? t('businessPlan') : t('freePlan');
+  const planLabel = userPlan === 'premium' ? 'Premium' : userPlan === 'basic' ? 'Basic' : 'Free';
   const showCookieBanner = useAppStore((s) => s.showCookieBanner);
   const openCookiePreferences = useAppStore((s) => s.openCookiePreferences);
 

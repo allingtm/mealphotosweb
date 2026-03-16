@@ -10,7 +10,6 @@ import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { ToastContainer } from '@/components/ui/Toast';
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
-import { WaitlistModal } from '@/components/layout/WaitlistModal';
 import '@/styles/globals.css';
 import { cn } from "@/lib/utils";
 
@@ -34,9 +33,12 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meal.photos'),
-  title: 'meal.photos — Rate Real Meals',
+  title: {
+    default: 'meal.photos — See what\'s being served right now',
+    template: '%s | meal.photos',
+  },
   description:
-    'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
+    'A live food feed from restaurants, cafes, and food businesses near you. Discover dishes, save favourites, and explore food culture worldwide.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -47,18 +49,18 @@ export const metadata: Metadata = {
     apple: '/icons/icon-192.png',
   },
   openGraph: {
-    title: 'meal.photos — A global stage for food culture',
+    title: 'meal.photos — See what\'s being served right now',
     description:
-      'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
+      'A live food feed from restaurants, cafes, and food businesses near you. Discover dishes, save favourites, and explore food culture worldwide.',
     siteName: 'meal.photos',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'meal.photos — A global stage for food culture',
+    title: 'meal.photos — See what\'s being served right now',
     description:
-      'Upload your meals and let the world rate them. Share privately with your nutritionist or PT. Get your business discovered by people who love food.',
+      'A live food feed from restaurants, cafes, and food businesses near you.',
   },
 };
 
@@ -137,7 +139,6 @@ export default async function RootLayout({
               <AppShell>{children}</AppShell>
               <ToastContainer />
               <CookieConsentBanner />
-              <WaitlistModal />
             </AuthProvider>
           </PostHogProvider>
         </NextIntlClientProvider>

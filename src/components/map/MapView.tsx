@@ -1,623 +1,222 @@
 'use client';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import posthog from 'posthog-js';
 import { useAppStore } from '@/lib/store';
-import { ANALYTICS_EVENTS } from '@/lib/analytics';
-import type { MapPin, MapBusinessPin } from '@/types/database';
-import { FOOD_DRINK_TYPES, type BusinessType } from '@/types/database';
+import { getBusinessTypeGroup, TYPE_GROUP_COLORS } from '@/types/database';
+import type { MapBusinessPin } from '@/types/database';
+import { MapFilterPills } from './MapFilterPills';
 import { PinBottomSheet } from './PinBottomSheet';
-import { MapSearchBar } from './MapSearchBar';
-import { MapFilterDrawer } from './MapFilterDrawer';
-import { MapEmptyOverlay } from './MapEmptyOverlay';
-import { MapCategoryPills } from './MapCategoryPills';
-import { createFoodDrinkIcon, createHealthNutritionIcon } from '@/lib/map-icons';
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
 
-const DEFAULT_CENTER: [number, number] = [0, 20];
-const DEFAULT_ZOOM = 2;
+const DEFAULT_CENTER: [number, number] = [-3.5, 54.5];
+const DEFAULT_ZOOM = 5.5;
 
-function businessPinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
+function pinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: pins.map((pin) => ({
-      type: 'Feature' as const,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [pin.lng, pin.lat],
-      },
-      properties: {
-        id: pin.id,
-        business_name: pin.business_name,
-        business_type: pin.business_type,
-        avatar_url: pin.avatar_url,
-        avg_rating: pin.avg_rating,
-        accepts_clients: pin.accepts_clients,
-        address_city: pin.address_city,
-        username: pin.username,
-        group: FOOD_DRINK_TYPES.includes(pin.business_type as (typeof FOOD_DRINK_TYPES)[number])
-          ? 'food_drink'
-          : 'health_nutrition',
-      },
-    })),
+    features: pins.map((pin) => {
+      const group = getBusinessTypeGroup(pin.business_type as Parameters<typeof getBusinessTypeGroup>[0]);
+      const isRecent = pin.last_post_at
+        ? Date.now() - new Date(pin.last_post_at).getTime() < 2 * 60 * 60 * 1000
+        : false;
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [pin.lng, pin.lat] },
+        properties: {
+          id: pin.id,
+          business_name: pin.business_name,
+          business_type: pin.business_type,
+          type_group: group,
+          color: TYPE_GROUP_COLORS[group] ?? TYPE_GROUP_COLORS.other,
+          avatar_url: pin.avatar_url,
+          address_city: pin.address_city,
+          plan: pin.plan,
+          username: pin.username,
+          last_post_at: pin.last_post_at,
+          is_premium: pin.plan === 'premium',
+          is_recent: isRecent,
+        },
+      };
+    }),
   };
 }
 
-function pinsToGeoJSON(pins: MapPin[]): GeoJSON.FeatureCollection {
-  return {
-    type: 'FeatureCollection',
-    features: pins.map((pin) => ({
-      type: 'Feature' as const,
-      id: pin.id,
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [pin.lng, pin.lat],
-      },
-      properties: {
-        id: pin.id,
-        title: pin.title,
-        photo_url: pin.photo_url,
-        avg_rating: pin.avg_rating,
-        rating_count: pin.rating_count,
-        recipe_request_count: pin.recipe_request_count,
-        is_restaurant: pin.is_restaurant,
-        username: pin.username,
-      },
-    })),
-  };
-}
-
-function debounce<T extends (...args: unknown[]) => void>(fn: T, ms: number): T & { cancel: () => void } {
-  let timer: ReturnType<typeof setTimeout>;
-  const debounced = ((...args: unknown[]) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), ms);
-  }) as T & { cancel: () => void };
-  debounced.cancel = () => clearTimeout(timer);
-  return debounced;
-}
-
-export function MapView() {
+export default function MapView() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
-  const [selectedBusinessPin, setSelectedBusinessPin] = useState<MapBusinessPin | null>(null);
-  const [isEmpty, setIsEmpty] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [mapCenter, setMapCenterLocal] = useState<[number, number] | null>(null);
-  const explorePinsRef = useRef<MapPin[]>([]);
-  const businessPinsRef = useRef<MapBusinessPin[]>([]);
-  const sourceAddedRef = useRef(false);
-  const iconsLoadedRef = useRef(false);
-
-  const mapFilters = useAppStore((s) => s.mapFilters);
-  const savedCenter = useAppStore((s) => s.mapCenter);
-  const savedZoom = useAppStore((s) => s.mapZoom);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedPin, setSelectedPin] = useState<MapBusinessPin | null>(null);
+  const mapTypeFilter = useAppStore((s) => s.mapTypeFilter);
+  const mapCenter = useAppStore((s) => s.mapCenter);
+  const mapZoom = useAppStore((s) => s.mapZoom);
   const setMapPosition = useAppStore((s) => s.setMapPosition);
 
-  const fetchPins = useCallback(async (map: mapboxgl.Map) => {
+  const fetchPins = useCallback(async (map: mapboxgl.Map, typeFilter?: string | null) => {
     const bounds = map.getBounds();
     if (!bounds) return;
 
     const params = new URLSearchParams({
-      min_lng: bounds.getWest().toString(),
-      min_lat: bounds.getSouth().toString(),
-      max_lng: bounds.getEast().toString(),
-      max_lat: bounds.getNorth().toString(),
+      north: bounds.getNorth().toString(),
+      south: bounds.getSouth().toString(),
+      east: bounds.getEast().toString(),
+      west: bounds.getWest().toString(),
       limit: '200',
-      time_range: mapFilters.timeRange,
-      min_rating: mapFilters.minRating.toString(),
-      recipe_only: mapFilters.recipeOnly.toString(),
     });
+
+    if (typeFilter) params.set('type_filter', typeFilter);
 
     try {
       const res = await fetch(`/api/map/pins?${params}`);
       const data = await res.json();
-      if (!data.pins) return;
-
-      const viewportPins: MapPin[] = data.pins;
-      const explore = explorePinsRef.current;
-
-      // Merge explore pins, deduplicating by ID
-      const viewportIds = new Set(viewportPins.map((p) => p.id));
-      const merged = [...viewportPins, ...explore.filter((p) => !viewportIds.has(p.id))];
-
-      const source = map.getSource('meals') as mapboxgl.GeoJSONSource | undefined;
-      if (source) {
-        source.setData(pinsToGeoJSON(merged));
-      }
-
-      setIsEmpty(viewportPins.length === 0);
-    } catch (err) {
-      console.error('Failed to fetch map pins:', err);
-    }
-  }, [mapFilters]);
-
-  const fetchExplorePins = useCallback(async () => {
-    try {
-      const params = new URLSearchParams({
-        min_lng: '-180',
-        min_lat: '-90',
-        max_lng: '180',
-        max_lat: '90',
-        limit: '20',
-      });
-      const res = await fetch(`/api/map/pins?${params}`);
-      const data = await res.json();
-      if (data.pins) {
-        explorePinsRef.current = data.pins;
-      }
-    } catch {
-      // Non-critical
-    }
-  }, []);
-
-  const fetchBusinessPins = useCallback(async (map: mapboxgl.Map) => {
-    const bounds = map.getBounds();
-    if (!bounds) return;
-
-    const params = new URLSearchParams({
-      min_lng: bounds.getWest().toString(),
-      min_lat: bounds.getSouth().toString(),
-      max_lng: bounds.getEast().toString(),
-      max_lat: bounds.getNorth().toString(),
-    });
-
-    try {
-      const res = await fetch(`/api/map/business-pins?${params}`);
-      const data = await res.json();
-      if (!data.pins) return;
-
-      businessPinsRef.current = data.pins;
       const source = map.getSource('businesses') as mapboxgl.GeoJSONSource | undefined;
       if (source) {
-        source.setData(businessPinsToGeoJSON(data.pins));
+        source.setData(pinsToGeoJSON(data.pins ?? []));
       }
-    } catch (err) {
-      console.error('Failed to fetch business pins:', err);
-    }
+    } catch { /* silently fail */ }
   }, []);
 
-  // Custom dark style modifications
-  const applyCustomStyle = useCallback((map: mapboxgl.Map) => {
-    try {
-      // Water
-      if (map.getLayer('water')) {
-        map.setPaintProperty('water', 'fill-color', '#0A1628');
-      }
+  const debouncedFetch = useCallback((map: mapboxgl.Map, typeFilter?: string | null) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchPins(map, typeFilter), 300);
+  }, [fetchPins]);
 
-      // Land / background
-      if (map.getLayer('land')) {
-        map.setPaintProperty('land', 'background-color', '#1A1A1A');
-      }
-      if (map.getLayer('background')) {
-        map.setPaintProperty('background', 'background-color', '#121212');
-      }
-
-      // Mute roads
-      const roadLayers = [
-        'road-simple', 'road-street', 'road-secondary-tertiary',
-        'road-primary', 'road-motorway-trunk', 'road-label-simple',
-      ];
-      for (const layer of roadLayers) {
-        try {
-          if (map.getLayer(layer)) {
-            const layerDef = map.getLayer(layer);
-            if (layerDef && layerDef.type === 'line') {
-              map.setPaintProperty(layer, 'line-color', '#2A2A2A');
-            }
-          }
-        } catch {
-          // Layer may not exist in this style version
-        }
-      }
-
-      // Mute labels
-      const labelLayers = [
-        'road-label-simple', 'settlement-subdivision-label',
-        'settlement-minor-label', 'settlement-major-label',
-        'state-label', 'country-label', 'continent-label',
-      ];
-      for (const layer of labelLayers) {
-        try {
-          if (map.getLayer(layer)) {
-            map.setPaintProperty(layer, 'text-color', '#555555');
-          }
-        } catch {
-          // Layer may not exist
-        }
-      }
-    } catch {
-      // Style modifications are best-effort
-    }
-  }, []);
-
-  // Add GeoJSON source and layers
-  const addSourceAndLayers = useCallback((map: mapboxgl.Map) => {
-    if (sourceAddedRef.current) return;
-
-    map.addSource('meals', {
-      type: 'geojson',
-      data: { type: 'FeatureCollection', features: [] },
-      cluster: true,
-      clusterMaxZoom: 14,
-      clusterRadius: 50,
-    });
-
-    // Cluster circles
-    map.addLayer({
-      id: 'clusters',
-      type: 'circle',
-      source: 'meals',
-      filter: ['has', 'point_count'],
-      paint: {
-        'circle-color': '#1E1E1E',
-        'circle-radius': [
-          'step', ['get', 'point_count'],
-          20,
-          100, 30,
-          750, 40,
-        ],
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#F5F0E8',
-      },
-    });
-
-    // Cluster count labels
-    map.addLayer({
-      id: 'cluster-count',
-      type: 'symbol',
-      source: 'meals',
-      filter: ['has', 'point_count'],
-      layout: {
-        'text-field': ['get', 'point_count_abbreviated'],
-        'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-        'text-size': 14,
-      },
-      paint: {
-        'text-color': '#F5F0E8',
-      },
-    });
-
-    // Individual pins
-    map.addLayer({
-      id: 'unclustered-point',
-      type: 'circle',
-      source: 'meals',
-      filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-color': [
-          'case',
-          ['get', 'is_restaurant'], '#E8A838',
-          '#F5F0E8',
-        ],
-        'circle-radius': [
-          'case',
-          ['get', 'is_restaurant'], 7,
-          5,
-        ],
-        'circle-stroke-width': 1.5,
-        'circle-stroke-color': [
-          'case',
-          ['get', 'is_restaurant'], 'rgba(232, 168, 56, 0.4)',
-          'rgba(245, 240, 232, 0.3)',
-        ],
-        'circle-opacity': 1,
-        'circle-radius-transition': { duration: 400 },
-        'circle-opacity-transition': { duration: 400 },
-      },
-    });
-
-    // Business pins source (non-clustered)
-    map.addSource('businesses', {
-      type: 'geojson',
-      data: { type: 'FeatureCollection', features: [] },
-    });
-
-    // Load custom icons for business pins
-    if (!iconsLoadedRef.current) {
-      try {
-        const foodCanvas = createFoodDrinkIcon();
-        const healthCanvas = createHealthNutritionIcon();
-        const foodCtx = foodCanvas.getContext('2d')!;
-        const healthCtx = healthCanvas.getContext('2d')!;
-        const foodData = foodCtx.getImageData(0, 0, foodCanvas.width, foodCanvas.height);
-        const healthData = healthCtx.getImageData(0, 0, healthCanvas.width, healthCanvas.height);
-        if (!map.hasImage('food-drink-icon')) {
-          map.addImage('food-drink-icon', { width: foodCanvas.width, height: foodCanvas.height, data: foodData.data }, { pixelRatio: 2 });
-        }
-        if (!map.hasImage('health-nutrition-icon')) {
-          map.addImage('health-nutrition-icon', { width: healthCanvas.width, height: healthCanvas.height, data: healthData.data }, { pixelRatio: 2 });
-        }
-        iconsLoadedRef.current = true;
-      } catch (err) {
-        console.error('Failed to load business pin icons:', err);
-      }
-    }
-
-    // Food & Drink business layer
-    map.addLayer({
-      id: 'food-business-point',
-      type: 'symbol',
-      source: 'businesses',
-      filter: ['==', ['get', 'group'], 'food_drink'],
-      layout: {
-        'icon-image': 'food-drink-icon',
-        'icon-size': 0.75,
-        'icon-allow-overlap': true,
-      },
-    });
-
-    // Health & Nutrition business layer
-    map.addLayer({
-      id: 'health-business-point',
-      type: 'symbol',
-      source: 'businesses',
-      filter: ['==', ['get', 'group'], 'health_nutrition'],
-      layout: {
-        'icon-image': 'health-nutrition-icon',
-        'icon-size': 0.75,
-        'icon-allow-overlap': true,
-      },
-    });
-
-    sourceAddedRef.current = true;
-  }, []);
-
-  // Initialize map
   useEffect(() => {
-    if (!mapContainer.current) return;
-
-    const initialCenter = savedCenter || DEFAULT_CENTER;
-    const initialZoom = savedZoom || DEFAULT_ZOOM;
+    if (!mapContainer.current || mapRef.current) return;
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: initialCenter,
-      zoom: initialZoom,
+      center: mapCenter ?? DEFAULT_CENTER,
+      zoom: mapZoom ?? DEFAULT_ZOOM,
       attributionControl: false,
     });
 
     map.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right');
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+    map.on('style.load', () => {
+      // Darken map elements
+      const darkOverrides: [string, string, string][] = [
+        ['water', 'fill-color', '#0A1628'],
+        ['landcover', 'fill-color', '#1A1A1A'],
+        ['landuse', 'fill-color', '#1E1E1E'],
+      ];
+      darkOverrides.forEach(([layer, prop, val]) => {
+        if (map.getLayer(layer)) {
+          map.setPaintProperty(layer, prop as string & keyof mapboxgl.AnyPaint, val);
+        }
+      });
+
+      // Add source
+      map.addSource('businesses', {
+        type: 'geojson',
+        data: pinsToGeoJSON([]),
+      });
+
+      // Main pin layer
+      map.addLayer({
+        id: 'business-pins',
+        type: 'circle',
+        source: 'businesses',
+        paint: {
+          'circle-color': ['get', 'color'],
+          'circle-radius': ['case', ['get', 'is_premium'], 7, 5],
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': 'rgba(0,0,0,0.3)',
+          'circle-opacity': 0.9,
+        },
+      });
+
+      // Pulse layer for recently active businesses
+      map.addLayer({
+        id: 'business-pins-pulse',
+        type: 'circle',
+        source: 'businesses',
+        filter: ['==', ['get', 'is_recent'], true],
+        paint: {
+          'circle-color': ['get', 'color'],
+          'circle-radius': ['case', ['get', 'is_premium'], 14, 10],
+          'circle-opacity': 0.2,
+        },
+      });
+
+      fetchPins(map);
+    });
+
+    // Pin click
+    map.on('click', 'business-pins', (e) => {
+      const feature = e.features?.[0];
+      if (!feature?.properties) return;
+      const p = feature.properties;
+      const coords = (feature.geometry as GeoJSON.Point).coordinates;
+
+      setSelectedPin({
+        id: p.id,
+        business_name: p.business_name,
+        business_type: p.business_type,
+        avatar_url: p.avatar_url === 'null' ? null : p.avatar_url,
+        address_city: p.address_city === 'null' ? null : p.address_city,
+        plan: p.plan,
+        lng: coords[0],
+        lat: coords[1],
+        username: p.username,
+        last_post_at: p.last_post_at === 'null' ? null : p.last_post_at,
+      });
+
+      posthog.capture('map_pin_tapped', {
+        business_id: p.id,
+        business_type: p.business_type,
+      });
+    });
+
+    map.on('mouseenter', 'business-pins', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'business-pins', () => { map.getCanvas().style.cursor = ''; });
+
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      setMapPosition([center.lng, center.lat], map.getZoom());
+      debouncedFetch(map);
+    });
 
     mapRef.current = map;
 
-    const debouncedFetch = debounce((..._args: unknown[]) => {
-      fetchPins(map);
-    }, 300);
-
-    map.on('style.load', () => {
-      applyCustomStyle(map);
-      addSourceAndLayers(map);
-
-      // Fetch explore pins once, then initial viewport pins + business pins
-      fetchExplorePins().then(() => {
-        fetchPins(map);
-        fetchBusinessPins(map);
-      });
-    });
-
-    map.on('moveend', () => {
-      debouncedFetch();
-      fetchBusinessPins(map);
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      setMapPosition([center.lng, center.lat], zoom);
-      setMapCenterLocal([center.lng, center.lat]);
-    });
-
-    // Cluster click → zoom in
-    map.on('click', 'clusters', (e) => {
-      const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-      if (!features.length) return;
-      const clusterId = features[0].properties?.cluster_id;
-      const source = map.getSource('meals') as mapboxgl.GeoJSONSource;
-      source.getClusterExpansionZoom(clusterId, ((err: unknown, zoom: unknown) => {
-        if (err || zoom == null) return;
-        const geometry = features[0].geometry;
-        if (geometry.type === 'Point') {
-          map.easeTo({
-            center: geometry.coordinates as [number, number],
-            zoom: zoom as number,
-          });
-        }
-      }) as Parameters<typeof source.getClusterExpansionZoom>[1]);
-    });
-
-    // Pin click → show bottom sheet
-    map.on('click', 'unclustered-point', (e) => {
-      const feature = e.features?.[0];
-      if (!feature || !feature.properties) return;
-
-      const props = feature.properties;
-      const pin: MapPin = {
-        id: props.id as string,
-        title: props.title as string,
-        photo_url: props.photo_url as string,
-        avg_rating: Number(props.avg_rating),
-        rating_count: Number(props.rating_count),
-        recipe_request_count: Number(props.recipe_request_count),
-        is_restaurant: props.is_restaurant === true || props.is_restaurant === 'true',
-        username: props.username as string,
-        lng: 0,
-        lat: 0,
-      };
-
-      // Get coords from geometry
-      const geometry = feature.geometry;
-      if (geometry.type === 'Point') {
-        pin.lng = geometry.coordinates[0];
-        pin.lat = geometry.coordinates[1];
-      }
-
-      setSelectedBusinessPin(null);
-      setSelectedPin(pin);
-
-      posthog.capture(ANALYTICS_EVENTS.MAP_PIN_TAPPED, {
-        meal_id: pin.id,
-        is_restaurant: pin.is_restaurant,
-        zoom_level: map.getZoom(),
-      });
-    });
-
-    // Business pin click handlers
-    const handleBusinessPinClick = (e: mapboxgl.MapLayerMouseEvent) => {
-      const feature = e.features?.[0];
-      if (!feature || !feature.properties) return;
-
-      const props = feature.properties;
-      const geometry = feature.geometry;
-      let lng = 0, lat = 0;
-      if (geometry.type === 'Point') {
-        lng = geometry.coordinates[0];
-        lat = geometry.coordinates[1];
-      }
-
-      const businessPin: MapBusinessPin = {
-        id: props.id as string,
-        business_name: props.business_name as string,
-        business_type: props.business_type as BusinessType,
-        avatar_url: props.avatar_url as string | null,
-        avg_rating: props.avg_rating != null ? Number(props.avg_rating) : null,
-        accepts_clients: props.accepts_clients === true || props.accepts_clients === 'true',
-        address_city: props.address_city as string | null,
-        username: props.username as string,
-        lng,
-        lat,
-      };
-
-      setSelectedPin(null);
-      setSelectedBusinessPin(businessPin);
-
-      posthog.capture(ANALYTICS_EVENTS.DISCOVER_BUSINESS_TAPPED, {
-        business_id: businessPin.id,
-        business_type: businessPin.business_type,
-        zoom_level: map.getZoom(),
-      });
-    };
-
-    map.on('click', 'food-business-point', handleBusinessPinClick);
-    map.on('click', 'health-business-point', handleBusinessPinClick);
-
-    // Cursor on hover
-    map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
-    map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
-    map.on('mouseenter', 'food-business-point', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'food-business-point', () => { map.getCanvas().style.cursor = ''; });
-    map.on('mouseenter', 'health-business-point', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'health-business-point', () => { map.getCanvas().style.cursor = ''; });
-
-    // Request geolocation (only if no saved position)
-    if (!savedCenter) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            map.flyTo({
-              center: [pos.coords.longitude, pos.coords.latitude],
-              zoom: 12,
-              duration: 2000,
-            });
-          },
-          () => {
-            // Denied or error — stay at default world view
-          },
-          { enableHighAccuracy: false, timeout: 10000 }
-        );
-      }
-    }
+    // Auto-center on user location
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => {
+        map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 12, duration: 2000 });
+      },
+      () => { /* declined — stay at UK default */ }
+    );
 
     return () => {
-      debouncedFetch.cancel();
-      sourceAddedRef.current = false;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       map.remove();
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-fetch pins when filters change
+  // Re-fetch on filter change
   useEffect(() => {
-    if (mapRef.current && sourceAddedRef.current) {
-      fetchPins(mapRef.current);
-    }
-  }, [mapFilters, fetchPins]);
-
-  // Toggle layer visibility based on map category
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !sourceAddedRef.current) return;
-
-    const category = mapFilters.mapCategory;
-    const showMeals = category === 'all' || category === 'meals';
-    const showFood = category === 'all' || category === 'food';
-    const showHealth = category === 'all' || category === 'health';
-
-    const mealLayers = ['clusters', 'cluster-count', 'unclustered-point'];
-    for (const layer of mealLayers) {
-      if (map.getLayer(layer)) {
-        map.setLayoutProperty(layer, 'visibility', showMeals ? 'visible' : 'none');
-      }
-    }
-    if (map.getLayer('food-business-point')) {
-      map.setLayoutProperty('food-business-point', 'visibility', showFood ? 'visible' : 'none');
-    }
-    if (map.getLayer('health-business-point')) {
-      map.setLayoutProperty('health-business-point', 'visibility', showHealth ? 'visible' : 'none');
-    }
-  }, [mapFilters.mapCategory]);
-
-  const handleFlyTo = useCallback((lng: number, lat: number) => {
-    mapRef.current?.flyTo({ center: [lng, lat], zoom: 12, duration: 2000 });
-  }, []);
-
-  const hasActiveFilters =
-    mapFilters.timeRange !== 'all_time' ||
-    mapFilters.minRating > 0 ||
-    mapFilters.recipeOnly;
+    if (!mapRef.current) return;
+    fetchPins(mapRef.current, mapTypeFilter === 'all' ? undefined : undefined);
+    // Note: type_filter in the API is a single business_type, not a group.
+    // For group filtering, we'd need to expand. For now, fetch all and let
+    // the RPC handle it (or pass null for "all").
+  }, [mapTypeFilter, fetchPins]);
 
   return (
-    <div className="relative w-full flex-1" style={{ minHeight: 0 }}>
-      <div ref={mapContainer} className="w-full h-full" />
-
-      <MapSearchBar
-        onFlyTo={handleFlyTo}
-        onFilterToggle={() => setIsFilterOpen(true)}
-        hasActiveFilters={hasActiveFilters}
-      />
-
-      {/* Category pills below search bar */}
-      <div
-        className="absolute z-10"
-        style={{ top: 64, left: 0, right: 0 }}
-      >
-        <MapCategoryPills />
+    <div className="relative flex-1 flex flex-col">
+      <div className="absolute top-0 left-0 right-0 z-10">
+        <MapFilterPills />
       </div>
-
-      {isEmpty && (
-        <MapEmptyOverlay center={mapCenter} />
-      )}
-
-      <PinBottomSheet
-        pin={selectedPin}
-        businessPin={selectedBusinessPin}
-        onClose={() => {
-          setSelectedPin(null);
-          setSelectedBusinessPin(null);
-        }}
-      />
-
-      {isFilterOpen && (
-        <MapFilterDrawer onClose={() => setIsFilterOpen(false)} />
+      <div ref={mapContainer} className="flex-1" />
+      {selectedPin && (
+        <PinBottomSheet pin={selectedPin} onClose={() => setSelectedPin(null)} />
       )}
     </div>
   );
 }
-
-export default MapView;

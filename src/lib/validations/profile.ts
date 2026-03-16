@@ -8,61 +8,25 @@ export const profileUpdateSchema = z.object({
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
     .trim()
     .optional(),
-  bio: z.string().max(160, 'Bio must be under 160 characters').trim().optional(),
   avatar_url: z.string().url().optional(),
   location_city: z.string().max(100).optional(),
   location_country: z.string().max(100).optional(),
-  timezone: z.string().max(50).optional(),
-  show_location: z.boolean().optional(),
-  show_streak: z.boolean().optional(),
 });
 
 const REPORT_REASONS = [
-  'not_food', 'inappropriate', 'spam', 'harassment', 'other',
-  'stolen_photo', 'wrong_venue', 'food_safety', 'privacy', 'copyright',
+  'inappropriate', 'spam', 'harassment', 'misleading', 'other',
 ] as const;
 
 export type ReportReason = typeof REPORT_REASONS[number];
 
 export const reportSchema = z.object({
-  reported_meal_id: z.string().uuid().nullable().optional(),
-  reported_user_id: z.string().uuid().nullable().optional(),
   reported_comment_id: z.string().uuid().nullable().optional(),
+  reported_business_id: z.string().uuid().nullable().optional(),
   reason: z.enum(REPORT_REASONS),
   detail: z.string().max(500).trim().optional(),
 }).refine(
-  data => data.reported_meal_id || data.reported_user_id || data.reported_comment_id,
-  'Must report a meal, user, or comment'
+  data => data.reported_comment_id || data.reported_business_id,
+  'Must report a comment or business'
 );
 
-export const COMMENT_REPORT_REASONS = [
-  'inappropriate', 'spam', 'harassment', 'other',
-] as const;
-
-export function getReportPriority(
-  reason: ReportReason
-): 'urgent' | 'high' | 'standard' {
-  if (reason === 'food_safety' || reason === 'privacy') return 'urgent';
-  if (reason === 'inappropriate' || reason === 'harassment' || reason === 'copyright') return 'high';
-  return 'standard';
-}
-
-export const disputeSchema = z.object({
-  meal_id: z.string().uuid(),
-  reason: z.enum(['not_served_here', 'wrong_location', 'fake_photo', 'other']),
-  detail: z.string().max(280).trim().optional(),
-});
-
-export const commentSchema = z.object({
-  meal_id: z.string().uuid(),
-  text: z.string().min(1).max(280, 'Comment must be under 280 characters').trim(),
-});
-
-export const followSchema = z.object({
-  following_id: z.string().uuid(),
-  notify_on_upload: z.boolean().optional().default(false),
-});
-
-export const blockSchema = z.object({
-  blocked_id: z.string().uuid(),
-});
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

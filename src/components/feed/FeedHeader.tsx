@@ -1,44 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { Utensils } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
-import { MenuButton } from '@/components/layout/MenuButton';
 
 export function FeedHeader() {
-  const t = useTranslations('feed');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <>
       <header
-        className="flex items-center justify-between"
+        className="sticky top-0 z-40 flex items-center justify-between px-4"
         style={{
-          padding: '8px 16px',
-          height: 48,
+          height: 56,
           backgroundColor: 'var(--bg-primary)',
           borderBottom: '1px solid var(--bg-elevated)',
         }}
       >
-        <div className="flex items-center gap-2">
-          <Utensils size={20} strokeWidth={1.5} color="var(--accent-primary)" />
-          <span
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 20,
-              fontWeight: 400,
-              color: 'var(--text-primary)',
-            }}
-          >
-            {t('title')}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <NotificationBell onClick={() => setIsPanelOpen(true)} />
-          <MenuButton />
-        </div>
+        <Link
+          href="/"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            fontWeight: 400,
+            color: 'var(--text-primary)',
+          }}
+        >
+          meal.photos
+        </Link>
+        <NotificationBell onClick={() => setIsPanelOpen(true)} />
       </header>
 
       <NotificationPanel

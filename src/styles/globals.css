@@ -40,38 +40,27 @@
   /* Fonts (set by next/font in layout.tsx) */
   --font-display: var(--font-instrument-serif);
   --font-body: var(--font-dm-sans);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* shadcn/ui theme — dark-first, mapped to our design tokens */
+  --background: #121212;
+  --foreground: #F5F0E8;
+  --card: #1E1E1E;
+  --card-foreground: #F5F0E8;
+  --popover: #1E1E1E;
+  --popover-foreground: #F5F0E8;
+  --primary: #E8A838;
+  --primary-foreground: #121212;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #F5F0E8;
+  --muted: #2A2A2A;
+  --muted-foreground: #888888;
+  --accent: #E8A838;
+  --accent-foreground: #121212;
+  --destructive: #D4553A;
+  --destructive-foreground: #F5F0E8;
+  --border: #2A2A2A;
+  --input: #2A2A2A;
+  --ring: #E8A838;
+  --radius: 1rem;
 }
 
 /* Light mode theme toggle */

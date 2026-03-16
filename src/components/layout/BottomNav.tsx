@@ -1,24 +1,18 @@
 'use client';
 
-import { Home, Compass, Trophy, ChefHat } from 'lucide-react';
+import { Home, Compass, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { UploadFAB } from './UploadFAB';
 
-const leftTabs = [
-  { href: '/', icon: Home, label: 'feed' },
-  { href: '/map', icon: Compass, label: 'map' },
-] as const;
-
-const rightTabs = [
-  { href: '/leaderboard', icon: Trophy, label: 'rankings' },
-  { href: '/recipes', icon: ChefHat, label: 'recipes' },
+const tabs = [
+  { href: '/', icon: Home, label: 'Feed' },
+  { href: '/map', icon: Compass, label: 'Map' },
+  { href: '/search', icon: Search, label: 'Search' },
+  { href: '/me', icon: User, label: 'Me' },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
-  const t = useTranslations('nav');
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
@@ -30,10 +24,9 @@ export function BottomNav() {
         height: 56,
         backgroundColor: 'var(--bg-surface)',
         borderColor: 'var(--bg-elevated)',
-        overflow: 'visible',
       }}
     >
-      {leftTabs.map(({ href, icon: Icon, label }) => (
+      {tabs.map(({ href, icon: Icon, label }) => (
         <Link
           key={href}
           href={href}
@@ -48,44 +41,11 @@ export function BottomNav() {
           <span
             className="font-medium"
             style={{
-              fontFamily: 'var(--font-body)',
               fontSize: 11,
-              fontWeight: 500,
               color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
           >
-            {t(label)}
-          </span>
-        </Link>
-      ))}
-
-      {/* Spacer for FAB */}
-      <div className="relative" style={{ width: 56 }}>
-        <UploadFAB />
-      </div>
-
-      {rightTabs.map(({ href, icon: Icon, label }) => (
-        <Link
-          key={href}
-          href={href}
-          className="flex flex-col items-center justify-center gap-0.5"
-          style={{ minWidth: 48, minHeight: 48 }}
-        >
-          <Icon
-            size={24}
-            strokeWidth={1.5}
-            color={isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)'}
-          />
-          <span
-            className="font-medium"
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 11,
-              fontWeight: 500,
-              color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
-            }}
-          >
-            {t(label)}
+            {label}
           </span>
         </Link>
       ))}

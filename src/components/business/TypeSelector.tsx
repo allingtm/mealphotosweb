@@ -1,11 +1,22 @@
 'use client';
 
 import {
-  FOOD_DRINK_TYPES,
+  FOOD_SERVICE_TYPES,
+  SHOPS_RETAIL_TYPES,
+  CHEFS_EXPERIENCES_TYPES,
   HEALTH_NUTRITION_TYPES,
+  PRODUCTION_TYPES,
   BUSINESS_TYPE_LABELS,
   type BusinessType,
 } from '@/types/database';
+
+const TYPE_GROUPS = [
+  { label: 'Food Service', types: FOOD_SERVICE_TYPES },
+  { label: 'Shops & Retail', types: SHOPS_RETAIL_TYPES },
+  { label: 'Chefs & Experiences', types: CHEFS_EXPERIENCES_TYPES },
+  { label: 'Health & Nutrition', types: HEALTH_NUTRITION_TYPES },
+  { label: 'Production', types: PRODUCTION_TYPES },
+];
 
 interface TypeSelectorProps {
   selected: BusinessType | null;
@@ -18,7 +29,7 @@ export default function TypeSelector({ selected, onSelect }: TypeSelectorProps) 
       <h2
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 28,
+          fontSize: 22,
           color: 'var(--text-primary)',
           textAlign: 'center',
         }}
@@ -26,61 +37,35 @@ export default function TypeSelector({ selected, onSelect }: TypeSelectorProps) 
         What type of business are you?
       </h2>
 
-      {/* Food & Drink group */}
-      <div>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: 12,
-          }}
-        >
-          Food & Drink
-        </p>
-        <div className="flex flex-col gap-2">
-          {FOOD_DRINK_TYPES.map((type) => (
-            <TypeOption
-              key={type}
-              type={type}
-              isSelected={selected === type}
-              onSelect={onSelect}
-            />
-          ))}
+      {TYPE_GROUPS.map((group) => (
+        <div key={group.label}>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: 12,
+            }}
+          >
+            {group.label}
+          </p>
+          <div className="flex flex-col gap-2">
+            {group.types.map((type) => (
+              <TypeOption
+                key={type}
+                type={type}
+                isSelected={selected === type}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      ))}
 
-      {/* Health & Nutrition group */}
-      <div>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: 12,
-          }}
-        >
-          Health & Nutrition
-        </p>
-        <div className="flex flex-col gap-2">
-          {HEALTH_NUTRITION_TYPES.map((type) => (
-            <TypeOption
-              key={type}
-              type={type}
-              isSelected={selected === type}
-              onSelect={onSelect}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Other */}
+      {/* Other — outside any group */}
       <TypeOption
         type="other"
         isSelected={selected === 'other'}
@@ -101,10 +86,12 @@ function TypeOption({
 }) {
   return (
     <button
+      type="button"
       onClick={() => onSelect(type)}
       className="flex items-center gap-3 w-full rounded-2xl transition-colors"
       style={{
         padding: '12px 16px',
+        minHeight: 48,
         backgroundColor: isSelected ? 'rgba(232, 168, 56, 0.15)' : 'var(--bg-surface)',
         border: isSelected
           ? '2px solid var(--accent-primary)'

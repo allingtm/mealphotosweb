@@ -11,6 +11,7 @@ interface BusinessProfileFormProps {
 
 export interface BusinessFormData {
   business_name: string;
+  bio: string;
   phone: string;
   email: string;
   website_url: string;
@@ -28,10 +29,13 @@ export interface BusinessFormData {
   accepts_clients: boolean;
   consultation_type: string[];
   service_area: string;
+  class_types: string[];
+  price_from: string;
 }
 
 export const defaultBusinessFormData: BusinessFormData = {
   business_name: '',
+  bio: '',
   phone: '',
   email: '',
   website_url: '',
@@ -49,6 +53,8 @@ export const defaultBusinessFormData: BusinessFormData = {
   accepts_clients: true,
   consultation_type: [],
   service_area: '',
+  class_types: [],
+  price_from: '',
 };
 
 const inputStyle = {
@@ -92,6 +98,40 @@ function Field({ label, required, children, error }: {
   );
 }
 
+function PillSelect({ options, selected, onToggle, labels }: {
+  options: string[];
+  selected: string[];
+  onToggle: (val: string) => void;
+  labels: Record<string, string>;
+}) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {options.map((opt) => {
+        const isChecked = selected.includes(opt);
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onToggle(opt)}
+            className="rounded-full transition-colors"
+            style={{
+              padding: '6px 16px',
+              fontSize: 14,
+              fontFamily: 'var(--font-body)',
+              backgroundColor: isChecked ? 'var(--accent-primary)' : 'var(--bg-surface)',
+              color: isChecked ? '#121212' : 'var(--text-secondary)',
+              border: isChecked ? 'none' : '1px solid var(--bg-elevated)',
+              fontWeight: isChecked ? 600 : 400,
+            }}
+          >
+            {labels[opt]}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function BusinessProfileForm({
   businessType,
   data,
@@ -99,19 +139,26 @@ export default function BusinessProfileForm({
   errors = {},
 }: BusinessProfileFormProps) {
   const group = getBusinessTypeGroup(businessType);
-  const isFoodDrink = group === 'food_drink';
+  const isFoodService = group === 'food_service';
+  const isShopsRetail = group === 'shops_retail';
+  const isChefsExperiences = group === 'chefs_experiences';
   const isHealthNutrition = group === 'health_nutrition';
+  const isProduction = group === 'production';
 
-  const showCuisine = ['restaurant', 'cafe', 'pub'].includes(businessType);
-  const showDelivery = ['takeaway', 'meal_prep_service'].includes(businessType);
-  const showMenu = ['restaurant', 'cafe', 'pub', 'bakery'].includes(businessType);
+  const showAddress = isFoodService || isShopsRetail || isProduction || businessType === 'other';
+  const showCuisine = ['restaurant', 'cafe', 'pub', 'hotel_restaurant'].includes(businessType);
+  const showDelivery = isShopsRetail || isProduction || ['takeaway', 'meal_prep_service'].includes(businessType);
+  const showMenu = ['restaurant', 'cafe', 'pub', 'bakery', 'hotel_restaurant'].includes(businessType);
+
+  const toggleArrayItem = (arr: string[], item: string) =>
+    arr.includes(item) ? arr.filter((t) => t !== item) : [...arr, item];
 
   return (
     <div className="flex flex-col gap-4">
       <h2
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 28,
+          fontSize: 22,
           color: 'var(--text-primary)',
           textAlign: 'center',
           marginBottom: 8,
@@ -129,6 +176,17 @@ export default function BusinessProfileForm({
           maxLength={100}
           placeholder="e.g. The Odd One Out"
           style={inputStyle}
+        />
+      </Field>
+
+      <Field label="Bio" error={errors.bio}>
+        <textarea
+          value={data.bio}
+          onChange={(e) => onChange({ bio: e.target.value })}
+          maxLength={500}
+          rows={3}
+          placeholder="Tell people about your business..."
+          style={{ ...inputStyle, resize: 'vertical' as const }}
         />
       </Field>
 
@@ -163,18 +221,20 @@ export default function BusinessProfileForm({
         />
       </Field>
 
-      <Field label="Booking URL" error={errors.booking_url}>
-        <input
-          type="url"
-          value={data.booking_url}
-          onChange={(e) => onChange({ booking_url: e.target.value })}
-          placeholder="https://booking.example.com"
-          style={inputStyle}
-        />
-      </Field>
+      {(isFoodService || isChefsExperiences) && (
+        <Field label="Booking URL" error={errors.booking_url}>
+          <input
+            type="url"
+            value={data.booking_url}
+            onChange={(e) => onChange({ booking_url: e.target.value })}
+            placeholder="https://booking.example.com"
+            style={inputStyle}
+          />
+        </Field>
+      )}
 
-      {/* Food & Drink: address fields */}
-      {(isFoodDrink || businessType === 'other') && (
+      {/* Address fields */}
+      {showAddress && (
         <>
           <Field label="Address line 1">
             <input
@@ -214,7 +274,7 @@ export default function BusinessProfileForm({
         </>
       )}
 
-      {/* Food & Drink specific fields */}
+      {/* Food Service specific */}
       {showCuisine && (
         <Field label="Cuisine types (comma-separated)">
           <input
@@ -254,7 +314,52 @@ export default function BusinessProfileForm({
         </label>
       )}
 
-      {/* Health & Nutrition specific fields */}
+      {/* Chefs & Experiences specific */}
+      {isChefsExperiences && (
+        <>
+          <Field label="Class types">
+            <PillSelect
+              options={['group', 'private', '1-to-1', 'corporate']}
+              selected={data.class_types}
+              onToggle={(val) => onChange({ class_types: toggleArrayItem(data.class_types, val) })}
+              labels={{ group: 'Group', private: 'Private', '1-to-1': '1-to-1', corporate: 'Corporate' }}
+            />
+          </Field>
+
+          <Field label="Price from (£)">
+            <input
+              type="number"
+              value={data.price_from}
+              onChange={(e) => onChange({ price_from: e.target.value })}
+              placeholder="35"
+              min="0"
+              style={inputStyle}
+            />
+          </Field>
+
+          <Field label="Service area">
+            <input
+              type="text"
+              value={data.service_area}
+              onChange={(e) => onChange({ service_area: e.target.value })}
+              placeholder="Colchester and surrounding areas"
+              style={inputStyle}
+            />
+          </Field>
+
+          <Field label="City">
+            <input
+              type="text"
+              value={data.address_city}
+              onChange={(e) => onChange({ address_city: e.target.value })}
+              placeholder="Colchester"
+              style={inputStyle}
+            />
+          </Field>
+        </>
+      )}
+
+      {/* Health & Nutrition specific */}
       {isHealthNutrition && (
         <>
           <Field label="Qualifications (comma-separated)">
@@ -291,36 +396,12 @@ export default function BusinessProfileForm({
           </label>
 
           <Field label="Consultation type">
-            <div className="flex gap-3 flex-wrap">
-              {(['in_person', 'online', 'both'] as const).map((opt) => {
-                const labels = { in_person: 'In-person', online: 'Online', both: 'Both' };
-                const isChecked = data.consultation_type.includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => {
-                      const next = isChecked
-                        ? data.consultation_type.filter((t) => t !== opt)
-                        : [...data.consultation_type, opt];
-                      onChange({ consultation_type: next });
-                    }}
-                    className="rounded-full transition-colors"
-                    style={{
-                      padding: '6px 16px',
-                      fontSize: 14,
-                      fontFamily: 'var(--font-body)',
-                      backgroundColor: isChecked ? 'var(--accent-primary)' : 'var(--bg-surface)',
-                      color: isChecked ? '#121212' : 'var(--text-secondary)',
-                      border: isChecked ? 'none' : '1px solid var(--bg-elevated)',
-                      fontWeight: isChecked ? 600 : 400,
-                    }}
-                  >
-                    {labels[opt]}
-                  </button>
-                );
-              })}
-            </div>
+            <PillSelect
+              options={['in_person', 'online']}
+              selected={data.consultation_type}
+              onToggle={(val) => onChange({ consultation_type: toggleArrayItem(data.consultation_type, val) })}
+              labels={{ in_person: 'In-person', online: 'Online' }}
+            />
           </Field>
 
           <Field label="Service area">
@@ -333,7 +414,6 @@ export default function BusinessProfileForm({
             />
           </Field>
 
-          {/* Optional address for Health & Nutrition */}
           <Field label="City (optional)">
             <input
               type="text"

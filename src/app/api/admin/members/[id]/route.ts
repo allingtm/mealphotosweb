@@ -113,12 +113,9 @@ export async function PATCH(
     // Build update object with only provided fields
     const updates: Record<string, unknown> = {};
     if (parsed.data.display_name !== undefined) updates.display_name = parsed.data.display_name;
-    if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio;
     if (parsed.data.is_admin !== undefined) updates.is_admin = parsed.data.is_admin;
-    if (parsed.data.banned_at !== undefined) updates.banned_at = parsed.data.banned_at;
-    if (parsed.data.suspended_until !== undefined) updates.suspended_until = parsed.data.suspended_until;
-    if (parsed.data.ban_reason !== undefined) updates.ban_reason = parsed.data.ban_reason;
-    if (parsed.data.moderation_tier !== undefined) updates.moderation_tier = parsed.data.moderation_tier;
+    if (parsed.data.is_business !== undefined) updates.is_business = parsed.data.is_business;
+    if (parsed.data.plan !== undefined) updates.plan = parsed.data.plan;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });

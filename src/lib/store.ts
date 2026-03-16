@@ -1,56 +1,45 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
+import type { BusinessTypeGroup } from '@/types/database';
 
-export interface MapFilters {
-  timeRange: 'today' | 'this_week' | 'this_month' | 'all_time';
-  minRating: number;
-  recipeOnly: boolean;
-  mapCategory: 'all' | 'food' | 'health' | 'meals';
-}
-
-const defaultMapFilters: MapFilters = {
-  timeRange: 'all_time',
-  minRating: 0,
-  recipeOnly: false,
-  mapCategory: 'all',
-};
+export type FeedTab = 'following' | 'nearby' | 'trending';
 
 interface AppState {
+  // Auth
   user: User | null;
   isAuthModalOpen: boolean;
   setUser: (user: User | null) => void;
   openAuthModal: () => void;
   closeAuthModal: () => void;
 
-  mapFilters: MapFilters;
-  mapCenter: [number, number] | null;
-  mapZoom: number | null;
-  setMapFilters: (filters: Partial<MapFilters>) => void;
-  resetMapFilters: () => void;
-  setMapPosition: (center: [number, number], zoom: number) => void;
-
-  userPlan: 'free' | 'personal' | 'business';
-  setUserPlan: (plan: 'free' | 'personal' | 'business') => void;
-
+  // User profile state
+  isBusiness: boolean;
+  setIsBusiness: (isBusiness: boolean) => void;
+  userPlan: 'free' | 'basic' | 'premium';
+  setUserPlan: (plan: 'free' | 'basic' | 'premium') => void;
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
-
   profileAvatarUrl: string | null;
   setProfileAvatarUrl: (url: string | null) => void;
 
+  // Feed
+  feedTab: FeedTab;
+  setFeedTab: (tab: FeedTab) => void;
+
+  // Map
+  mapTypeFilter: BusinessTypeGroup | 'all';
+  mapCenter: [number, number] | null;
+  mapZoom: number | null;
+  setMapTypeFilter: (filter: BusinessTypeGroup | 'all') => void;
+  setMapPosition: (center: [number, number], zoom: number) => void;
+
+  // Cookie consent
   isCookieBannerVisible: boolean;
   isCookiePreferencesOpen: boolean;
   showCookieBanner: () => void;
   hideCookieBanner: () => void;
   openCookiePreferences: () => void;
   closeCookiePreferences: () => void;
-
-  isWaitlistModalOpen: boolean;
-  showWaitlistModal: () => void;
-  hideWaitlistModal: () => void;
-
-  pendingUploadFile: File | null;
-  setPendingUploadFile: (file: File | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -60,21 +49,22 @@ export const useAppStore = create<AppState>((set) => ({
   openAuthModal: () => set({ isAuthModalOpen: true }),
   closeAuthModal: () => set({ isAuthModalOpen: false }),
 
+  isBusiness: false,
+  setIsBusiness: (isBusiness) => set({ isBusiness }),
   userPlan: 'free',
   setUserPlan: (plan) => set({ userPlan: plan }),
-
   isAdmin: false,
   setIsAdmin: (isAdmin) => set({ isAdmin }),
-
   profileAvatarUrl: null,
   setProfileAvatarUrl: (url) => set({ profileAvatarUrl: url }),
 
-  mapFilters: { ...defaultMapFilters },
+  feedTab: 'nearby',
+  setFeedTab: (tab) => set({ feedTab: tab }),
+
+  mapTypeFilter: 'all',
   mapCenter: null,
   mapZoom: null,
-  setMapFilters: (filters) =>
-    set((state) => ({ mapFilters: { ...state.mapFilters, ...filters } })),
-  resetMapFilters: () => set({ mapFilters: { ...defaultMapFilters } }),
+  setMapTypeFilter: (filter) => set({ mapTypeFilter: filter }),
   setMapPosition: (center, zoom) => set({ mapCenter: center, mapZoom: zoom }),
 
   isCookieBannerVisible: false,
@@ -84,11 +74,4 @@ export const useAppStore = create<AppState>((set) => ({
     set({ isCookieBannerVisible: false, isCookiePreferencesOpen: false }),
   openCookiePreferences: () => set({ isCookiePreferencesOpen: true }),
   closeCookiePreferences: () => set({ isCookiePreferencesOpen: false }),
-
-  isWaitlistModalOpen: false,
-  showWaitlistModal: () => set({ isWaitlistModalOpen: true }),
-  hideWaitlistModal: () => set({ isWaitlistModalOpen: false }),
-
-  pendingUploadFile: null,
-  setPendingUploadFile: (file) => set({ pendingUploadFile: file }),
 }));

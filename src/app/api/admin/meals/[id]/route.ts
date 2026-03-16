@@ -45,14 +45,9 @@ export async function PATCH(
       );
     }
 
+    // v3: Admin can only delete dishes (managed by businesses)
+    // This PATCH route is kept for compatibility but does nothing meaningful
     const updates: Record<string, unknown> = {};
-    if (parsed.data.title !== undefined) updates.title = parsed.data.title;
-    if (parsed.data.tags !== undefined) updates.tags = parsed.data.tags;
-    if (parsed.data.cuisine !== undefined) updates.cuisine = parsed.data.cuisine;
-
-    if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
-    }
 
     const serviceClient = createServiceRoleClient();
 

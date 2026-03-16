@@ -2,30 +2,20 @@
 
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function BackButton() {
   const router = useRouter();
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="icon"
       onClick={() => router.back()}
-      className="flex items-center justify-center"
-      style={{
-        width: 40,
-        height: 40,
-        borderRadius: 'var(--radius-full)',
-        backgroundColor: 'rgba(18, 18, 18, 0.5)',
-        border: 'none',
-        cursor: 'pointer',
-      }}
+      className="rounded-full bg-black/50 hover:bg-black/70"
       aria-label="Go back"
     >
-      <ArrowLeft
-        size={24}
-        strokeWidth={1.5}
-        color="var(--text-primary)"
-      />
-    </button>
+      <ArrowLeft size={24} strokeWidth={1.5} className="text-(--text-primary)" />
+    </Button>
   );
 }

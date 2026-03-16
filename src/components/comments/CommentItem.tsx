@@ -11,17 +11,17 @@ import type { CommentWithProfile } from '@/types/database';
 interface CommentItemProps {
   comment: CommentWithProfile;
   isOwnComment: boolean;
-  isAdmin: boolean;
-  onDelete: (id: string) => void;
-  onReport: (id: string, reason: string, detail?: string) => void;
+  isBusinessOwner: boolean;
+  canDelete: boolean;
+  onDelete: () => void;
 }
 
 export function CommentItem({
   comment,
   isOwnComment,
-  isAdmin,
+  isBusinessOwner,
+  canDelete,
   onDelete,
-  onReport,
 }: CommentItemProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const profile = comment.profiles;
@@ -29,18 +29,19 @@ export function CommentItem({
 
   return (
     <div
-      className="flex gap-3"
+      className="flex gap-3 rounded-xl"
       style={{
-        padding: '8px 0',
+        padding: '10px 12px',
         opacity: isOptimistic ? 0.7 : 1,
         transition: 'opacity 0.2s ease',
+        // Business reply: amber left border + subtle bg
+        borderLeft: isBusinessOwner ? '3px solid var(--accent-primary)' : '3px solid transparent',
+        backgroundColor: isBusinessOwner ? 'var(--bg-elevated)' : 'transparent',
       }}
+      aria-label={isBusinessOwner ? `Reply from ${profile.display_name ?? profile.username}` : undefined}
     >
       {/* Avatar */}
-      <Link
-        href={`/profile/${profile.username}`}
-        className="flex-shrink-0"
-      >
+      <Link href={`/business/${profile.username}`} className="shrink-0">
         {profile.avatar_url ? (
           <Image
             src={profile.avatar_url}
@@ -72,7 +73,7 @@ export function CommentItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <Link
-            href={`/profile/${profile.username}`}
+            href={`/business/${profile.username}`}
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: 14,
@@ -84,7 +85,7 @@ export function CommentItem({
             @{profile.username}
           </Link>
 
-          {comment.is_author && (
+          {isBusinessOwner && (
             <span
               style={{
                 padding: '1px 6px',
@@ -96,17 +97,11 @@ export function CommentItem({
                 backgroundColor: 'rgba(232, 168, 56, 0.15)',
               }}
             >
-              Author
+              Business
             </span>
           )}
 
-          <span
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 12,
-              color: 'var(--text-secondary)',
-            }}
-          >
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
             &middot; {timeAgo(comment.created_at)}
           </span>
         </div>
@@ -126,24 +121,15 @@ export function CommentItem({
       </div>
 
       {/* More menu trigger */}
-      {!isOptimistic && (
+      {!isOptimistic && (isOwnComment || canDelete) && (
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          className="flex-shrink-0 self-start"
-          style={{
-            padding: 4,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className="shrink-0 self-start"
+          style={{ padding: 4 }}
           aria-label="Comment options"
         >
-          <MoreVertical
-            size={16}
-            strokeWidth={1.5}
-            style={{ color: 'var(--text-secondary)' }}
-          />
+          <MoreVertical size={16} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
         </button>
       )}
 
@@ -151,10 +137,17 @@ export function CommentItem({
         <CommentMoreMenu
           commentId={comment.id}
           isOwnComment={isOwnComment}
-          isAdmin={isAdmin}
+          isAdmin={canDelete && !isOwnComment}
           onClose={() => setMenuOpen(false)}
-          onDelete={onDelete}
-          onReport={onReport}
+          onDelete={(id) => { onDelete(); setMenuOpen(false); }}
+          onReport={(id, reason) => {
+            fetch('/api/reports', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ reported_comment_id: id, reason }),
+            }).catch(() => {});
+            setMenuOpen(false);
+          }}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, User, Info, Mail, MessageSquare, Store, Shield, LogOut, UtensilsCrossed, AlertTriangle, Settings } from 'lucide-react';
+import { X, User, Info, Mail, Store, Shield, LogOut, AlertTriangle, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -18,7 +18,6 @@ const menuItems = [
   { href: '/pricing', icon: Store, labelKey: 'pricing' },
   { href: '/about', icon: Info, labelKey: 'about' },
   { href: '/contact', icon: Mail, labelKey: 'contactUs' },
-  { href: '/feedback', icon: MessageSquare, labelKey: 'feedback' },
 ] as const;
 
 export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
@@ -133,7 +132,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
           {/* Profile / Sign in */}
           {user ? (
             <Link
-              href="/profile"
+              href="/me"
               onClick={onClose}
               className="flex items-center gap-3 w-full"
               style={{
@@ -182,31 +181,6 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
                 {t('signIn')}
               </span>
             </button>
-          )}
-
-          {/* My Meals — only when logged in */}
-          {user && (
-            <Link
-              href="/my-meals"
-              onClick={onClose}
-              className="flex items-center gap-3 w-full"
-              style={{
-                padding: '14px 16px',
-                textDecoration: 'none',
-              }}
-            >
-              <UtensilsCrossed size={20} strokeWidth={1.5} color="var(--text-secondary)" />
-              <span
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 15,
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
-                }}
-              >
-                {t('myMeals')}
-              </span>
-            </Link>
           )}
 
           {/* Settings — only when logged in */}

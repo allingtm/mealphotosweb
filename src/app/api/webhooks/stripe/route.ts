@@ -1,24 +1,15 @@
 import Stripe from 'stripe';
-import { revalidateTag } from 'next/cache';
 import { stripe } from '@/lib/stripe';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
-const PERSONAL_PRICE_ID = process.env.STRIPE_PERSONAL_PRICE_ID!;
 const BASIC_PRICE_ID = process.env.STRIPE_BASIC_PRICE_ID!;
 const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID!;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-function getPlanAndTier(priceId: string): {
-  plan: 'personal' | 'business' | 'free';
-  tier: 'personal' | 'premium';
-  isRestaurant: boolean;
-} {
-  if (priceId === PERSONAL_PRICE_ID) {
-    return { plan: 'personal', tier: 'personal', isRestaurant: false };
-  }
-  // Both premium and legacy basic price IDs map to business plan
-  return { plan: 'business', tier: 'premium', isRestaurant: true };
+function getPlan(priceId: string): 'basic' | 'premium' {
+  if (priceId === BASIC_PRICE_ID) return 'basic';
+  return 'premium';
 }
 
 export async function POST(req: Request) {
@@ -42,17 +33,14 @@ export async function POST(req: Request) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
-
       if (!session.subscription) break;
 
-      const subscription = await stripe.subscriptions.retrieve(
-        session.subscription as string
-      );
+      const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
       const priceId = subscription.items.data[0].price.id;
-      const { plan, tier, isRestaurant } = getPlanAndTier(priceId);
+      const plan = session.metadata?.plan as 'basic' | 'premium' ?? getPlan(priceId);
 
-      // Resolve user ID from subscription metadata, fallback to customer lookup
-      let uid = subscription.metadata?.supabase_uid;
+      // Resolve user ID
+      let uid = subscription.metadata?.supabase_user_id ?? session.metadata?.supabase_user_id;
       if (!uid) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -67,38 +55,27 @@ export async function POST(req: Request) {
         break;
       }
 
-      // Read business_type from session metadata (set during onboarding)
-      const businessType = session.metadata?.business_type ?? null;
-
-      const profileUpdate: Record<string, unknown> = {
+      await supabase.from('profiles').update({
         plan,
-        is_restaurant: isRestaurant,
-        subscription_tier: tier,
         subscription_status: 'active',
         subscription_id: subscription.id,
         stripe_customer_id: session.customer as string,
-      };
-      if (businessType) {
-        profileUpdate.business_type = businessType;
-      }
-
-      await supabase.from('profiles').update(profileUpdate).eq('id', uid);
+        is_business: true,
+      }).eq('id', uid);
 
       break;
     }
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
-      const uid = subscription.metadata?.supabase_uid;
+      const uid = subscription.metadata?.supabase_user_id;
       if (!uid) break;
 
       const priceId = subscription.items.data[0].price.id;
-      const { plan, tier, isRestaurant } = getPlanAndTier(priceId);
+      const plan = getPlan(priceId);
 
       await supabase.from('profiles').update({
         plan,
-        is_restaurant: isRestaurant,
-        subscription_tier: tier,
         subscription_status: subscription.status === 'active' ? 'active' : 'past_due',
       }).eq('id', uid);
 
@@ -107,13 +84,11 @@ export async function POST(req: Request) {
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription;
-      const uid = subscription.metadata?.supabase_uid;
+      const uid = subscription.metadata?.supabase_user_id;
       if (!uid) break;
 
       await supabase.from('profiles').update({
         plan: 'free',
-        is_restaurant: false,
-        subscription_tier: null,
         subscription_status: 'cancelled',
         subscription_id: null,
       }).eq('id', uid);
@@ -121,30 +96,21 @@ export async function POST(req: Request) {
       break;
     }
 
-    case 'price.updated':
-    case 'price.created':
-    case 'price.deleted': {
-      revalidateTag('stripe-prices', { expire: 0 });
-      break;
-    }
-
     case 'invoice.payment_failed': {
       const invoice = event.data.object as Stripe.Invoice;
       const subRef = invoice.parent?.subscription_details?.subscription;
-      const subId =
-        typeof subRef === 'string' ? subRef : subRef?.id;
-
+      const subId = typeof subRef === 'string' ? subRef : subRef?.id;
       if (!subId) break;
 
       const subscription = await stripe.subscriptions.retrieve(subId);
-      const uid = subscription.metadata?.supabase_uid;
+      const uid = subscription.metadata?.supabase_user_id;
 
       if (uid) {
         await supabase.from('profiles').update({
           subscription_status: 'past_due',
         }).eq('id', uid);
 
-        // Send warning email via Resend
+        // Send warning email
         if (RESEND_API_KEY) {
           const { data: authUser } = await supabase.auth.admin.getUserById(uid);
           const email = authUser?.user?.email;
@@ -163,8 +129,8 @@ export async function POST(req: Request) {
                   html: `
                     <div style="font-family: 'DM Sans', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #121212; color: #F5F0E8;">
                       <h1 style="font-family: 'Instrument Serif', serif; color: #E8A838; font-size: 28px; margin-bottom: 16px;">Payment Failed</h1>
-                      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">We couldn't process your latest payment. Please update your payment method to avoid losing access to your premium features.</p>
-                      <a href="https://meal.photos/settings" style="display: inline-block; background: #E8A838; color: #121212; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 16px;">Update Payment</a>
+                      <p style="font-size: 16px; line-height: 1.5; margin-bottom: 24px;">We couldn't process your latest payment. Please update your payment method to avoid losing access to your business features.</p>
+                      <a href="https://meal.photos/me" style="display: inline-block; background: #E8A838; color: #121212; padding: 12px 32px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 16px;">Update Payment</a>
                       <p style="font-size: 12px; color: #888888; margin-top: 32px;">You're receiving this because you have an active subscription on meal.photos.</p>
                     </div>
                   `,

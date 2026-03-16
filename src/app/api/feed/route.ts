@@ -1,75 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { Redis } from '@upstash/redis';
+import { applyRateLimit } from '@/lib/rate-limit';
+import { z } from 'zod';
 
-const redis = Redis.fromEnv();
+const feedSchema = z.object({
+  tab: z.enum(['following', 'nearby', 'trending']).default('nearby'),
+  lat: z.coerce.number().optional(),
+  lng: z.coerce.number().optional(),
+  radius_km: z.coerce.number().int().min(1).max(50).default(8),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  cursor: z.string().optional(),
+});
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const cursor = searchParams.get('cursor');
-  const limit = Math.min(Number(searchParams.get('limit') ?? 10), 20);
+export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
+  const rateLimited = await applyRateLimit(ip, 'read');
+  if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
+  const params = Object.fromEntries(req.nextUrl.searchParams);
+  const parsed = feedSchema.safeParse(params);
 
-  // Check if user is authenticated (private meals are user-specific, skip cache)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isAuthenticated = !!user;
-
-  // Try Redis cache for non-cursor (first page) requests — anonymous users only
-  const cacheKey = !isAuthenticated && !cursor ? `feed:first:${limit}` : null;
-  if (cacheKey) {
-    try {
-      const cached = await redis.get<string>(cacheKey);
-      if (cached) {
-        const response = NextResponse.json(typeof cached === 'string' ? JSON.parse(cached) : cached);
-        response.headers.set(
-          'Cache-Control',
-          'public, max-age=60, stale-while-revalidate=120'
-        );
-        return response;
-      }
-    } catch {
-      // Redis unavailable — fall through to DB
-    }
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid params', details: parsed.error.flatten() }, { status: 400 });
   }
 
+  const { tab, lat, lng, radius_km, limit, cursor } = parsed.data;
+
   const { data, error } = await supabase.rpc('get_feed', {
+    p_tab: tab,
+    p_lat: lat ?? null,
+    p_lng: lng ?? null,
+    p_radius_km: radius_km,
     p_limit: limit,
-    ...(cursor ? { p_cursor: cursor } : {}),
+    p_cursor: cursor ?? null,
   });
 
   if (error) {
-    console.error('Feed RPC error:', error);
-    return NextResponse.json(
-      { error: 'Failed to load feed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const nextCursor =
-    data && data.length === limit
-      ? data[data.length - 1].created_at
-      : null;
-
-  const body = { meals: data ?? [], nextCursor };
-
-  // Cache first page in Redis (60s TTL) — anonymous users only
-  if (cacheKey) {
-    try {
-      await redis.set(cacheKey, JSON.stringify(body), { ex: 60 });
-    } catch {
-      // Redis unavailable — continue
-    }
-  }
-
-  const response = NextResponse.json(body);
-  response.headers.set(
-    'Cache-Control',
-    isAuthenticated
-      ? 'private, no-cache'
-      : 'public, max-age=60, stale-while-revalidate=120'
-  );
-  return response;
+  return NextResponse.json({
+    items: data ?? [],
+    cursor: data?.length === limit ? data[data.length - 1].created_at : null,
+  });
 }

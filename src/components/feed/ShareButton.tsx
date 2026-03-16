@@ -1,43 +1,50 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useTranslations } from 'next-intl';
 import { Share2 } from 'lucide-react';
+import posthog from 'posthog-js';
+import { showToast } from '@/components/ui/Toast';
 
 interface ShareButtonProps {
-  mealId: string;
+  dishId: string;
   title: string;
+  businessName: string;
 }
 
-export function ShareButton({ mealId, title }: ShareButtonProps) {
-  const t = useTranslations('actions');
+export function ShareButton({ dishId, title, businessName }: ShareButtonProps) {
   const handleShare = useCallback(async () => {
-    const url = `${window.location.origin}/meal/${mealId}`;
+    const url = `${window.location.origin}/dish/${dishId}`;
+    const text = `${title} from ${businessName} on meal.photos`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title, url });
+        await navigator.share({ title: text, url });
+        posthog.capture('dish_shared', { dish_id: dishId, share_method: 'native' });
       } catch {
         // User cancelled share dialog
       }
     } else {
       await navigator.clipboard.writeText(url);
+      showToast('Link copied to clipboard', 'success');
+      posthog.capture('dish_shared', { dish_id: dishId, share_method: 'clipboard' });
     }
-  }, [mealId, title]);
+  }, [dishId, title, businessName]);
 
   return (
     <button
+      type="button"
       onClick={handleShare}
-      className="flex items-center justify-center"
+      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors"
       style={{
-        width: 48,
-        height: 48,
-        borderRadius: 'var(--radius-full)',
-        backgroundColor: 'rgba(18, 18, 18, 0.5)',
+        backgroundColor: 'var(--bg-elevated)',
+        color: 'var(--text-secondary)',
+        fontFamily: 'var(--font-body)',
+        fontSize: 13,
       }}
-      aria-label={t('shareThisMeal')}
+      aria-label={`Share ${title}`}
     >
-      <Share2 size={24} strokeWidth={1.5} color="var(--text-primary)" />
+      <Share2 size={16} strokeWidth={1.5} />
+      <span>Share</span>
     </button>
   );
 }

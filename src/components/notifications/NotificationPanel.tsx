@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   X,
-  Star,
-  BookOpen,
-  Unlock,
-  Trophy,
-  Flame,
+  UtensilsCrossed,
+  TrendingUp,
+  MessageCircle,
   UserPlus,
+  MapPin,
+  Navigation,
   BellRing,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -23,43 +23,39 @@ interface NotificationPanelProps {
   onClose: () => void;
 }
 
-const NOTIFICATION_ICONS: Record<string, typeof Star> = {
-  rating_milestone: Star,
-  recipe_near_unlock: BookOpen,
-  recipe_unlocked: Unlock,
-  leaderboard_move: Trophy,
-  streak_reminder: Flame,
-  streak_milestone: Flame,
+const NOTIFICATION_ICONS: Record<string, typeof UtensilsCrossed> = {
+  new_dish: UtensilsCrossed,
+  reaction_milestone: TrendingUp,
+  new_comment: MessageCircle,
   new_follower: UserPlus,
+  dish_request_nearby: MapPin,
+  proximity: Navigation,
 };
 
 const NOTIFICATION_COLORS: Record<string, string> = {
-  rating_milestone: 'var(--accent-primary)',
-  recipe_near_unlock: 'var(--accent-primary)',
-  recipe_unlocked: 'var(--status-success)',
-  leaderboard_move: 'var(--accent-primary)',
-  streak_reminder: 'var(--status-error)',
-  streak_milestone: 'var(--status-success)',
-  new_follower: 'var(--text-primary)',
+  new_dish: 'var(--accent-primary)',
+  reaction_milestone: 'var(--status-success)',
+  new_comment: 'var(--text-primary)',
+  new_follower: 'var(--accent-primary)',
+  dish_request_nearby: 'var(--accent-primary)',
+  proximity: 'var(--status-success)',
 };
 
 function getNavigationUrl(notification: Notification): string | null {
   const data = notification.data as Record<string, unknown>;
   switch (notification.type) {
-    case 'rating_milestone':
-    case 'recipe_near_unlock':
-    case 'recipe_unlocked':
-      return data.meal_id ? `/meal/${data.meal_id}` : null;
-    case 'leaderboard_move':
-      return '/leaderboard';
+    case 'new_dish':
+      return data.dish_id ? `/dish/${data.dish_id}` : null;
+    case 'reaction_milestone':
+      return data.dish_id ? `/dish/${data.dish_id}` : null;
+    case 'new_comment':
+      return data.dish_id ? `/dish/${data.dish_id}` : null;
     case 'new_follower':
-      return data.follower_username
-        ? `/profile/${data.follower_username}`
-        : null;
-    case 'streak_reminder':
-      return '/upload';
-    case 'streak_milestone':
-      return '/profile';
+      return data.follower_id ? `/me` : null;
+    case 'dish_request_nearby':
+      return '/me';
+    case 'proximity':
+      return data.dish_id ? `/dish/${data.dish_id}` : null;
     default:
       return null;
   }

@@ -3,7 +3,14 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useLocale } from 'next-intl';
-import type { BusinessPost } from '@/types/database';
+// v3: BusinessPost type removed — using Dish type instead
+interface BusinessPost {
+  id: string;
+  title: string | null;
+  body: string | null;
+  image_url: string | null;
+  created_at: string;
+}
 
 interface BusinessPostGridProps {
   username: string;

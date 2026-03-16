@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { MealGrid } from './MealGrid';
+// MealGrid removed in v3 — dishes are shown on business profiles
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MealGrid = (_props: any) => <div>No meals view in v3</div>;
 import { BusinessPostGrid } from './BusinessPostGrid';
 import { getBusinessTypeGroup, type BusinessType } from '@/types/database';
 
@@ -69,7 +71,7 @@ export function ProfileTabs({
   let defaultTab: TabKey;
   let visibleTabs: readonly TabKey[];
 
-  if (bpGroup === 'food_drink') {
+  if (bpGroup === 'food_service') {
     visibleTabs = FOOD_DRINK_TAB_KEYS;
     defaultTab = 'allMeals';
   } else if (bpGroup === 'health_nutrition') {
@@ -140,7 +142,7 @@ export function ProfileTabs({
       {/* Tab content */}
       {(activeTab === 'myMeals' || activeTab === 'meals') && <MealGrid meals={meals} authorView={authorView} />}
       {activeTab === 'saved' && <MealGrid meals={savedMeals} showHeart />}
-      {(isRestaurant || bpGroup === 'food_drink') &&
+      {(isRestaurant || bpGroup === 'food_service') &&
         ['allMeals', 'ourDishes', 'dinerPosts'].includes(activeTab) && (
         <MealGrid
           meals={activeTab === 'allMeals' ? meals : []}

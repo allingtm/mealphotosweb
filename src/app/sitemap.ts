@@ -1,78 +1,42 @@
 import type { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { createServiceRoleClient } from '@/lib/supabase/service-role';
-
-export const revalidate = 3600; // 1 hour ISR
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: 'https://meal.photos/', changeFrequency: 'daily', priority: 1.0 },
-    {
-      url: 'https://meal.photos/map',
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: 'https://meal.photos/leaderboard',
-      changeFrequency: 'daily',
-      priority: 0.7,
-    },
-    {
-      url: 'https://meal.photos/explore',
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
+    { url: 'https://meal.photos/', changeFrequency: 'hourly', priority: 1 },
+    { url: 'https://meal.photos/map', changeFrequency: 'daily', priority: 0.8 },
+    { url: 'https://meal.photos/search', changeFrequency: 'daily', priority: 0.8 },
+    { url: 'https://meal.photos/pricing', changeFrequency: 'monthly', priority: 0.5 },
+    { url: 'https://meal.photos/about', changeFrequency: 'monthly', priority: 0.3 },
   ];
 
-  // Dynamic meal pages
-  const { data: meals } = await supabase
-    .from('meals')
-    .select('id, updated_at')
-    .order('created_at', { ascending: false })
-    .limit(50000);
-
-  const mealPages: MetadataRoute.Sitemap = (meals ?? []).map((meal) => ({
-    url: `https://meal.photos/meal/${meal.id}`,
-    lastModified: meal.updated_at,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  // Dynamic profile pages
-  const { data: profiles } = await supabase
+  const { data: businesses } = await supabase
     .from('profiles')
     .select('username, updated_at')
+    .eq('is_business', true)
+    .eq('subscription_status', 'active');
+
+  const businessPages: MetadataRoute.Sitemap = businesses?.map((b) => ({
+    url: `https://meal.photos/business/${b.username}`,
+    lastModified: b.updated_at,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  })) ?? [];
+
+  const { data: dishes } = await supabase
+    .from('dishes')
+    .select('id, created_at')
     .order('created_at', { ascending: false })
-    .limit(50000);
+    .limit(1000);
 
-  const profilePages: MetadataRoute.Sitemap = (profiles ?? []).map(
-    (profile) => ({
-      url: `https://meal.photos/profile/${profile.username}`,
-      lastModified: profile.updated_at,
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    })
-  );
+  const dishPages: MetadataRoute.Sitemap = dishes?.map((d) => ({
+    url: `https://meal.photos/dish/${d.id}`,
+    lastModified: d.created_at,
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  })) ?? [];
 
-  // Explore pages (location, cuisine, combos)
-  const serviceClient = createServiceRoleClient();
-  const { data: exploreSlugs } = await serviceClient.rpc('get_explore_slugs');
-
-  const explorePages: MetadataRoute.Sitemap = (
-    (exploreSlugs ?? []) as unknown as { slug_type: string; slug_value: string; meal_count: number }[]
-  ).map((s) => {
-    const path = s.slug_type === 'cuisine'
-      ? `/explore/cuisine/${s.slug_value}`
-      : `/explore/${s.slug_value}`;
-    return {
-      url: `https://meal.photos${path}`,
-      changeFrequency: 'weekly' as const,
-      priority: s.slug_type === 'city' ? 0.7 : s.slug_type === 'country' ? 0.7 : 0.6,
-    };
-  });
-
-  return [...staticPages, ...mealPages, ...profilePages, ...explorePages];
+  return [...staticPages, ...businessPages, ...dishPages];
 }

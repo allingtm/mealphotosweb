@@ -10,16 +10,12 @@ export const markReadSchema = z.object({
 });
 
 export const NOTIFICATION_TYPES = [
-  'rating_milestone',
-  'recipe_near_unlock',
-  'recipe_unlocked',
-  'leaderboard_move',
-  'streak_reminder',
-  'streak_milestone',
-  'new_follower',
+  'new_dish',
+  'reaction_milestone',
   'new_comment',
-  'comment_thread',
-  'comment_hidden',
+  'new_follower',
+  'dish_request_nearby',
+  'proximity',
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

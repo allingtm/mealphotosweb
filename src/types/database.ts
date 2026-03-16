@@ -1,170 +1,288 @@
-// TypeScript interfaces matching Supabase tables
+// TypeScript interfaces matching Supabase v3 tables
 
 // =============================================
 // Business type constants
 // =============================================
 
 export const BUSINESS_TYPES = [
+  // Food service
   'restaurant', 'takeaway', 'cafe', 'pub', 'bakery',
-  'food_truck', 'catering', 'meal_prep_service', 'cooking_school',
-  'nutritionist', 'personal_trainer', 'dietitian',
+  'food_truck', 'catering', 'meal_prep_service',
+  'ice_cream_parlour', 'juice_bar', 'hotel_restaurant',
+  // Shops & retail
+  'deli', 'farm_shop', 'butcher', 'fishmonger',
+  'greengrocer', 'specialist_food_shop',
+  // Chefs & experiences
+  'cooking_school', 'private_chef', 'supper_club',
+  'food_tour', 'food_experience',
+  // Health & nutrition
+  'nutritionist', 'dietitian', 'personal_trainer',
+  // Production
+  'artisan_producer', 'home_baker', 'chocolatier',
+  // Other
   'other',
 ] as const;
 
 export type BusinessType = (typeof BUSINESS_TYPES)[number];
 
-export const FOOD_DRINK_TYPES: BusinessType[] = [
+// Type groups for map pins, profile variations, and filter pills
+export const FOOD_SERVICE_TYPES: BusinessType[] = [
   'restaurant', 'takeaway', 'cafe', 'pub', 'bakery',
-  'food_truck', 'catering', 'meal_prep_service', 'cooking_school',
+  'food_truck', 'catering', 'meal_prep_service',
+  'ice_cream_parlour', 'juice_bar', 'hotel_restaurant',
+];
+
+export const SHOPS_RETAIL_TYPES: BusinessType[] = [
+  'deli', 'farm_shop', 'butcher', 'fishmonger',
+  'greengrocer', 'specialist_food_shop',
+];
+
+export const CHEFS_EXPERIENCES_TYPES: BusinessType[] = [
+  'cooking_school', 'private_chef', 'supper_club',
+  'food_tour', 'food_experience',
 ];
 
 export const HEALTH_NUTRITION_TYPES: BusinessType[] = [
-  'nutritionist', 'personal_trainer', 'dietitian',
+  'nutritionist', 'dietitian', 'personal_trainer',
 ];
 
-export function getBusinessTypeGroup(type: BusinessType): 'food_drink' | 'health_nutrition' | 'other' {
-  if (FOOD_DRINK_TYPES.includes(type)) return 'food_drink';
+export const PRODUCTION_TYPES: BusinessType[] = [
+  'artisan_producer', 'home_baker', 'chocolatier',
+];
+
+export type BusinessTypeGroup =
+  | 'food_service'
+  | 'shops_retail'
+  | 'chefs_experiences'
+  | 'health_nutrition'
+  | 'production'
+  | 'other';
+
+export function getBusinessTypeGroup(type: BusinessType): BusinessTypeGroup {
+  if (FOOD_SERVICE_TYPES.includes(type)) return 'food_service';
+  if (SHOPS_RETAIL_TYPES.includes(type)) return 'shops_retail';
+  if (CHEFS_EXPERIENCES_TYPES.includes(type)) return 'chefs_experiences';
   if (HEALTH_NUTRITION_TYPES.includes(type)) return 'health_nutrition';
+  if (PRODUCTION_TYPES.includes(type)) return 'production';
   return 'other';
 }
+
+// Map pin colours per type group
+export const TYPE_GROUP_COLORS: Record<BusinessTypeGroup, string> = {
+  food_service: '#E8A838',    // Amber
+  shops_retail: '#2DD4BF',    // Teal
+  chefs_experiences: '#FF6B6B', // Coral
+  health_nutrition: '#4CAF50', // Green
+  production: '#9B59B6',      // Purple
+  other: '#888888',           // Grey
+};
 
 export const BUSINESS_TYPE_LABELS: Record<BusinessType, string> = {
   restaurant: 'Restaurant',
   takeaway: 'Takeaway',
-  cafe: 'Cafe',
+  cafe: 'Cafe / Coffee Shop',
   pub: 'Pub / Gastropub',
   bakery: 'Bakery',
-  food_truck: 'Food Truck / Market Stall',
+  food_truck: 'Food Truck / Street Food',
   catering: 'Catering',
   meal_prep_service: 'Meal Prep Service',
-  cooking_school: 'Cooking School',
+  ice_cream_parlour: 'Ice Cream Parlour',
+  juice_bar: 'Juice / Smoothie Bar',
+  hotel_restaurant: 'Hotel Restaurant',
+  deli: 'Deli / Farm Shop',
+  farm_shop: 'Farm Shop',
+  butcher: 'Butcher',
+  fishmonger: 'Fishmonger',
+  greengrocer: 'Greengrocer',
+  specialist_food_shop: 'Specialist Food Shop',
+  cooking_school: 'Cooking School / Classes',
+  private_chef: 'Private Chef',
+  supper_club: 'Supper Club',
+  food_tour: 'Food Tour',
+  food_experience: 'Food & Drink Experience',
   nutritionist: 'Nutritionist',
-  personal_trainer: 'Personal Trainer',
   dietitian: 'Dietitian',
+  personal_trainer: 'Personal Trainer',
+  artisan_producer: 'Artisan Food Producer',
+  home_baker: 'Home Baker',
+  chocolatier: 'Chocolatier',
   other: 'Other',
 };
+
+// Cloudflare Images named variants
+export const CF_VARIANTS = {
+  avatar: 'avatar',       // 80px — profile headers, comment avatars
+  thumbnail: 'thumbnail', // 120px — grid views, search results, saved dishes
+  feed: 'feed',           // full width — feed cards, dish detail
+  full: 'public',         // full resolution — zoom/share
+} as const;
+
+export function cfImageUrl(imageId: string, variant: keyof typeof CF_VARIANTS): string {
+  return `https://imagedelivery.net/${process.env.NEXT_PUBLIC_CLOUDFLARE_ACCOUNT_HASH}/${imageId}/${CF_VARIANTS[variant]}`;
+}
+
+// =============================================
+// Table interfaces
+// =============================================
 
 export interface Profile {
   id: string;
   username: string;
   display_name: string | null;
-  bio: string | null;
   avatar_url: string | null;
   location_city: string | null;
   location_country: string | null;
-  streak_current: number;
-  streak_best: number;
-  streak_last_upload: string | null; // DATE as ISO string
-  timezone: string;
-  plan: 'free' | 'personal' | 'business';
-  business_type: string | null;
-  is_restaurant: boolean;
+  is_business: boolean;
+  plan: 'free' | 'basic' | 'premium';
   stripe_customer_id: string | null;
-  subscription_tier: 'basic' | 'premium' | 'personal' | null;
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
   is_admin: boolean;
-  moderation_tier: 'new' | 'trusted' | 'flagged';
-  banned_at: string | null;
-  suspended_until: string | null;
-  ban_reason: string | null;
-  show_location: boolean;
-  show_streak: boolean;
   follower_count: number;
-  following_count: number;
   created_at: string;
   updated_at: string;
 }
 
-export interface RestaurantClaim {
+export interface BusinessProfile {
   id: string;
-  venue_mapbox_id: string;
-  venue_name: string;
-  claimed_by: string;
-  outreach_status: 'pending' | 'claimed' | 'verified' | 'rejected';
+  business_name: string;
+  business_type: BusinessType;
+  bio: string | null;
+  phone: string | null;
+  email: string | null;
+  website_url: string | null;
+  booking_url: string | null;
+  menu_url: string | null;
+  address_line_1: string | null;
+  address_line_2: string | null;
+  address_city: string | null;
+  address_postcode: string | null;
+  address_country: string | null;
+  location: unknown | null;
+  opening_hours: Record<string, { open: string; close: string }> | null;
+  cuisine_types: string[];
+  qualifications: string[];
+  specialisms: string[];
+  accepts_clients: boolean;
+  consultation_type: string[];
+  service_area: string | null;
+  delivery_available: boolean;
+  class_types: string[];
+  price_from_pence: number | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface Meal {
+export interface Dish {
   id: string;
-  user_id: string;
+  business_id: string;
   title: string;
+  description: string | null;
+  price_pence: number | null;
   photo_url: string;
   cloudflare_image_id: string | null;
   photo_blur_hash: string | null;
-  location: unknown | null; // PostGIS GEOGRAPHY(Point, 4326)
-  location_city: string | null;
-  location_country: string | null;
-  tags: string[];
-  cuisine:
-    | 'italian'
-    | 'asian'
-    | 'mexican'
-    | 'british'
-    | 'indian'
-    | 'middle_eastern'
-    | 'american'
-    | 'french'
-    | 'other'
-    | null;
-  rating_count: number;
-  rating_sum: number;
-  avg_rating: number;
-  recipe_request_count: number;
-  recipe_unlock_threshold: number;
-  recipe_unlocked: boolean;
-  is_restaurant_meal: boolean;
-  restaurant_id: string | null;
-  restaurant_revealed: boolean;
-  venue_name: string | null;
-  venue_mapbox_id: string | null;
-  venue_address: string | null;
-  visibility: 'public' | 'private';
   image_count: number;
+  menu_item_id: string | null;
+  reaction_count: number;
+  save_count: number;
   comment_count: number;
   comments_enabled: boolean;
-  comments_muted: boolean;
   created_at: string;
-  updated_at: string;
 }
 
-export interface Rating {
+export interface DishImage {
   id: string;
-  meal_id: string;
+  dish_id: string;
+  position: number;
+  cloudflare_image_id: string;
+  photo_url: string;
+  photo_blur_hash: string | null;
+  created_at: string;
+}
+
+export interface Reaction {
+  dish_id: string;
   user_id: string;
-  score: number; // 1–10
   created_at: string;
 }
 
-export interface RecipeRequest {
-  id: string;
-  meal_id: string;
+export interface Save {
+  dish_id: string;
   user_id: string;
   created_at: string;
-}
-
-export interface Ingredient {
-  quantity: number;
-  unit: 'g' | 'kg' | 'ml' | 'L' | 'tsp' | 'tbsp' | 'cup' | 'piece' | 'pinch';
-  name: string;
-}
-
-export interface Recipe {
-  id: string;
-  meal_id: string;
-  ingredients: Ingredient[];
-  method: string[];
-  cook_time_minutes: number | null;
-  serves: number | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface Follow {
   follower_id: string;
   following_id: string;
-  notify_on_upload: boolean;
+  created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  dish_id: string;
+  user_id: string;
+  text: string;
+  visible: boolean;
+  created_at: string;
+}
+
+export interface CommentWithProfile {
+  id: string;
+  dish_id: string;
+  user_id: string;
+  text: string;
+  visible: boolean;
+  created_at: string;
+  is_author: boolean;
+  is_business_owner: boolean;
+  is_optimistic?: boolean;
+  profiles: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    is_business: boolean;
+  };
+}
+
+export interface MenuSection {
+  id: string;
+  business_id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface MenuItem {
+  id: string;
+  section_id: string;
+  business_id: string;
+  name: string;
+  description: string | null;
+  price_pence: number | null;
+  dietary_tags: string[];
+  photo_url: string | null;
+  reaction_count: number;
+  available: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DishRequest {
+  id: string;
+  user_id: string;
+  dish_name: string;
+  location_city: string;
+  location: unknown | null;
+  upvote_count: number;
+  created_at: string;
+}
+
+export interface DishRequestUpvote {
+  request_id: string;
+  user_id: string;
   created_at: string;
 }
 
@@ -179,238 +297,44 @@ export interface Notification {
   created_at: string;
 }
 
-export interface UserBadge {
-  id: string;
-  user_id: string;
-  badge_type: string;
-  awarded_at: string;
-}
-
 export interface Report {
   id: string;
   reporter_id: string;
-  reported_meal_id: string | null;
-  reported_user_id: string | null;
   reported_comment_id: string | null;
-  reason:
-    | 'not_food' | 'inappropriate' | 'spam' | 'harassment' | 'other'
-    | 'stolen_photo' | 'wrong_venue' | 'food_safety' | 'privacy' | 'copyright';
-  priority: 'urgent' | 'high' | 'standard';
+  reported_business_id: string | null;
+  reason: 'inappropriate' | 'spam' | 'harassment' | 'misleading' | 'other';
   detail: string | null;
   status: 'pending' | 'reviewed' | 'actioned' | 'dismissed';
   created_at: string;
-  reviewed_at: string | null;
 }
 
-export interface VenueDispute {
-  id: string;
-  meal_id: string;
-  restaurant_profile_id: string;
-  venue_mapbox_id: string;
-  reason: 'not_served_here' | 'wrong_location' | 'fake_photo' | 'other';
-  detail: string | null;
-  status: 'pending' | 'upheld' | 'dismissed';
-  reviewed_by: string | null;
-  created_at: string;
-  reviewed_at: string | null;
-  admin_notes: string | null;
-}
-
-export interface BlockedUser {
-  blocker_id: string;
-  blocked_id: string;
-  created_at: string;
-}
-
-export interface Comment {
-  id: string;
-  meal_id: string;
-  user_id: string;
-  text: string;
-  visible: boolean;
-  created_at: string;
-}
-
-export interface CommentWithProfile {
-  id: string;
-  meal_id: string;
-  user_id: string;
-  text: string;
-  visible: boolean;
-  created_at: string;
-  is_author: boolean;
-  is_optimistic?: boolean;
-  profiles: {
-    username: string;
-    display_name: string | null;
-    avatar_url: string | null;
-  };
-}
-
-export interface MealModeration {
-  id: string;
-  meal_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'manual_review';
-  moderation_labels: Record<string, unknown>;
-  reviewed_by: string | null;
-  created_at: string;
-  reviewed_at: string | null;
-  cloud_vision_checked: boolean;
-}
-
-// Composite types from database functions
-
-export interface MealImage {
-  id: string;
-  meal_id: string;
-  position: number;
-  cloudflare_image_id: string;
-  photo_url: string;
-  photo_blur_hash: string | null;
-  created_at: string;
-}
-
-export interface PrivateFeedListEntry {
-  id: string;
-  owner_id: string;
-  member_id: string;
-  status: 'pending' | 'accepted' | 'declined';
-  invited_at: string;
-  accepted_at: string | null;
-}
+// =============================================
+// Composite types (from API/DB functions)
+// =============================================
 
 export interface FeedItem {
   id: string;
-  user_id: string;
+  business_id: string;
   title: string;
-  photo_url: string;
-  photo_blur_hash: string | null;
-  /** Server-computed base64 data URL from blurhash (first 3 cards only) */
-  blurDataURL?: string;
-  location_city: string | null;
-  avg_rating: number;
-  rating_count: number;
-  recipe_request_count: number;
-  recipe_unlock_threshold: number;
-  recipe_unlocked: boolean;
-  created_at: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  user_has_rated: boolean;
-  user_rating: number | null;
-  feed_score: number;
-  comment_count: number;
-  venue_name: string | null;
-  venue_mapbox_id: string | null;
-  venue_verified: boolean;
-  user_has_requested: boolean;
-  user_is_following: boolean;
-  comments_enabled: boolean;
-  visibility: 'public' | 'private';
-  image_count: number;
-}
-
-export interface FollowingFeedItem {
-  id: string;
-  user_id: string;
-  title: string;
+  description: string | null;
+  price_pence: number | null;
   photo_url: string;
   photo_blur_hash: string | null;
   blurDataURL?: string;
-  location_city: string | null;
-  avg_rating: number;
-  rating_count: number;
-  recipe_request_count: number;
-  recipe_unlock_threshold: number;
-  recipe_unlocked: boolean;
-  created_at: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  user_has_rated: boolean;
-  user_rating: number | null;
-  comment_count: number;
-  venue_name: string | null;
-  venue_mapbox_id: string | null;
-  venue_verified: boolean;
-  user_has_requested: boolean;
-  comments_enabled: boolean;
-  visibility: 'public' | 'private';
   image_count: number;
-}
-
-export interface FollowSuggestion {
-  id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  meal_count: number;
-  avg_rating: number;
-}
-
-export interface BusinessProfile {
-  id: string;
-  business_type: BusinessType;
-  business_name: string;
-  phone: string | null;
-  email: string | null;
-  website_url: string | null;
-  booking_url: string | null;
-  address_line_1: string | null;
-  address_line_2: string | null;
-  address_city: string | null;
-  address_postcode: string | null;
-  address_country: string | null;
-  location: unknown | null;
-  opening_hours: Record<string, { open: string; close: string }> | null;
-  cuisine_types: string[] | null;
-  delivery_available: boolean;
-  menu_url: string | null;
-  qualifications: string[] | null;
-  specialisms: string[] | null;
-  accepts_clients: boolean;
-  consultation_type: string[] | null;
-  service_area: string | null;
+  reaction_count: number;
+  save_count: number;
+  comment_count: number;
   created_at: string;
-  updated_at: string;
-}
-
-export interface BusinessPost {
-  id: string;
-  user_id: string;
-  title: string | null;
-  body: string | null;
-  image_url: string | null;
-  cloudflare_image_id: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface BusinessSearchResult {
-  profile_id: string;
-  username: string;
   business_name: string;
   business_type: BusinessType;
   avatar_url: string | null;
   address_city: string | null;
-  avg_rating: number | null;
-  meal_count: number;
-  accepts_clients: boolean;
+  plan: 'free' | 'basic' | 'premium';
+  user_has_reacted: boolean;
+  user_has_saved: boolean;
+  is_followed: boolean;
   distance_km: number | null;
-}
-
-export interface MapPin {
-  id: string;
-  title: string;
-  photo_url: string;
-  avg_rating: number;
-  rating_count: number;
-  recipe_request_count: number;
-  lng: number;
-  lat: number;
-  is_restaurant: boolean;
-  username: string;
 }
 
 export interface MapBusinessPin {
@@ -418,48 +342,50 @@ export interface MapBusinessPin {
   business_name: string;
   business_type: BusinessType;
   avatar_url: string | null;
-  avg_rating: number | null;
-  accepts_clients: boolean;
   address_city: string | null;
+  plan: 'free' | 'basic' | 'premium';
   lng: number;
   lat: number;
   username: string;
+  last_post_at: string | null;
 }
 
 export interface PublicProfile {
   id: string;
   username: string;
   display_name: string | null;
-  bio: string | null;
   avatar_url: string | null;
   location_city: string | null;
   location_country: string | null;
-  streak_current: number;
-  streak_best: number;
-  plan: 'free' | 'personal' | 'business';
-  is_restaurant: boolean;
+  is_business: boolean;
+  plan: 'free' | 'basic' | 'premium';
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   follower_count: number;
-  following_count: number;
-  show_location: boolean;
-  show_streak: boolean;
   created_at: string;
 }
 
-export interface ProfileStats {
-  meal_count: number;
-  avg_rating: number;
-  ratings_given_count: number;
+export interface SavedDishItem {
+  dish_id: string;
+  saved_at: string;
+  title: string;
+  price_pence: number | null;
+  photo_url: string;
+  photo_blur_hash: string | null;
+  reaction_count: number;
+  business_name: string;
+  business_type: BusinessType;
+  address_city: string | null;
+  distance_km: number | null;
 }
 
-export interface LeaderboardEntry {
-  rank: number;
-  user_id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  location_city: string | null;
-  location_country: string | null;
-  meal_count: number;
-  avg_rating: number;
+export interface SearchResult {
+  type: 'dish' | 'business';
+  id: string;
+  title: string;
+  photo_url: string | null;
+  business_name: string;
+  business_type: BusinessType;
+  address_city: string | null;
+  reaction_count: number;
+  distance_km: number | null;
 }

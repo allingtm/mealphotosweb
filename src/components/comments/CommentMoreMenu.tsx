@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { COMMENT_REPORT_REASONS } from '@/lib/validations/profile';
+const COMMENT_REPORT_REASONS = ['inappropriate', 'spam', 'harassment', 'other'] as const;
 
 interface CommentMoreMenuProps {
   commentId: string;

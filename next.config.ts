@@ -8,7 +8,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@resvg/resvg-js'],
+  serverExternalPackages: [],
   images: {
     loader: 'custom',
     loaderFile: './src/lib/cloudflare-loader.ts',

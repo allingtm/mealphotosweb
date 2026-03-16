@@ -12,21 +12,38 @@ import BusinessProfileForm, {
 } from '@/components/business/BusinessProfileForm';
 import { type BusinessType, getBusinessTypeGroup } from '@/types/database';
 
-const BUSINESS_FEATURES = [
-  'Unlimited dish uploads',
-  'Verified business profile & badge',
-  'Dedicated map pin for your venue',
-  'Feed promotion in your local area',
-  'Full analytics dashboard',
-  'Anonymous dish testing',
-  'Priority map placement',
+const PLAN_OPTIONS = [
+  {
+    id: 'basic' as const,
+    name: 'Basic',
+    price: '£29',
+    features: [
+      'Business profile & map pin',
+      'Up to 20 dish posts per day',
+      'Basic stats (reactions, saves)',
+      'Comments & Q&A with customers',
+    ],
+  },
+  {
+    id: 'premium' as const,
+    name: 'Premium',
+    price: '£79',
+    features: [
+      'Everything in Basic',
+      'Unlimited dish posts',
+      'Full analytics dashboard',
+      'Larger map pin',
+      'Featured badge on profile',
+    ],
+  },
 ];
 
 export default function OnboardPage() {
   const requireAuth = useRequireAuth();
-  const [step, setStep] = useState(0); // 0: type, 1: profile
+  const [step, setStep] = useState(0); // 0: type, 1: profile, 2: plan
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [formData, setFormData] = useState<BusinessFormData>(defaultBusinessFormData);
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +70,7 @@ export default function OnboardPage() {
       const profilePayload: Record<string, unknown> = {
         business_type: businessType,
         business_name: formData.business_name.trim(),
+        bio: formData.bio || null,
         phone: formData.phone || null,
         email: formData.email || null,
         website_url: formData.website_url || null,
@@ -64,7 +82,7 @@ export default function OnboardPage() {
         address_country: formData.address_country || 'GB',
       };
 
-      if (group === 'food_drink' || businessType === 'other') {
+      if (group === 'food_service' || businessType === 'other') {
         profilePayload.menu_url = formData.menu_url || null;
         profilePayload.delivery_available = formData.delivery_available;
         if (formData.cuisine_types) {
@@ -73,6 +91,16 @@ export default function OnboardPage() {
             .map((s) => s.trim())
             .filter(Boolean);
         }
+      }
+
+      if (group === 'shops_retail' || group === 'production') {
+        profilePayload.delivery_available = formData.delivery_available;
+      }
+
+      if (group === 'chefs_experiences') {
+        profilePayload.class_types = formData.class_types.length > 0 ? formData.class_types : null;
+        profilePayload.price_from_pence = formData.price_from ? Math.round(parseFloat(formData.price_from) * 100) : null;
+        profilePayload.service_area = formData.service_area || null;
       }
 
       if (group === 'health_nutrition') {
@@ -95,7 +123,7 @@ export default function OnboardPage() {
         }
       }
 
-      const profileRes = await fetch('/api/business-profile', {
+      const profileRes = await fetch('/api/businesses/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profilePayload),
@@ -116,8 +144,7 @@ export default function OnboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          plan: 'business',
-          business_type: businessType,
+          plan: selectedPlan,
         }),
       });
 
@@ -147,7 +174,7 @@ export default function OnboardPage() {
       <div className="w-full" style={{ maxWidth: 480, paddingTop: 32 }}>
         {/* Step indicator */}
         <div className="flex items-center gap-2 justify-center" style={{ marginBottom: 32 }}>
-          {[0, 1].map((s) => (
+          {[0, 1, 2].map((s) => (
             <div
               key={s}
               className="rounded-full"
@@ -194,78 +221,101 @@ export default function OnboardPage() {
               onChange={handleFormChange}
             />
 
-            {/* Plan summary */}
-            <div
-              className="rounded-2xl"
+            <div className="flex gap-3" style={{ marginTop: 24 }}>
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="py-3 px-6 rounded-2xl flex items-center gap-2"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-secondary)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 16,
+                  border: '1px solid var(--bg-elevated)',
+                }}
+              >
+                <ArrowLeft size={18} strokeWidth={1.5} />
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={() => formData.business_name.trim() && setStep(2)}
+                disabled={!formData.business_name.trim()}
+                className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: !formData.business_name.trim()
+                    ? 'var(--bg-elevated)'
+                    : 'var(--accent-primary)',
+                  color: !formData.business_name.trim()
+                    ? 'var(--text-secondary)'
+                    : '#121212',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 16,
+                  fontWeight: 600,
+                }}
+              >
+                Continue
+                <ArrowRight size={18} strokeWidth={1.5} />
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Step 2: Plan selection + submit */}
+        {step === 2 && (
+          <>
+            <h2
               style={{
-                marginTop: 24,
-                padding: 16,
-                backgroundColor: 'var(--bg-surface)',
-                border: '1px solid var(--bg-elevated)',
+                fontFamily: 'var(--font-display)',
+                fontSize: 22,
+                color: 'var(--text-primary)',
+                textAlign: 'center',
+                marginBottom: 16,
               }}
             >
-              <div className="flex items-baseline justify-between" style={{ marginBottom: 12 }}>
-                <span
+              Choose your plan
+            </h2>
+
+            <div className="flex flex-col gap-3">
+              {PLAN_OPTIONS.map((plan) => (
+                <button
+                  key={plan.id}
+                  type="button"
+                  onClick={() => setSelectedPlan(plan.id)}
+                  className="rounded-2xl text-left transition-colors"
                   style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: 'var(--text-primary)',
+                    padding: 16,
+                    backgroundColor: selectedPlan === plan.id ? 'rgba(232, 168, 56, 0.15)' : 'var(--bg-surface)',
+                    border: selectedPlan === plan.id
+                      ? '2px solid var(--accent-primary)'
+                      : '1px solid var(--bg-elevated)',
                   }}
                 >
-                  Business Plan
-                </span>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 24,
-                    color: 'var(--accent-primary)',
-                  }}
-                >
-                  £79
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: 'var(--text-secondary)',
-                      fontFamily: 'var(--font-body)',
-                    }}
-                  >
-                    /mo
-                  </span>
-                </span>
-              </div>
-              <ul className="flex flex-col gap-1">
-                {BUSINESS_FEATURES.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check
-                      size={14}
-                      strokeWidth={2}
-                      style={{ color: 'var(--status-success)', marginTop: 3, flexShrink: 0 }}
-                    />
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: 13,
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      {f}
+                  <div className="flex items-baseline justify-between" style={{ marginBottom: 8 }}>
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {plan.name}
                     </span>
-                  </li>
-                ))}
-              </ul>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--accent-primary)' }}>
+                      {plan.price}
+                      <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>/mo</span>
+                    </span>
+                  </div>
+                  <ul className="flex flex-col gap-1">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <Check size={14} strokeWidth={2} style={{ color: 'var(--status-success)', marginTop: 3, flexShrink: 0 }} />
+                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
+                          {f}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </button>
+              ))}
             </div>
 
             {error && (
-              <p
-                style={{
-                  marginTop: 16,
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 14,
-                  color: 'var(--status-error)',
-                  textAlign: 'center',
-                }}
-              >
+              <p style={{ marginTop: 16, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--status-error)', textAlign: 'center' }}>
                 {error}
               </p>
             )}
@@ -273,7 +323,7 @@ export default function OnboardPage() {
             <div className="flex gap-3" style={{ marginTop: 24 }}>
               <button
                 type="button"
-                onClick={() => setStep(0)}
+                onClick={() => setStep(1)}
                 disabled={loading}
                 className="py-3 px-6 rounded-2xl flex items-center gap-2"
                 style={{
@@ -290,15 +340,11 @@ export default function OnboardPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading || !formData.business_name.trim()}
+                disabled={loading}
                 className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: loading || !formData.business_name.trim()
-                    ? 'var(--bg-elevated)'
-                    : 'var(--accent-primary)',
-                  color: loading || !formData.business_name.trim()
-                    ? 'var(--text-secondary)'
-                    : '#121212',
+                  backgroundColor: loading ? 'var(--bg-elevated)' : 'var(--accent-primary)',
+                  color: loading ? 'var(--text-secondary)' : '#121212',
                   fontFamily: 'var(--font-body)',
                   fontSize: 16,
                   fontWeight: 600,

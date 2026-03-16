@@ -7,7 +7,12 @@ import Link from 'next/link';
 import { ArrowLeft, Shield, Ban, Clock, Trash2, Edit3, Save, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { showToast } from '@/components/ui/Toast';
 import { ConfirmDialog } from './ConfirmDialog';
-import { CUISINE_OPTIONS, CUISINE_LABELS } from '@/lib/validations/meal';
+// v3: CUISINE_OPTIONS removed — cuisines stored as free-text array on business_profiles
+const CUISINE_OPTIONS = ['italian', 'asian', 'mexican', 'british', 'indian', 'middle_eastern', 'american', 'french', 'other'] as const;
+const CUISINE_LABELS: Record<string, string> = {
+  italian: 'Italian', asian: 'Asian', mexican: 'Mexican', british: 'British',
+  indian: 'Indian', middle_eastern: 'Middle Eastern', american: 'American', french: 'French', other: 'Other',
+};
 
 interface MemberData {
   id: string;
