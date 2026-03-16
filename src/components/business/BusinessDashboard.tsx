@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Settings } from 'lucide-react';
+import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
 
@@ -58,16 +58,6 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
       <div className="mx-auto w-full px-4 pb-24" style={{ maxWidth: 600 }}>
-        {/* Header */}
-        <div className="flex items-center justify-between py-4">
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)' }}>
-            Dashboard
-          </h1>
-          <Link href="/settings" aria-label="Settings">
-            <Settings size={24} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
-          </Link>
-        </div>
-
         {/* Post a Dish CTA */}
         <Link
           href="/post"

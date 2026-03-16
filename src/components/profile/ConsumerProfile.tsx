@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Settings, UtensilsCrossed, MapPin } from 'lucide-react';
+import { UtensilsCrossed, MapPin } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BUSINESS_TYPE_LABELS } from '@/types/database';
 import { formatPrice } from '@/lib/utils';
 import { timeAgo } from '@/lib/utils/timeAgo';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 
 interface ConsumerProfileProps {
@@ -66,14 +65,6 @@ export function ConsumerProfile({ userId, username, avatarUrl, locationCity }: C
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
       <div className="mx-auto w-full pb-24" style={{ maxWidth: 600 }}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/settings" aria-label="Settings">
-            <Settings size={24} strokeWidth={1.5} style={{ color: 'var(--text-secondary)' }} />
-          </Link>
-          <NotificationBell onClick={() => {}} />
-        </div>
-
         {/* Avatar + info */}
         <div className="flex flex-col items-center px-4 pb-4">
           {avatarUrl ? (

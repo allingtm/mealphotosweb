@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
+import { MenuButton } from '@/components/layout/MenuButton';
 
 export function FeedHeader() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -11,7 +12,7 @@ export function FeedHeader() {
   return (
     <>
       <header
-        className="sticky z-40 flex items-center justify-between px-4"
+        className="sticky z-40 flex items-center justify-between px-4 md:hidden"
         style={{
           top: 'env(safe-area-inset-top, 0px)',
           height: 56,
@@ -30,7 +31,10 @@ export function FeedHeader() {
         >
           meal.photos
         </Link>
-        <NotificationBell onClick={() => setIsPanelOpen(true)} />
+        <div className="flex items-center gap-1">
+          <NotificationBell onClick={() => setIsPanelOpen(true)} />
+          <MenuButton />
+        </div>
       </header>
 
       <NotificationPanel

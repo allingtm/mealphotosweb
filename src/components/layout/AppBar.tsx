@@ -18,7 +18,7 @@ export function AppBar({ title, rightAction }: AppBarProps) {
   return (
     <>
       <header
-        className="flex items-center justify-between"
+        className="hidden md:flex items-center justify-between"
         style={{
           padding: '8px 16px',
           height: 48,

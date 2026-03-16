@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
+import { FeedHeader } from '@/components/feed/FeedHeader';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const navItems = [
@@ -129,6 +130,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
         )}
       </aside>
+
+      {/* Mobile top bar */}
+      <FeedHeader />
 
       {/* Main content */}
       <main

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import type { FeedItem } from '@/types/database';
-import { FeedHeader } from './FeedHeader';
 import { FeedTabBar } from './FeedTabBar';
 import { DishCard } from './DishCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -92,7 +91,6 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <FeedHeader />
       <FeedTabBar />
 
       <div
