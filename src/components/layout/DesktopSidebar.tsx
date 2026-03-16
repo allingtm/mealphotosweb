@@ -40,7 +40,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          See what dishes people are loving right now.
+          Discover the most popular dishes being posted right now. See what everyone is eating and reacting to.
         </p>
         <Link
           href="/?tab=trending"
@@ -81,7 +81,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Find food businesses near you on the map.
+          Browse restaurants, cafes, and food businesses near you on an interactive map — discover what's being served in your area and beyond.
         </p>
         <Link
           href="/map"
@@ -122,7 +122,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Find dishes, cuisines, and businesses.
+          Search for specific dishes, cuisines, or businesses — find exactly what you're craving or explore something new.
         </p>
         <Link
           href="/search"
