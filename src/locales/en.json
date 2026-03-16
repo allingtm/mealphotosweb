@@ -113,7 +113,7 @@
   "auth": {
     "joinTitle": "Join meal.photos",
     "welcomeBack": "Welcome back",
-    "signupDesc": "How does your food score? It's free!",
+    "signupDesc": "Discover what's cooking near you. It's free!",
     "signinDesc": "Sign in to your account.",
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
@@ -462,8 +462,80 @@
   },
   "about": {
     "title": "About",
-    "comingSoon": "Coming soon",
-    "description": "Learn more about meal.photos and our mission."
+    "description": "See what's being served right now. A live food feed from real kitchens — discover dishes near you and explore food culture worldwide.",
+    "hero": {
+      "heading": "See what's being served right now.",
+      "subtitle": "A live feed of real food from real kitchens. No stock photos. No stale menus. Just what's cooking today, near you and around the world."
+    },
+    "problem": {
+      "heading": "Finding great food shouldn't be this hard.",
+      "stalePhotos": "Restaurant photos that are three years old.",
+      "textReviews": "Pages of text reviews but nothing to look at.",
+      "algorithmBuried": "Your post buried by an algorithm that doesn't care about food.",
+      "highCommission": "Delivery apps that take 30% of every order."
+    },
+    "what": {
+      "heading": "A global stage for food culture.",
+      "body": "meal.photos is a live food feed where restaurants, cafés, bakeries, and food businesses of every kind post real photos of what they're serving today. Consumers browse, react, save, and discover what's good — right now, near them, or anywhere in the world.",
+      "realPhotos": {
+        "title": "Real photos, posted live",
+        "description": "Every photo is taken by the kitchen that made it, posted the same day."
+      },
+      "searchByDish": {
+        "title": "Search by dish, not just by place",
+        "description": "Craving something specific? Find who's serving it near you today."
+      },
+      "exploreWorldwide": {
+        "title": "Explore food worldwide",
+        "description": "A global map of food culture — from Tokyo to the shop around the corner."
+      }
+    },
+    "consumers": {
+      "label": "For food lovers",
+      "heading": "Discover what's good today.",
+      "liveFeed": "Browse a live feed of dishes from businesses near you",
+      "react": "React to dishes you'd eat — help others discover the best food",
+      "save": "Save dishes and build your personal food collection",
+      "follow": "Follow your favourite businesses and never miss a new post",
+      "search": "Search by dish name to find exactly what you're craving",
+      "requests": "Request dishes you want to see on the menu",
+      "closing": "Always free. No account required to browse.",
+      "cta": "Start Browsing"
+    },
+    "businesses": {
+      "label": "For food businesses",
+      "heading": "Your food deserves to be seen.",
+      "subtitle": "No commission. No algorithms hiding your posts. Just a direct line to hungry locals.",
+      "photos": "Post authentic photos of your dishes — show what you're really serving",
+      "map": "Appear on the map so nearby customers can find you",
+      "requestsArea": "See what dishes people are requesting in your area",
+      "following": "Build a following and get direct engagement from your community",
+      "analytics": "Full analytics dashboard — understand what resonates",
+      "menu": "Digitise your menu with AI-powered scanning",
+      "pricing": "£49.95/month. Zero commission. Cancel anytime.",
+      "comparison": "Less than the commission on a single delivery order.",
+      "cta": "Get Started"
+    },
+    "howItWorks": {
+      "heading": "How it works",
+      "step1": {
+        "title": "Open the feed",
+        "description": "See what's being served right now near you."
+      },
+      "step2": {
+        "title": "React and save",
+        "description": "Tap on dishes you'd eat. Save your favourites."
+      },
+      "step3": {
+        "title": "Discover more",
+        "description": "Explore the map, follow businesses, request dishes."
+      }
+    },
+    "closing": {
+      "heading": "Ready to see what's cooking?",
+      "ctaPrimary": "Browse the Feed",
+      "ctaSecondary": "List Your Business"
+    }
   },
   "contact": {
     "title": "Contact Us",

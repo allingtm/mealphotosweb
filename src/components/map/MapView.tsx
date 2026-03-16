@@ -5,6 +5,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import posthog from 'posthog-js';
 import { useAppStore } from '@/lib/store';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { getBusinessTypeGroup, TYPE_GROUP_COLORS } from '@/types/database';
 import type { MapBusinessPin } from '@/types/database';
 import { MapFilterPills } from './MapFilterPills';
@@ -14,6 +15,35 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
 
 const DEFAULT_CENTER: [number, number] = [-3.5, 54.5];
 const DEFAULT_ZOOM = 5.5;
+
+const MAP_STYLES = {
+  dark: 'mapbox://styles/mapbox/dark-v11',
+  light: 'mapbox://styles/mapbox/light-v11',
+} as const;
+
+const THEME_OVERRIDES: Record<'dark' | 'light', [string, string, string][]> = {
+  dark: [
+    ['water', 'fill-color', '#0A1628'],
+    ['landcover', 'fill-color', '#1A1A1A'],
+    ['landuse', 'fill-color', '#1E1E1E'],
+  ],
+  light: [
+    ['water', 'fill-color', '#C4DFF6'],
+    ['landcover', 'fill-color', '#E8E8E8'],
+    ['landuse', 'fill-color', '#F0F0F0'],
+  ],
+};
+
+const PIN_STROKE: Record<'dark' | 'light', string> = {
+  dark: 'rgba(0,0,0,0.3)',
+  light: 'rgba(0,0,0,0.15)',
+};
+
+function getResolvedTheme(theme: string): 'dark' | 'light' {
+  if (theme === 'dark' || theme === 'light') return theme;
+  if (typeof window === 'undefined') return 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 function pinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
   return {
@@ -49,11 +79,13 @@ export default function MapView() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterRef = useRef<string | null>(null);
+  const resolvedThemeRef = useRef<'dark' | 'light'>('dark');
   const [selectedPin, setSelectedPin] = useState<MapBusinessPin | null>(null);
   const mapTypeFilter = useAppStore((s) => s.mapTypeFilter);
   const mapCenter = useAppStore((s) => s.mapCenter);
   const mapZoom = useAppStore((s) => s.mapZoom);
   const setMapPosition = useAppStore((s) => s.setMapPosition);
+  const { theme } = useTheme();
 
   const fetchPins = useCallback(async (map: mapboxgl.Map, typeFilter?: string | null) => {
     const bounds = map.getBounds();
@@ -87,9 +119,12 @@ export default function MapView() {
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
 
+    const resolved = getResolvedTheme(theme);
+    resolvedThemeRef.current = resolved;
+
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
+      style: MAP_STYLES[resolved],
       center: mapCenter ?? DEFAULT_CENTER,
       zoom: mapZoom ?? DEFAULT_ZOOM,
       attributionControl: false,
@@ -99,52 +134,55 @@ export default function MapView() {
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
 
     map.on('style.load', () => {
-      // Darken map elements
-      const darkOverrides: [string, string, string][] = [
-        ['water', 'fill-color', '#0A1628'],
-        ['landcover', 'fill-color', '#1A1A1A'],
-        ['landuse', 'fill-color', '#1E1E1E'],
-      ];
-      darkOverrides.forEach(([layer, prop, val]) => {
+      const t = resolvedThemeRef.current;
+
+      // Apply theme-specific color overrides
+      THEME_OVERRIDES[t].forEach(([layer, prop, val]) => {
         if (map.getLayer(layer)) {
           map.setPaintProperty(layer, prop as string & keyof mapboxgl.AnyPaint, val);
         }
       });
 
-      // Add source
-      map.addSource('businesses', {
-        type: 'geojson',
-        data: pinsToGeoJSON([]),
-      });
+      // Add source (cleared on style swap)
+      if (!map.getSource('businesses')) {
+        map.addSource('businesses', {
+          type: 'geojson',
+          data: pinsToGeoJSON([]),
+        });
+      }
 
       // Main pin layer
-      map.addLayer({
-        id: 'business-pins',
-        type: 'circle',
-        source: 'businesses',
-        paint: {
-          'circle-color': ['get', 'color'],
-          'circle-radius': 5,
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': 'rgba(0,0,0,0.3)',
-          'circle-opacity': 0.9,
-        },
-      });
+      if (!map.getLayer('business-pins')) {
+        map.addLayer({
+          id: 'business-pins',
+          type: 'circle',
+          source: 'businesses',
+          paint: {
+            'circle-color': ['get', 'color'],
+            'circle-radius': 5,
+            'circle-stroke-width': 1.5,
+            'circle-stroke-color': PIN_STROKE[t],
+            'circle-opacity': 0.9,
+          },
+        });
+      }
 
       // Pulse layer for recently active businesses
-      map.addLayer({
-        id: 'business-pins-pulse',
-        type: 'circle',
-        source: 'businesses',
-        filter: ['==', ['get', 'is_recent'], true],
-        paint: {
-          'circle-color': ['get', 'color'],
-          'circle-radius': 10,
-          'circle-opacity': 0.2,
-        },
-      });
+      if (!map.getLayer('business-pins-pulse')) {
+        map.addLayer({
+          id: 'business-pins-pulse',
+          type: 'circle',
+          source: 'businesses',
+          filter: ['==', ['get', 'is_recent'], true],
+          paint: {
+            'circle-color': ['get', 'color'],
+            'circle-radius': 10,
+            'circle-opacity': 0.2,
+          },
+        });
+      }
 
-      fetchPins(map);
+      fetchPins(map, filterRef.current);
     });
 
     // Pin click
@@ -198,6 +236,16 @@ export default function MapView() {
       mapRef.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Swap map style when theme changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const resolved = getResolvedTheme(theme);
+    if (resolved === resolvedThemeRef.current) return;
+    resolvedThemeRef.current = resolved;
+    map.setStyle(MAP_STYLES[resolved]);
+  }, [theme]);
 
   // Re-fetch on filter change
   useEffect(() => {

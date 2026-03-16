@@ -31,7 +31,7 @@ export function MapFilterPills() {
     <div
       className="flex gap-2 px-4 py-2 overflow-x-auto"
       style={{
-        backgroundColor: 'rgba(18, 18, 18, 0.85)',
+        backgroundColor: 'color-mix(in srgb, var(--bg-primary) 85%, transparent)',
         backdropFilter: 'blur(8px)',
         scrollbarWidth: 'none',
       }}
