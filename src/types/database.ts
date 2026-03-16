@@ -389,3 +389,16 @@ export interface SearchResult {
   reaction_count: number;
   distance_km: number | null;
 }
+
+export interface ContactSubmission {
+  id: string;
+  name: string | null;
+  email: string;
+  subject: string | null;
+  message: string;
+  status: 'new' | 'in_progress' | 'resolved' | 'spam';
+  admin_notes: string | null;
+  ip_hash: string | null;
+  created_at: string;
+  updated_at: string;
+}

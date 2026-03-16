@@ -89,7 +89,7 @@ export default function PricingPage() {
             marginBottom: 8,
           }}
         >
-          Plans for Food Businesses
+          Restaurants and other businesses
         </h1>
         <p
           style={{
@@ -100,7 +100,7 @@ export default function PricingPage() {
             marginBottom: 40,
           }}
         >
-          Consumers always browse for free. Choose a plan to showcase your dishes.
+          Browse dishes, save favourites, and follow businesses.
         </p>
 
         {/* Plan cards */}

@@ -427,7 +427,11 @@
     "manageFeedList": "Gestionar lista del feed",
     "viewInvitations": "Ver invitaciones",
     "language": "Idioma",
-    "languageLabel": "Idioma de la app"
+    "languageLabel": "Idioma de la app",
+    "theme": "Tema",
+    "themeDark": "Oscuro",
+    "themeLight": "Claro",
+    "themeSystem": "Sistema"
   },
   "footer": {
     "privacy": "Privacidad",
@@ -462,9 +466,21 @@
     "description": "Conoce m\u00e1s sobre meal.photos y nuestra misi\u00f3n."
   },
   "contact": {
-    "title": "Cont\u00e1ctanos",
-    "comingSoon": "Pr\u00f3ximamente",
-    "description": "Ponte en contacto con el equipo de meal.photos."
+    "title": "Contáctanos",
+    "description": "Ponte en contacto con el equipo de meal.photos.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Tu nombre (opcional)",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@email.com",
+    "subjectLabel": "Asunto",
+    "subjectPlaceholder": "¿De qué se trata? (opcional)",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Cuéntanos lo que piensas...",
+    "submit": "Enviar mensaje",
+    "sending": "Enviando...",
+    "successMessage": "¡Mensaje enviado! Te responderemos pronto.",
+    "errorMessage": "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+    "sendAnother": "Enviar otro mensaje"
   },
   "feedback": {
     "title": "Comentarios",

@@ -57,3 +57,7 @@ export type { NotificationType } from './notification';
 
 // Admin
 export { adminMemberSearchSchema, adminMemberUpdateSchema, adminMealUpdateSchema, adminMealsPaginationSchema } from './admin';
+
+// Contact
+export { contactSubmissionSchema, adminContactQuerySchema, adminContactUpdateSchema } from './contact';
+export type { ContactSubmissionInput } from './contact';

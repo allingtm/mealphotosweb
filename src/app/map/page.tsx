@@ -25,8 +25,8 @@ const MapView = dynamic(
 
 export default function MapPage() {
   return (
-    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ minHeight: '100dvh', backgroundColor: 'var(--bg-primary)' }}>
-      <div className="flex flex-col h-[calc(100dvh-56px-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] md:h-full md:flex-1">
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="flex flex-col h-[calc(100dvh-56px-3.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-56px-36px)]">
         <MapView />
       </div>
     </div>

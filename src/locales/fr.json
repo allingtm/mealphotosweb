@@ -427,7 +427,11 @@
     "manageFeedList": "Gérer la liste du fil",
     "viewInvitations": "Voir les invitations",
     "language": "Langue",
-    "languageLabel": "Langue de l'application"
+    "languageLabel": "Langue de l'application",
+    "theme": "Thème",
+    "themeDark": "Sombre",
+    "themeLight": "Clair",
+    "themeSystem": "Système"
   },
   "footer": {
     "privacy": "Confidentialité",
@@ -463,8 +467,20 @@
   },
   "contact": {
     "title": "Nous contacter",
-    "comingSoon": "Bientôt disponible",
-    "description": "Contactez l'équipe meal.photos."
+    "description": "Contactez l'équipe meal.photos.",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Votre nom (facultatif)",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "votre@email.com",
+    "subjectLabel": "Objet",
+    "subjectPlaceholder": "De quoi s'agit-il ? (facultatif)",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Dites-nous ce que vous avez en tête...",
+    "submit": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "successMessage": "Message envoyé ! Nous vous répondrons bientôt.",
+    "errorMessage": "Échec de l'envoi du message. Veuillez réessayer.",
+    "sendAnother": "Envoyer un autre message"
   },
   "feedback": {
     "title": "Avis",

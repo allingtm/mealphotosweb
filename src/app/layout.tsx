@@ -7,6 +7,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AppShell } from '@/components/layout/AppShell';
 import { ToastContainer } from '@/components/ui/Toast';
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
@@ -65,7 +66,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#121212',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#121212' },
+    { media: '(prefers-color-scheme: light)', color: '#FAFAFA' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -83,8 +87,16 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
+      suppressHydrationWarning
       className={cn(instrumentSerif.variable, dmSans.variable, "font-sans", geist.variable, "min-h-dvh")}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var r=(t==='dark'||t==='light')?t:(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.classList.add(r)}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body
         className="min-h-dvh"
         style={{
@@ -137,10 +149,12 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <PostHogProvider>
             <AuthProvider>
-              <OneSignalProvider />
-              <AppShell>{children}</AppShell>
-              <ToastContainer />
-              <CookieConsentBanner />
+              <ThemeProvider>
+                <OneSignalProvider />
+                <AppShell>{children}</AppShell>
+                <ToastContainer />
+                <CookieConsentBanner />
+              </ThemeProvider>
             </AuthProvider>
           </PostHogProvider>
         </NextIntlClientProvider>

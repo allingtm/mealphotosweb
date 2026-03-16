@@ -427,7 +427,11 @@
     "manageFeedList": "Manage Feed List",
     "viewInvitations": "View Invitations",
     "language": "Language",
-    "languageLabel": "App language"
+    "languageLabel": "App language",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "themeSystem": "System"
   },
   "footer": {
     "privacy": "Privacy",
@@ -463,8 +467,20 @@
   },
   "contact": {
     "title": "Contact Us",
-    "comingSoon": "Coming soon",
-    "description": "Get in touch with the meal.photos team."
+    "description": "Get in touch with the meal.photos team.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name (optional)",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What's this about? (optional)",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what's on your mind...",
+    "submit": "Send Message",
+    "sending": "Sending...",
+    "successMessage": "Message sent! We'll get back to you soon.",
+    "errorMessage": "Failed to send message. Please try again.",
+    "sendAnother": "Send another message"
   },
   "feedback": {
     "title": "Feedback",

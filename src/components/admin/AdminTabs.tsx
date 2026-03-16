@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { showToast } from '@/components/ui/Toast';
 import { MembersTab } from './MembersTab';
+import { ContactTab } from './ContactTab';
 
 interface ModerationItem {
   id: string;
@@ -70,6 +71,7 @@ interface AdminTabsProps {
     disputes: number;
     urgentReports: number;
     members: number;
+    contact: number;
   };
 }
 
@@ -79,6 +81,7 @@ const TABS = [
   { key: 'moderation', label: 'Moderation' },
   { key: 'reports', label: 'Reports' },
   { key: 'disputes', label: 'Disputes' },
+  { key: 'contact', label: 'Contact' },
 ] as const;
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -211,6 +214,7 @@ export function AdminTabs({
               <StatCard label="Urgent Reports" value={counts.urgentReports} color="var(--status-error)" />
               <StatCard label="Pending Disputes" value={counts.disputes} />
               <StatCard label="Total Members" value={counts.members} />
+              <StatCard label="New Contact" value={counts.contact} />
             </div>
           </div>
         )}
@@ -461,6 +465,9 @@ export function AdminTabs({
             ))}
           </div>
         )}
+
+        {/* Contact tab */}
+        {activeTab === 'contact' && <ContactTab />}
       </div>
     </div>
   );

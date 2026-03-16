@@ -1,7 +1,6 @@
-import { Mail } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { AppBar } from '@/components/layout/AppBar';
+import { ContactForm } from '@/components/contact/ContactForm';
 
 export async function generateMetadata() {
   const t = await getTranslations('contact');
@@ -16,8 +15,6 @@ export default function ContactPage() {
 }
 
 function ContactContent() {
-  const t = useTranslations('contact');
-
   return (
     <div
       className="md:overflow-y-auto md:flex-1 md:min-h-0"
@@ -26,43 +23,11 @@ function ContactContent() {
         backgroundColor: 'var(--bg-primary)',
       }}
     >
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
-      <AppBar title={t('title')} />
-      <div
-        className="flex flex-col items-center justify-center"
-        style={{
-          minHeight: '60vh',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}
-      >
-        <Mail
-          size={48}
-          strokeWidth={1}
-          color="var(--text-secondary)"
-        />
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 28,
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            margin: '16px 0 8px',
-          }}
-        >
-          {t('title')}
-        </h1>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 16,
-            color: 'var(--text-secondary)',
-            maxWidth: 360,
-          }}
-        >
-          {t('comingSoon')} — {t('description')}
-        </p>
-      </div>
+      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+        <AppBar title="Contact Us" />
+        <div style={{ padding: '24px 16px' }}>
+          <ContactForm />
+        </div>
       </div>
     </div>
   );

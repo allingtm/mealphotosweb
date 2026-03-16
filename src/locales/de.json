@@ -427,7 +427,11 @@
     "manageFeedList": "Feed-Liste verwalten",
     "viewInvitations": "Einladungen ansehen",
     "language": "Sprache",
-    "languageLabel": "App-Sprache"
+    "languageLabel": "App-Sprache",
+    "theme": "Design",
+    "themeDark": "Dunkel",
+    "themeLight": "Hell",
+    "themeSystem": "System"
   },
   "footer": {
     "privacy": "Datenschutz",
@@ -463,8 +467,20 @@
   },
   "contact": {
     "title": "Kontakt",
-    "comingSoon": "Kommt bald",
-    "description": "Nimm Kontakt mit dem meal.photos-Team auf."
+    "description": "Nimm Kontakt mit dem meal.photos-Team auf.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Dein Name (optional)",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "deine@email.com",
+    "subjectLabel": "Betreff",
+    "subjectPlaceholder": "Worum geht es? (optional)",
+    "messageLabel": "Nachricht",
+    "messagePlaceholder": "Sag uns, was du denkst...",
+    "submit": "Nachricht senden",
+    "sending": "Wird gesendet...",
+    "successMessage": "Nachricht gesendet! Wir melden uns bald bei dir.",
+    "errorMessage": "Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
+    "sendAnother": "Weitere Nachricht senden"
   },
   "feedback": {
     "title": "Feedback",
