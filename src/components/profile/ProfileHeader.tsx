@@ -14,7 +14,6 @@ import { AvatarCropModal } from '@/components/profile/AvatarCropModal';
 import { FollowButton } from '@/components/profile/FollowButton';
 import { FollowerFollowingList } from '@/components/profile/FollowerFollowingList';
 import { ProfileMoreMenu } from '@/components/profile/ProfileMoreMenu';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Globe, Phone, Menu, CalendarDays, GraduationCap, Tag, MapPin, UserCheck } from 'lucide-react';
 import type { BusinessProfile } from '@/types/database';
 import { BUSINESS_TYPE_LABELS, getBusinessTypeGroup, type BusinessType } from '@/types/database';
@@ -54,7 +53,6 @@ export function ProfileHeader({ profile, businessProfile, isOwnProfile, isFollow
   const initial = (profile.display_name || profile.username).charAt(0).toUpperCase();
 
   const isBusiness = profile.plan === 'business' && profile.subscription_status === 'active';
-  const isVerified = isBusiness || (profile.is_restaurant && profile.subscription_status === 'active');
   const followerCount = profile.follower_count ?? 0;
   const followingCount = profile.following_count ?? 0;
 
@@ -215,7 +213,6 @@ export function ProfileHeader({ profile, businessProfile, isOwnProfile, isFollow
               {profile.display_name}
             </h1>
           )}
-          {isVerified && <VerifiedBadge />}
         </div>
 
         {/* Username */}

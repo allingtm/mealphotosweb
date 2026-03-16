@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     if ((count ?? 0) >= limit) {
       return NextResponse.json(
-        { error: `Daily post limit reached (${limit}/day). Upgrade to Premium for unlimited posts.` },
+        { error: 'Daily post limit reached.' },
         { status: 429 }
       );
     }

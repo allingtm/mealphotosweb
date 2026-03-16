@@ -10,7 +10,7 @@ export const adminMemberUpdateSchema = z.object({
   display_name: z.string().max(50).trim().nullable().optional(),
   is_admin: z.boolean().optional(),
   is_business: z.boolean().optional(),
-  plan: z.enum(['free', 'basic', 'premium']).optional(),
+  plan: z.enum(['free', 'business']).optional(),
 });
 
 // v3: No meal update (dishes managed by businesses, not admin)

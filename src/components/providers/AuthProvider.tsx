@@ -24,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
       setIsAdmin(data?.is_admin ?? false);
       setIsBusiness(data?.is_business ?? false);
-      setUserPlan((data?.plan as 'free' | 'basic' | 'premium') ?? 'free');
+      setUserPlan((data?.plan as 'free' | 'business') ?? 'free');
       setProfileAvatarUrl(data?.avatar_url ?? null);
     }
 

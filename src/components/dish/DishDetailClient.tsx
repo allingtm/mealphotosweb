@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { UtensilsCrossed, MapPin } from 'lucide-react';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 import { BackButton } from '@/components/ui/BackButton';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { ReactionButton } from '@/components/feed/ReactionButton';
 import { SaveButton } from '@/components/feed/SaveButton';
 import { ShareButton } from '@/components/feed/ShareButton';
@@ -49,8 +48,6 @@ interface DishDetailClientProps {
 export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }: DishDetailClientProps) {
   const bp = dish.business_profiles;
   const profile = dish.profiles;
-  const isPremium = profile.plan === 'premium';
-
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
       <div className="mx-auto w-full pb-24" style={{ maxWidth: 600 }}>
@@ -137,7 +134,6 @@ export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }:
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--text-primary)', fontWeight: 500 }}>
               {bp.business_name}
             </span>
-            {isPremium && <VerifiedBadge size={14} />}
           </Link>
 
           {/* Location */}

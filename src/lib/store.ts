@@ -15,8 +15,8 @@ interface AppState {
   // User profile state
   isBusiness: boolean;
   setIsBusiness: (isBusiness: boolean) => void;
-  userPlan: 'free' | 'basic' | 'premium';
-  setUserPlan: (plan: 'free' | 'basic' | 'premium') => void;
+  userPlan: 'free' | 'business';
+  setUserPlan: (plan: 'free' | 'business') => void;
   isAdmin: boolean;
   setIsAdmin: (isAdmin: boolean) => void;
   profileAvatarUrl: string | null;

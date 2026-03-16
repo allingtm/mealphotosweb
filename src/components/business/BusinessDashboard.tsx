@@ -146,15 +146,13 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
               </div>
             )}
 
-            {/* Analytics link (Premium only) */}
-            {userPlan === 'premium' && (
-              <Link
-                href="/me"
-                style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--accent-primary)' }}
-              >
-                View Full Analytics →
-              </Link>
-            )}
+            {/* Analytics link */}
+            <Link
+              href="/me"
+              style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--accent-primary)' }}
+            >
+              View Full Analytics →
+            </Link>
           </div>
         )}
       </div>

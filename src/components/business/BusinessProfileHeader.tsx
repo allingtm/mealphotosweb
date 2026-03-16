@@ -7,7 +7,6 @@ import posthog from 'posthog-js';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 import { BackButton } from '@/components/ui/BackButton';
 import { ShareButton } from '@/components/feed/ShareButton';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BUSINESS_TYPE_LABELS, type BusinessProfile } from '@/types/database';
 import { useAppStore } from '@/lib/store';
 
@@ -30,7 +29,6 @@ export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowin
   const user = useAppStore((s) => s.user);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
 
-  const isPremium = profile.plan === 'premium';
   const typeLabel = BUSINESS_TYPE_LABELS[bp.business_type] ?? bp.business_type;
 
   const handleFollow = async () => {
@@ -100,7 +98,6 @@ export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowin
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)', margin: 0 }}>
           {bp.business_name}
         </h1>
-        {isPremium && <VerifiedBadge size={16} />}
       </div>
 
       {/* Type + cuisine */}

@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe, getBaseUrl } from '@/lib/stripe';
 import { applyRateLimit } from '@/lib/rate-limit';
-import { z } from 'zod';
-
-const subscribeSchema = z.object({
-  plan: z.enum(['basic', 'premium']),
-});
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,16 +15,7 @@ export async function POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(user.id, 'write');
     if (rateLimited) return rateLimited;
 
-    const body = await req.json();
-    const parsed = subscribeSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid plan', details: parsed.error.flatten() }, { status: 400 });
-    }
-
-    const { plan } = parsed.data;
-    const priceId = plan === 'basic'
-      ? process.env.STRIPE_BASIC_PRICE_ID!
-      : process.env.STRIPE_PREMIUM_PRICE_ID!;
+    const priceId = process.env.STRIPE_BUSINESS_PRICE_ID!;
 
     // Check if already subscribed
     const { data: profile } = await supabase
@@ -63,7 +49,7 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}/me?subscription=success`,
       cancel_url: `${baseUrl}/pricing?subscription=cancelled`,
-      metadata: { supabase_user_id: user.id, plan },
+      metadata: { supabase_user_id: user.id, plan: 'business' },
       subscription_data: {
         metadata: { supabase_user_id: user.id },
       },

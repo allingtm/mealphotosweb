@@ -37,7 +37,6 @@ function pinsToGeoJSON(pins: MapBusinessPin[]): GeoJSON.FeatureCollection {
           plan: pin.plan,
           username: pin.username,
           last_post_at: pin.last_post_at,
-          is_premium: pin.plan === 'premium',
           is_recent: isRecent,
         },
       };
@@ -125,7 +124,7 @@ export default function MapView() {
         source: 'businesses',
         paint: {
           'circle-color': ['get', 'color'],
-          'circle-radius': ['case', ['get', 'is_premium'], 7, 5],
+          'circle-radius': 5,
           'circle-stroke-width': 1.5,
           'circle-stroke-color': 'rgba(0,0,0,0.3)',
           'circle-opacity': 0.9,
@@ -140,7 +139,7 @@ export default function MapView() {
         filter: ['==', ['get', 'is_recent'], true],
         paint: {
           'circle-color': ['get', 'color'],
-          'circle-radius': ['case', ['get', 'is_premium'], 14, 10],
+          'circle-radius': 10,
           'circle-opacity': 0.2,
         },
       });

@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const userPlan = useAppStore((s) => s.userPlan);
-  const planLabel = userPlan === 'premium' ? 'Premium' : userPlan === 'basic' ? 'Basic' : 'Free';
+  const planLabel = userPlan === 'business' ? 'Business' : 'Free';
 
   const handleSignOut = async () => {
     const supabase = createClient();

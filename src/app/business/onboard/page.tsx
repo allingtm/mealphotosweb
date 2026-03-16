@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import posthog from 'posthog-js';
@@ -12,38 +12,11 @@ import BusinessProfileForm, {
 } from '@/components/business/BusinessProfileForm';
 import { type BusinessType, getBusinessTypeGroup } from '@/types/database';
 
-const PLAN_OPTIONS = [
-  {
-    id: 'basic' as const,
-    name: 'Basic',
-    price: '£29',
-    features: [
-      'Business profile & map pin',
-      'Up to 20 dish posts per day',
-      'Basic stats (reactions, saves)',
-      'Comments & Q&A with customers',
-    ],
-  },
-  {
-    id: 'premium' as const,
-    name: 'Premium',
-    price: '£79',
-    features: [
-      'Everything in Basic',
-      'Unlimited dish posts',
-      'Full analytics dashboard',
-      'Larger map pin',
-      'Featured badge on profile',
-    ],
-  },
-];
-
 export default function OnboardPage() {
   const requireAuth = useRequireAuth();
-  const [step, setStep] = useState(0); // 0: type, 1: profile, 2: plan
+  const [step, setStep] = useState(0); // 0: type, 1: profile
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [formData, setFormData] = useState<BusinessFormData>(defaultBusinessFormData);
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -143,9 +116,6 @@ export default function OnboardPage() {
       const subRes = await fetch('/api/restaurants/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan: selectedPlan,
-        }),
       });
 
       const subData = await subRes.json();
@@ -174,7 +144,7 @@ export default function OnboardPage() {
       <div className="w-full" style={{ maxWidth: 480, paddingTop: 32 }}>
         {/* Step indicator */}
         <div className="flex items-center gap-2 justify-center" style={{ marginBottom: 32 }}>
-          {[0, 1, 2].map((s) => (
+          {[0, 1].map((s) => (
             <div
               key={s}
               className="rounded-full"
@@ -221,99 +191,6 @@ export default function OnboardPage() {
               onChange={handleFormChange}
             />
 
-            <div className="flex gap-3" style={{ marginTop: 24 }}>
-              <button
-                type="button"
-                onClick={() => setStep(0)}
-                className="py-3 px-6 rounded-2xl flex items-center gap-2"
-                style={{
-                  backgroundColor: 'var(--bg-surface)',
-                  color: 'var(--text-secondary)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 16,
-                  border: '1px solid var(--bg-elevated)',
-                }}
-              >
-                <ArrowLeft size={18} strokeWidth={1.5} />
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={() => formData.business_name.trim() && setStep(2)}
-                disabled={!formData.business_name.trim()}
-                className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: !formData.business_name.trim()
-                    ? 'var(--bg-elevated)'
-                    : 'var(--accent-primary)',
-                  color: !formData.business_name.trim()
-                    ? 'var(--text-secondary)'
-                    : '#121212',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 16,
-                  fontWeight: 600,
-                }}
-              >
-                Continue
-                <ArrowRight size={18} strokeWidth={1.5} />
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Step 2: Plan selection + submit */}
-        {step === 2 && (
-          <>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 22,
-                color: 'var(--text-primary)',
-                textAlign: 'center',
-                marginBottom: 16,
-              }}
-            >
-              Choose your plan
-            </h2>
-
-            <div className="flex flex-col gap-3">
-              {PLAN_OPTIONS.map((plan) => (
-                <button
-                  key={plan.id}
-                  type="button"
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className="rounded-2xl text-left transition-colors"
-                  style={{
-                    padding: 16,
-                    backgroundColor: selectedPlan === plan.id ? 'rgba(232, 168, 56, 0.15)' : 'var(--bg-surface)',
-                    border: selectedPlan === plan.id
-                      ? '2px solid var(--accent-primary)'
-                      : '1px solid var(--bg-elevated)',
-                  }}
-                >
-                  <div className="flex items-baseline justify-between" style={{ marginBottom: 8 }}>
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {plan.name}
-                    </span>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--accent-primary)' }}>
-                      {plan.price}
-                      <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>/mo</span>
-                    </span>
-                  </div>
-                  <ul className="flex flex-col gap-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <Check size={14} strokeWidth={2} style={{ color: 'var(--status-success)', marginTop: 3, flexShrink: 0 }} />
-                        <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
-                          {f}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </button>
-              ))}
-            </div>
-
             {error && (
               <p style={{ marginTop: 16, fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--status-error)', textAlign: 'center' }}>
                 {error}
@@ -323,7 +200,7 @@ export default function OnboardPage() {
             <div className="flex gap-3" style={{ marginTop: 24 }}>
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => setStep(0)}
                 disabled={loading}
                 className="py-3 px-6 rounded-2xl flex items-center gap-2"
                 style={{
@@ -340,11 +217,15 @@ export default function OnboardPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !formData.business_name.trim()}
                 className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: loading ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-                  color: loading ? 'var(--text-secondary)' : '#121212',
+                  backgroundColor: loading || !formData.business_name.trim()
+                    ? 'var(--bg-elevated)'
+                    : 'var(--accent-primary)',
+                  color: loading || !formData.business_name.trim()
+                    ? 'var(--text-secondary)'
+                    : '#121212',
                   fontFamily: 'var(--font-body)',
                   fontSize: 16,
                   fontWeight: 600,

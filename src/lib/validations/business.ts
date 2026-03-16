@@ -55,7 +55,6 @@ export const businessProfileUpdateSchema = businessProfileCreateSchema.partial()
 
 export const businessOnboardSchema = z.object({
   business_type: businessTypeSchema,
-  plan: z.enum(['basic', 'premium']),
   business_name: z.string().min(1).max(100),
   phone: z.string().max(20).optional().nullable(),
   email: z.string().email().optional().nullable(),

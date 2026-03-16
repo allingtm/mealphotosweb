@@ -1,20 +1,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export function isBusinessActive(plan: string, status: string): boolean {
-  return (plan === 'basic' || plan === 'premium') && status === 'active';
-}
-
-export function isPremium(plan: string): boolean {
-  return plan === 'premium';
+  return plan === 'business' && status === 'active';
 }
 
 export function getPostLimit(plan: string): number {
-  return plan === 'premium' ? Infinity : 20;
+  return plan === 'business' ? Infinity : 20;
 }
 
 interface SubscriptionInfo {
   active: boolean;
-  plan: 'free' | 'basic' | 'premium';
+  plan: 'free' | 'business';
   stripeCustomerId: string | null;
 }
 
@@ -34,7 +30,7 @@ export async function verifyActiveSubscription(
 
   return {
     active: true,
-    plan: profile.plan as 'basic' | 'premium',
+    plan: profile.plan as 'business',
     stripeCustomerId: profile.stripe_customer_id,
   };
 }

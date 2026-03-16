@@ -7,7 +7,7 @@ import { useAppStore } from '@/lib/store';
 interface SubscriptionState {
   loading: boolean;
   isActive: boolean;
-  tier: 'basic' | 'premium' | null;
+  tier: 'business' | null;
   status: 'active' | 'past_due' | 'cancelled' | 'inactive';
 }
 
@@ -29,7 +29,7 @@ export function useSubscription(): SubscriptionState {
     const supabase = createClient();
     supabase
       .from('profiles')
-      .select('subscription_status, subscription_tier')
+      .select('subscription_status, plan')
       .eq('id', user.id)
       .single()
       .then(({ data }) => {
@@ -37,7 +37,7 @@ export function useSubscription(): SubscriptionState {
           setState({
             loading: false,
             isActive: data.subscription_status === 'active',
-            tier: data.subscription_tier,
+            tier: data.plan === 'business' ? 'business' : null,
             status: data.subscription_status,
           });
         } else {

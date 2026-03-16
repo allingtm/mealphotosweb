@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { UtensilsCrossed, MapPin } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BUSINESS_TYPE_LABELS } from '@/types/database';
 import { formatPrice } from '@/lib/utils';
 import { timeAgo } from '@/lib/utils/timeAgo';
@@ -184,7 +183,6 @@ export function ConsumerProfile({ userId, username, avatarUrl, locationCity }: C
                       <div>
                         <div className="flex items-center gap-1">
                           <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500, color: 'var(--text-primary)' }}>{bp.business_name}</span>
-                          {profile.plan === 'premium' && <VerifiedBadge size={12} />}
                         </div>
                         <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
                           {typeLabel}{bp.address_city && ` · 📍 ${bp.address_city}`}

@@ -207,21 +207,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Enforce Basic tier 10-upload limit
-      if (profile.subscription_tier === 'basic') {
-        const { count } = await supabase
-          .from('meals')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('is_restaurant_meal', true);
-
-        if ((count ?? 0) >= 10) {
-          return NextResponse.json(
-            { error: 'Basic plan is limited to 10 dish uploads. Upgrade to Premium for unlimited uploads.' },
-            { status: 403 }
-          );
-        }
-      }
     }
 
     // 8. Upload all images to Cloudflare Images in parallel

@@ -7,7 +7,6 @@ import { Search, X, TrendingUp, UtensilsCrossed, Loader2 } from 'lucide-react';
 import posthog from 'posthog-js';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BUSINESS_TYPE_LABELS } from '@/types/database';
 import { formatPrice } from '@/lib/utils';
 import cloudflareLoader from '@/lib/cloudflare-loader';
@@ -275,7 +274,6 @@ export function SearchClient() {
                             <div>
                               <div className="flex items-center gap-1">
                                 <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500, color: 'var(--text-primary)' }}>{biz.business_name}</span>
-                                {profile.plan === 'premium' && <VerifiedBadge size={12} />}
                               </div>
                               <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
                                 {BUSINESS_TYPE_LABELS[biz.business_type as keyof typeof BUSINESS_TYPE_LABELS] ?? biz.business_type}

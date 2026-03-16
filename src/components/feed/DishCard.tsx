@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { UtensilsCrossed, MapPin } from 'lucide-react';
 import type { FeedItem } from '@/types/database';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { ReactionButton } from './ReactionButton';
 import { SaveButton } from './SaveButton';
 import { ShareButton } from './ShareButton';
@@ -92,7 +91,6 @@ export function DishCard({ dish }: DishCardProps) {
           >
             {dish.business_name}
           </Link>
-          {dish.plan === 'premium' && <VerifiedBadge size={14} />}
           <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>·</span>
           <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
             {timeAgo(dish.created_at)}

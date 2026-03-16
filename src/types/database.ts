@@ -133,7 +133,7 @@ export interface Profile {
   location_city: string | null;
   location_country: string | null;
   is_business: boolean;
-  plan: 'free' | 'basic' | 'premium';
+  plan: 'free' | 'business';
   stripe_customer_id: string | null;
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   subscription_id: string | null;
@@ -330,7 +330,7 @@ export interface FeedItem {
   business_type: BusinessType;
   avatar_url: string | null;
   address_city: string | null;
-  plan: 'free' | 'basic' | 'premium';
+  plan: 'free' | 'business';
   user_has_reacted: boolean;
   user_has_saved: boolean;
   is_followed: boolean;
@@ -343,7 +343,7 @@ export interface MapBusinessPin {
   business_type: BusinessType;
   avatar_url: string | null;
   address_city: string | null;
-  plan: 'free' | 'basic' | 'premium';
+  plan: 'free' | 'business';
   lng: number;
   lat: number;
   username: string;
@@ -358,7 +358,7 @@ export interface PublicProfile {
   location_city: string | null;
   location_country: string | null;
   is_business: boolean;
-  plan: 'free' | 'basic' | 'premium';
+  plan: 'free' | 'business';
   subscription_status: 'active' | 'past_due' | 'cancelled' | 'inactive';
   follower_count: number;
   created_at: string;

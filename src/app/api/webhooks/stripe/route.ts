@@ -3,14 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
-const BASIC_PRICE_ID = process.env.STRIPE_BASIC_PRICE_ID!;
-const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID!;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
-function getPlan(priceId: string): 'basic' | 'premium' {
-  if (priceId === BASIC_PRICE_ID) return 'basic';
-  return 'premium';
-}
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -36,8 +29,6 @@ export async function POST(req: Request) {
       if (!session.subscription) break;
 
       const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-      const priceId = subscription.items.data[0].price.id;
-      const plan = session.metadata?.plan as 'basic' | 'premium' ?? getPlan(priceId);
 
       // Resolve user ID
       let uid = subscription.metadata?.supabase_user_id ?? session.metadata?.supabase_user_id;
@@ -56,7 +47,7 @@ export async function POST(req: Request) {
       }
 
       await supabase.from('profiles').update({
-        plan,
+        plan: 'business',
         subscription_status: 'active',
         subscription_id: subscription.id,
         stripe_customer_id: session.customer as string,
@@ -71,11 +62,8 @@ export async function POST(req: Request) {
       const uid = subscription.metadata?.supabase_user_id;
       if (!uid) break;
 
-      const priceId = subscription.items.data[0].price.id;
-      const plan = getPlan(priceId);
-
       await supabase.from('profiles').update({
-        plan,
+        plan: 'business',
         subscription_status: subscription.status === 'active' ? 'active' : 'past_due',
       }).eq('id', uid);
 

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { BUSINESS_TYPE_LABELS } from '@/types/database';
 import type { MapBusinessPin } from '@/types/database';
 import { timeAgo } from '@/lib/utils/timeAgo';
@@ -17,8 +16,6 @@ interface PinBottomSheetProps {
 
 export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
   const typeLabel = BUSINESS_TYPE_LABELS[pin.business_type as keyof typeof BUSINESS_TYPE_LABELS] ?? pin.business_type;
-  const isPremium = pin.plan === 'premium';
-
   return (
     <Sheet open onOpenChange={(open) => { if (!open) onClose(); }}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 pt-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
@@ -56,7 +53,6 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
               >
                 {pin.business_name}
               </span>
-              {isPremium && <VerifiedBadge size={14} />}
             </div>
 
             <div className="flex items-center gap-1.5 mt-0.5">

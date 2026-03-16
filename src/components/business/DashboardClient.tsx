@@ -20,7 +20,7 @@ interface MealData {
 interface ProfileData {
   display_name: string | null;
   username: string;
-  subscription_tier: 'basic' | 'premium' | null;
+  subscription_tier: 'business' | null;
   subscription_status: string;
   is_restaurant: boolean;
   business_type: BusinessType | null;
@@ -96,7 +96,7 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
     }
   };
 
-  const tierLabel = profile.subscription_tier === 'premium' ? 'Premium' : 'Basic';
+  const tierLabel = 'Business';
   const restaurantName = profile.business_name || profile.display_name || profile.username;
   const businessTypeLabel = profile.business_type
     ? BUSINESS_TYPE_LABELS[profile.business_type]
@@ -155,14 +155,8 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
             className="rounded-full"
             style={{
               padding: '2px 10px',
-              backgroundColor:
-                profile.subscription_tier === 'premium'
-                  ? 'var(--accent-primary)'
-                  : 'var(--bg-elevated)',
-              color:
-                profile.subscription_tier === 'premium'
-                  ? '#121212'
-                  : 'var(--text-primary)',
+              backgroundColor: 'var(--accent-primary)',
+              color: '#121212',
               fontFamily: 'var(--font-body)',
               fontSize: 12,
               fontWeight: 600,
@@ -515,7 +509,7 @@ export function DashboardClient({ profile, meals: initialMeals, showWelcome }: D
                   color: 'var(--text-secondary)',
                 }}
               >
-                £{profile.subscription_tier === 'premium' ? '79' : '29'}/month
+                £49.95/month
               </p>
             </div>
           </div>
