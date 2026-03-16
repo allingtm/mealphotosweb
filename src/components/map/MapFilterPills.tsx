@@ -1,10 +1,13 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
+import type { BusinessType, BusinessTypeGroup } from '@/types/database';
+
+type FilterValue = BusinessType | BusinessTypeGroup | 'all';
 
 interface FilterPill {
   label: string;
-  value: string;
+  value: FilterValue;
   emoji?: string;
 }
 
