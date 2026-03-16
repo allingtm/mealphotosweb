@@ -10,10 +10,10 @@ export function VerifiedBadge({ size = 14 }: VerifiedBadgeProps) {
       title="Verified restaurant"
     >
       <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="8" fill="#E8A838" />
+        <circle cx="8" cy="8" r="8" fill="var(--accent-primary)" />
         <path
           d="M5 8L7 10L11 6"
-          stroke="#121212"
+          stroke="var(--bg-primary)"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
