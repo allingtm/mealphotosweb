@@ -83,9 +83,10 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={cn(instrumentSerif.variable, dmSans.variable, "font-sans", geist.variable)}
+      className={cn(instrumentSerif.variable, dmSans.variable, "font-sans", geist.variable, "min-h-dvh")}
     >
       <body
+        className="min-h-dvh"
         style={{
           backgroundColor: 'var(--bg-primary)',
           color: 'var(--text-primary)',

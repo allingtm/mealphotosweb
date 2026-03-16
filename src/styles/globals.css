@@ -30,8 +30,8 @@
   --radius-modal: 24px;
   --radius-full: 999px;
 
-  /* Feed card height: subtract header (48px) + bottom nav (56px) on mobile */
-  --feed-card-height: calc(100dvh - 48px - 56px);
+  /* Feed card height: subtract header (48px) + bottom nav (56px) + safe areas on mobile */
+  --feed-card-height: calc(100dvh - 48px - 56px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   --feed-max-width: 480px;
 
   /* Spacing base */

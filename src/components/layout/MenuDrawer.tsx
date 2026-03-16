@@ -85,6 +85,8 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
         className="fixed top-0 right-0 bottom-0 z-[90] flex flex-col"
         style={{
           width: 'min(320px, 85vw)',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           backgroundColor: 'var(--bg-surface)',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.3s ease-in-out',
