@@ -64,9 +64,9 @@ export function ConsumerProfile({ userId, username, avatarUrl, locationCity }: C
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full pb-24" style={{ maxWidth: 600 }}>
+      <div className="w-full pb-24" style={{ maxWidth: 768 }}>
         {/* Avatar + info */}
-        <div className="flex flex-col items-center px-4 pb-4">
+        <div className="flex flex-col items-center px-4 pt-6 pb-4">
           {avatarUrl ? (
             <Image src={avatarUrl} alt={username} width={64} height={64} className="rounded-full object-cover mb-2" loader={cloudflareLoader} />
           ) : (

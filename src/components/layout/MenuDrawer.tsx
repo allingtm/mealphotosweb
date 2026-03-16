@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { X, User, Info, Mail, Store, Shield, LogOut, AlertTriangle, Settings } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { X, User, Info, Mail, Store, Shield, LogOut, Settings, FileText, Cookie, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase/client';
-import { DangerZoneDrawer } from '@/components/layout/DangerZoneDrawer';
 
 interface MenuDrawerProps {
   isOpen: boolean;
@@ -24,12 +23,13 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const t = useTranslations('menu');
   const tFooter = useTranslations('footer');
   const tSettings = useTranslations('settings');
+  const showCookieBanner = useAppStore((s) => s.showCookieBanner);
+  const openCookiePreferences = useAppStore((s) => s.openCookiePreferences);
   const user = useAppStore((s) => s.user);
   const isAdmin = useAppStore((s) => s.isAdmin);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
   const panelRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState(false);
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -294,83 +294,114 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
                 </span>
               </button>
 
-              <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', margin: '4px 16px' }} />
-              <button
-                type="button"
-                onClick={() => setIsDangerZoneOpen(true)}
-                className="flex items-center gap-3 w-full"
-                style={{
-                  padding: '14px 16px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <AlertTriangle size={20} strokeWidth={1.5} color="var(--status-error)" />
-                <span
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 15,
-                    fontWeight: 500,
-                    color: 'var(--status-error)',
-                  }}
-                >
-                  {tSettings('dangerZone')}
-                </span>
-              </button>
             </>
           )}
         </div>
 
-        {/* Footer — legal links */}
+        {/* Legal section */}
         <div
-          className="flex flex-wrap gap-x-4 gap-y-1"
           style={{
-            padding: 16,
             borderTop: '1px solid var(--bg-elevated)',
           }}
         >
+          <h3
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              padding: '12px 16px 8px',
+              margin: 0,
+            }}
+          >
+            {tSettings('legal')}
+          </h3>
           <Link
             href="/legal/privacy"
             onClick={onClose}
+            className="flex items-center justify-between w-full"
             style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 12,
-              color: 'var(--text-secondary)',
+              padding: '12px 16px',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
             }}
           >
-            {tFooter('privacy')}
+            <div className="flex items-center gap-3">
+              <Shield size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}>
+                {tSettings('privacyPolicy')}
+              </span>
+            </div>
+            <ChevronRight size={18} strokeWidth={1.5} color="var(--text-secondary)" />
           </Link>
+          <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', marginLeft: 52 }} />
           <Link
             href="/legal/terms"
             onClick={onClose}
+            className="flex items-center justify-between w-full"
             style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 12,
-              color: 'var(--text-secondary)',
+              padding: '12px 16px',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
             }}
           >
-            {tFooter('terms')}
+            <div className="flex items-center gap-3">
+              <FileText size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}>
+                {tSettings('termsOfService')}
+              </span>
+            </div>
+            <ChevronRight size={18} strokeWidth={1.5} color="var(--text-secondary)" />
           </Link>
+          <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', marginLeft: 52 }} />
           <Link
             href="/legal/cookies"
             onClick={onClose}
+            className="flex items-center justify-between w-full"
             style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 12,
-              color: 'var(--text-secondary)',
+              padding: '12px 16px',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
             }}
           >
-            {tFooter('cookieSettings')}
+            <div className="flex items-center gap-3">
+              <Cookie size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}>
+                {tSettings('cookiePolicy')}
+              </span>
+            </div>
+            <ChevronRight size={18} strokeWidth={1.5} color="var(--text-secondary)" />
           </Link>
+          <div style={{ height: 1, backgroundColor: 'var(--bg-elevated)', marginLeft: 52 }} />
+          <button
+            type="button"
+            onClick={() => {
+              showCookieBanner();
+              openCookiePreferences();
+              onClose();
+            }}
+            className="flex items-center justify-between w-full"
+            style={{
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <Cookie size={20} strokeWidth={1.5} color="var(--text-secondary)" />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}>
+                {tSettings('cookieSettings')}
+              </span>
+            </div>
+            <ChevronRight size={18} strokeWidth={1.5} color="var(--text-secondary)" />
+          </button>
         </div>
       </div>
 
-      {/* Danger Zone bottom sheet */}
-      <DangerZoneDrawer
-        isOpen={isDangerZoneOpen}
-        onClose={() => setIsDangerZoneOpen(false)}
-      />
     </>
   );
 }

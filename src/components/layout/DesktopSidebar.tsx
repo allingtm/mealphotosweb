@@ -6,7 +6,7 @@ import { TrendingUp, Search, MapPin } from 'lucide-react';
 export function DesktopSidebar() {
   return (
     <aside
-      className="hidden lg:flex flex-col gap-6 fixed right-0 top-0 bottom-0 overflow-y-auto"
+      className="hidden lg:flex flex-col gap-6 fixed right-0 top-14 bottom-0 overflow-y-auto"
       style={{
         width: 320,
         padding: '24px 16px',
@@ -137,23 +137,6 @@ export function DesktopSidebar() {
         </Link>
       </div>
 
-      {/* Legal footer */}
-      <div
-        className="mt-auto pt-6"
-        style={{ borderTop: '1px solid var(--bg-elevated)' }}
-      >
-        <div className="flex flex-wrap gap-x-4 gap-y-1">
-          <Link href="/legal/privacy" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Privacy
-          </Link>
-          <Link href="/legal/terms" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Terms
-          </Link>
-          <Link href="/legal/cookies" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Cookies
-          </Link>
-        </div>
-      </div>
     </aside>
   );
 }

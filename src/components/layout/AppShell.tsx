@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       {/* Desktop / tablet side rail */}
       <aside
-        className="fixed left-0 top-0 bottom-0 z-50 hidden md:flex flex-col items-center gap-2 border-r py-8 overflow-y-auto"
+        className="fixed left-0 top-14 bottom-0 z-40 hidden md:flex flex-col items-center gap-2 border-r py-8 overflow-y-auto"
         style={{
           width: 72,
           backgroundColor: 'var(--bg-surface)',
@@ -131,19 +131,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </aside>
 
-      {/* Mobile top bar */}
+      {/* Global top bar */}
       <FeedHeader />
 
       {/* Main content */}
       <main
         id="main-content"
-        className="pt-[env(safe-area-inset-top,0px)] pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pt-0 md:pb-0 md:pl-18 md:h-dvh md:overflow-hidden md:flex md:flex-col lg:pr-80"
+        className="pt-[calc(56px+env(safe-area-inset-top,0px))] pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-9 md:pl-18 md:h-dvh md:overflow-hidden md:flex md:flex-col lg:pr-80"
       >
         {children}
       </main>
 
       {/* Desktop right sidebar */}
       <DesktopSidebar />
+
+      {/* Desktop full-width footer */}
+      <footer
+        className="hidden md:flex items-center justify-center gap-4 fixed bottom-0 left-0 right-0 z-30"
+        style={{
+          height: 36,
+          backgroundColor: 'var(--bg-surface)',
+          borderTop: '1px solid var(--bg-elevated)',
+        }}
+      >
+        <Link href="/legal/privacy" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          Privacy
+        </Link>
+        <Link href="/legal/terms" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          Terms
+        </Link>
+        <Link href="/legal/cookies" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+          Cookies
+        </Link>
+      </footer>
 
       {/* Mobile bottom nav */}
       <BottomNav />

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, LogOut, Shield, FileText, Cookie, Trash2, Download, CreditCard, Users, Mail } from 'lucide-react';
+import { ChevronRight, LogOut, CreditCard, Users, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { LanguagePicker } from '@/components/settings/LanguagePicker';
@@ -11,13 +11,10 @@ import { createClient } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
   const t = useTranslations('settings');
-  const tLegal = useTranslations('legal');
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const userPlan = useAppStore((s) => s.userPlan);
   const planLabel = userPlan === 'premium' ? 'Premium' : userPlan === 'basic' ? 'Basic' : 'Free';
-  const showCookieBanner = useAppStore((s) => s.showCookieBanner);
-  const openCookiePreferences = useAppStore((s) => s.openCookiePreferences);
 
   const handleSignOut = async () => {
     const supabase = createClient();
@@ -31,7 +28,6 @@ export default function SettingsPage() {
       className="w-full flex-1 min-h-0 overflow-y-auto"
       style={{
         maxWidth: 960,
-        margin: '0 auto',
         backgroundColor: 'var(--bg-primary)',
         minHeight: '100dvh',
         paddingBottom: 72,
@@ -59,54 +55,6 @@ export default function SettingsPage() {
           style={{ backgroundColor: 'var(--bg-surface)' }}
         >
           <LanguagePicker />
-        </div>
-      </section>
-
-      {/* Legal section */}
-      <section className="mb-8">
-        <h2
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: 12,
-          }}
-        >
-          {t('legal')}
-        </h2>
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ backgroundColor: 'var(--bg-surface)' }}
-        >
-          <SettingsLink
-            href="/legal/privacy"
-            icon={<Shield size={20} strokeWidth={1.5} />}
-            label={t('privacyPolicy')}
-          />
-          <SettingsDivider />
-          <SettingsLink
-            href="/legal/terms"
-            icon={<FileText size={20} strokeWidth={1.5} />}
-            label={t('termsOfService')}
-          />
-          <SettingsDivider />
-          <SettingsLink
-            href="/legal/cookies"
-            icon={<Cookie size={20} strokeWidth={1.5} />}
-            label={t('cookiePolicy')}
-          />
-          <SettingsDivider />
-          <SettingsButton
-            icon={<Cookie size={20} strokeWidth={1.5} />}
-            label={t('cookieSettings')}
-            onClick={() => {
-              showCookieBanner();
-              openCookiePreferences();
-            }}
-          />
         </div>
       </section>
 
@@ -233,38 +181,6 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          <section>
-            <h2
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'var(--status-error)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                marginBottom: 12,
-              }}
-            >
-              {t('dangerZone')}
-            </h2>
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-surface)' }}
-            >
-              <SettingsDisabled
-                icon={<Download size={20} strokeWidth={1.5} />}
-                label={t('exportData')}
-                badge={t('comingSoon')}
-              />
-              <SettingsDivider />
-              <SettingsDisabled
-                icon={<Trash2 size={20} strokeWidth={1.5} />}
-                label={t('deleteAccount')}
-                badge={t('comingSoon')}
-                danger
-              />
-            </div>
-          </section>
         </>
       ) : (
         <section>
@@ -354,55 +270,6 @@ function SettingsButton({
         style={{ color: 'var(--text-secondary)' }}
       />
     </button>
-  );
-}
-
-function SettingsDisabled({
-  icon,
-  label,
-  badge,
-  danger,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  badge: string;
-  danger?: boolean;
-}) {
-  return (
-    <div
-      className="flex items-center justify-between px-4 py-3"
-      style={{ opacity: 0.5 }}
-    >
-      <div className="flex items-center gap-3">
-        <span
-          style={{
-            color: danger ? 'var(--status-error)' : 'var(--text-secondary)',
-          }}
-        >
-          {icon}
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 15,
-            color: danger ? 'var(--status-error)' : 'var(--text-primary)',
-          }}
-        >
-          {label}
-        </span>
-      </div>
-      <span
-        className="rounded-full px-2 py-0.5"
-        style={{
-          fontFamily: 'var(--font-body)',
-          fontSize: 11,
-          color: 'var(--text-secondary)',
-          backgroundColor: 'var(--bg-elevated)',
-        }}
-      >
-        {badge}
-      </span>
-    </div>
   );
 }
 

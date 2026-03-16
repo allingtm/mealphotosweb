@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
-import type { BusinessTypeGroup } from '@/types/database';
+import type { BusinessType, BusinessTypeGroup } from '@/types/database';
 
 export type FeedTab = 'following' | 'nearby' | 'trending';
 
@@ -27,10 +27,10 @@ interface AppState {
   setFeedTab: (tab: FeedTab) => void;
 
   // Map
-  mapTypeFilter: BusinessTypeGroup | 'all';
+  mapTypeFilter: BusinessType | BusinessTypeGroup | 'all';
   mapCenter: [number, number] | null;
   mapZoom: number | null;
-  setMapTypeFilter: (filter: BusinessTypeGroup | 'all') => void;
+  setMapTypeFilter: (filter: BusinessType | BusinessTypeGroup | 'all') => void;
   setMapPosition: (center: [number, number], zoom: number) => void;
 
   // Cookie consent

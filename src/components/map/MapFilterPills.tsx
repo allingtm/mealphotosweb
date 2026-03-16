@@ -1,21 +1,20 @@
 'use client';
 
 import { useAppStore } from '@/lib/store';
-import type { BusinessTypeGroup } from '@/types/database';
 
 interface FilterPill {
   label: string;
-  value: BusinessTypeGroup | 'all';
+  value: string;
   emoji?: string;
 }
 
 const FILTER_PILLS: FilterPill[] = [
   { label: 'All', value: 'all' },
-  { label: 'Restaurants', value: 'food_service', emoji: '🍽' },
-  { label: 'Cafés', value: 'food_service', emoji: '☕' },
-  { label: 'Takeaways', value: 'food_service', emoji: '🍕' },
-  { label: 'Pubs', value: 'food_service', emoji: '🍺' },
-  { label: 'Bakeries', value: 'production', emoji: '🥐' },
+  { label: 'Restaurants', value: 'restaurant', emoji: '🍽' },
+  { label: 'Cafés', value: 'cafe', emoji: '☕' },
+  { label: 'Takeaways', value: 'takeaway', emoji: '🍕' },
+  { label: 'Pubs', value: 'pub', emoji: '🍺' },
+  { label: 'Bakeries', value: 'bakery', emoji: '🥐' },
   { label: 'Chefs', value: 'chefs_experiences', emoji: '🧑‍🍳' },
   { label: 'Nutrition', value: 'health_nutrition', emoji: '🥗' },
   { label: 'Shops', value: 'shops_retail', emoji: '🛒' },

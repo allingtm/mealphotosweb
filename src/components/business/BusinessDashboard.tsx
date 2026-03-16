@@ -57,7 +57,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full px-4 pb-24" style={{ maxWidth: 600 }}>
+      <div className="w-full px-4 pb-24" style={{ maxWidth: 768 }}>
         {/* Post a Dish CTA */}
         <Link
           href="/post"

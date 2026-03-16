@@ -49,6 +49,7 @@ export default function MapView() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const filterRef = useRef<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<MapBusinessPin | null>(null);
   const mapTypeFilter = useAppStore((s) => s.mapTypeFilter);
   const mapCenter = useAppStore((s) => s.mapCenter);
@@ -179,7 +180,7 @@ export default function MapView() {
     map.on('moveend', () => {
       const center = map.getCenter();
       setMapPosition([center.lng, center.lat], map.getZoom());
-      debouncedFetch(map);
+      debouncedFetch(map, filterRef.current);
     });
 
     mapRef.current = map;
@@ -201,11 +202,10 @@ export default function MapView() {
 
   // Re-fetch on filter change
   useEffect(() => {
+    const filter = mapTypeFilter === 'all' ? null : mapTypeFilter;
+    filterRef.current = filter;
     if (!mapRef.current) return;
-    fetchPins(mapRef.current, mapTypeFilter === 'all' ? undefined : undefined);
-    // Note: type_filter in the API is a single business_type, not a group.
-    // For group filtering, we'd need to expand. For now, fetch all and let
-    // the RPC handle it (or pass null for "all").
+    fetchPins(mapRef.current, filter);
   }, [mapTypeFilter, fetchPins]);
 
   return (

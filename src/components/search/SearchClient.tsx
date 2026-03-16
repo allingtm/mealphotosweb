@@ -109,26 +109,28 @@ export function SearchClient() {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full px-4 pb-24" style={{ maxWidth: 600 }}>
+      <div className="w-full px-4 pb-24" style={{ maxWidth: 768 }}>
         {/* Search input */}
-        <div className="relative py-4">
-          <Search size={18} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 mt-2" style={{ color: 'var(--text-secondary)' }} />
+        <div className="py-4">
+          <div className="relative">
+          <Search size={18} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-secondary)' }} />
           <Input
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="Search dishes, cuisines, places"
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 focus-visible:ring-0 focus-visible:border-input"
           />
           {query && (
             <button
               type="button"
               onClick={() => { setQuery(''); setHasSearched(false); setDishes([]); setBusinesses([]); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 mt-2"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
               style={{ color: 'var(--text-secondary)' }}
             >
               <X size={18} strokeWidth={1.5} />
             </button>
           )}
+          </div>
         </div>
 
         {/* Searching indicator */}
