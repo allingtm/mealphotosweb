@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Instrument_Serif, DM_Sans } from 'next/font/google';
+import { Instrument_Serif, DM_Sans, Geist } from 'next/font/google';
 import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
@@ -12,6 +12,9 @@ import { ToastContainer } from '@/components/ui/Toast';
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
 import { WaitlistModal } from '@/components/layout/WaitlistModal';
 import '@/styles/globals.css';
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const instrumentSerif = Instrument_Serif({
   weight: '400',
@@ -77,7 +80,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${instrumentSerif.variable} ${dmSans.variable}`}
+      className={cn(instrumentSerif.variable, dmSans.variable, "font-sans", geist.variable)}
     >
       <body
         style={{
