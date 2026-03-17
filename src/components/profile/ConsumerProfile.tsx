@@ -63,7 +63,7 @@ export function ConsumerProfile({ userId, username, avatarUrl, locationCity }: C
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="w-full pb-24" style={{ maxWidth: 768 }}>
+      <div className="w-full pb-24 max-w-3xl md:max-w-none">
         {/* Avatar + info */}
         <div className="flex flex-col items-center px-4 pt-6 pb-4">
           {avatarUrl ? (

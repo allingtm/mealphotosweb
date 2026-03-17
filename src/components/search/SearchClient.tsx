@@ -238,7 +238,7 @@ export function SearchClient() {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="w-full px-4 pb-24" style={{ maxWidth: 768 }}>
+      <div className="w-full px-4 pb-24 max-w-3xl md:max-w-none">
         {/* Search input */}
         <div className="py-4">
           <div className="relative">

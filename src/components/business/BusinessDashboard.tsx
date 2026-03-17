@@ -153,7 +153,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
         </div>
       )}
 
-      <div className="w-full px-4 pb-24" style={{ maxWidth: 768 }}>
+      <div className="w-full px-4 pb-24 max-w-3xl md:max-w-none">
         {/* Post a Dish CTA */}
         <Link
           href="/post"

@@ -94,8 +94,7 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
       <FeedTabBar />
 
       <div
-        className="flex-1 overflow-y-auto px-4"
-        style={{ maxWidth: 'var(--feed-max-width)', width: '100%' }}
+        className="flex-1 overflow-y-auto px-4 w-full max-w-(--feed-max-width) md:max-w-none"
       >
         {initialLoading ? (
           <div className="flex flex-col gap-8 pt-4">

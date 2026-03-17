@@ -25,6 +25,12 @@
   /* Gradient */
   --gradient-overlay: linear-gradient(to bottom, rgba(18, 18, 18, 0), rgba(18, 18, 18, 0.95));
 
+  /* Layout */
+  --layout-max-width: 1280px;
+  --left-rail-width: 72px;
+  --right-sidebar-width: 320px;
+  --layout-gap: 24px;
+
   /* Border radius */
   --radius-card: 16px;
   --radius-modal: 24px;

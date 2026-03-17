@@ -45,7 +45,7 @@ export function BusinessProfileClient({ profile, dishes, menuSections, isFollowi
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full pb-24" style={{ maxWidth: 600 }}>
+      <div className="mx-auto w-full pb-24 max-w-xl md:max-w-none">
         <BusinessProfileHeader
           profile={profile}
           businessProfile={bp}

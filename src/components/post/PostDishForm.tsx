@@ -112,7 +112,7 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full px-4 pb-24" style={{ maxWidth: 500 }}>
+      <div className="mx-auto w-full px-4 pb-24 max-w-lg md:max-w-none">
         {/* Header */}
         <div className="flex items-center justify-between py-4">
           <button type="button" onClick={() => router.back()} style={{ color: 'var(--text-secondary)' }}>

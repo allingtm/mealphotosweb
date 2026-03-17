@@ -6,9 +6,8 @@ import { TrendingUp, Search, MapPin } from 'lucide-react';
 export function DesktopSidebar() {
   return (
     <aside
-      className="hidden lg:flex flex-col gap-6 fixed right-0 top-14 bottom-0 overflow-y-auto"
+      className="flex flex-col gap-6 overflow-y-auto h-full"
       style={{
-        width: 320,
         padding: '24px 16px',
         borderLeft: '1px solid var(--bg-elevated)',
         backgroundColor: 'var(--bg-primary)',

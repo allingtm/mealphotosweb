@@ -306,7 +306,7 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full px-4 pb-24" style={{ maxWidth: 600 }}>
+      <div className="mx-auto w-full px-4 pb-24 max-w-xl md:max-w-none">
         {/* Header */}
         <div className="flex items-center gap-3 py-4">
           <BackButton />

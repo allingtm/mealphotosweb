@@ -50,7 +50,7 @@ export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }:
   const profile = dish.profiles;
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="mx-auto w-full pb-24" style={{ maxWidth: 600 }}>
+      <div className="mx-auto w-full pb-24 max-w-xl md:max-w-none">
         {/* Header bar — Back + Share */}
         <div className="flex items-center justify-between px-4 py-3">
           <BackButton />
