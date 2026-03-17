@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Compass, Search, User } from 'lucide-react';
+import { Home, Compass, Search, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -8,7 +8,7 @@ const tabs = [
   { href: '/', icon: Home, label: 'Feed' },
   { href: '/map', icon: Compass, label: 'Map' },
   { href: '/search', icon: Search, label: 'Search' },
-  { href: '/me', icon: User, label: 'Me' },
+  { href: '/blog', icon: BookOpen, label: 'Blog' },
 ] as const;
 
 export function BottomNav() {

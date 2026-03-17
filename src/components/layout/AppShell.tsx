@@ -1,6 +1,6 @@
 'use client';
 
-import { UtensilsCrossed, Globe, Search, User, PlusCircle, Shield } from 'lucide-react';
+import { UtensilsCrossed, Globe, Search, BookOpen, User, PlusCircle, Shield } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,6 +14,7 @@ const navItems = [
   { href: '/', icon: UtensilsCrossed, label: 'Feed' },
   { href: '/map', icon: Globe, label: 'Map' },
   { href: '/search', icon: Search, label: 'Search' },
+  { href: '/blog', icon: BookOpen, label: 'Blog' },
   { href: '/me', icon: User, label: 'Me' },
 ] as const;
 

@@ -14,8 +14,8 @@ export function FeedHeader() {
       <header
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:pl-22 lg:pr-84"
         style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          height: 56,
+          paddingTop: 'calc(env(safe-area-inset-top, 0px) + 4px)',
+          height: 'calc(56px + env(safe-area-inset-top, 0px))',
           backgroundColor: 'var(--bg-primary)',
           borderBottom: '1px solid var(--bg-elevated)',
         }}
