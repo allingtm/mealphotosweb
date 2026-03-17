@@ -318,11 +318,9 @@ export default function MapView() {
   }, [mapTypeFilter, fetchPins]);
 
   return (
-    <div className="relative flex-1 flex flex-col">
-      <div className="absolute top-0 left-0 right-0 z-10">
-        <MapFilterPills />
-      </div>
-      <div ref={mapContainer} className="flex-1" />
+    <div className="relative flex-1 flex flex-col min-h-0 min-w-0">
+      <MapFilterPills />
+      <div ref={mapContainer} className="flex-1 min-h-0 md:rounded-2xl md:overflow-hidden" />
       {selectedPin && (
         <PinBottomSheet pin={selectedPin} onClose={() => setSelectedPin(null)} />
       )}
