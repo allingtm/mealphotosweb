@@ -68,7 +68,7 @@ export function InviteCodesTab() {
           code: newCode,
           label: newLabel || undefined,
           max_uses: parseInt(newMaxUses, 10) || 1,
-          expires_at: newExpiry || undefined,
+          expires_at: newExpiry ? new Date(newExpiry).toISOString() : undefined,
         }),
       });
       if (res.ok) {
