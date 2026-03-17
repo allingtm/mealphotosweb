@@ -61,3 +61,6 @@ export { adminMemberSearchSchema, adminMemberUpdateSchema, adminMealUpdateSchema
 // Contact
 export { contactSubmissionSchema, adminContactQuerySchema, adminContactUpdateSchema } from './contact';
 export type { ContactSubmissionInput } from './contact';
+
+// Invite codes
+export { validateInviteCodeSchema, createInviteCodeSchema, updateInviteCodeSchema } from './invite-code';

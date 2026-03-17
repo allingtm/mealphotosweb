@@ -56,6 +56,12 @@ export const ANALYTICS_EVENTS = {
   DISCOVER_BUSINESS_TAPPED: 'discover_business_tapped',
   MAP_FILTER_CHANGED: 'map_filter_changed',
 
+  // Invite codes
+  INVITE_CODE_VALIDATED: 'invite_code_validated',
+  INVITE_CODE_REDEEMED: 'invite_code_redeemed',
+  INVITE_CODE_INVALID: 'invite_code_invalid',
+  INVITE_CODE_CREATED: 'invite_code_created',
+
   // Comments
   COMMENT_POSTED: 'comment_posted',
   COMMENT_DELETED: 'comment_deleted',

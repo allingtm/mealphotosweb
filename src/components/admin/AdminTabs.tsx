@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { showToast } from '@/components/ui/Toast';
 import { MembersTab } from './MembersTab';
 import { ContactTab } from './ContactTab';
+import { InviteCodesTab } from './InviteCodesTab';
 
 interface ModerationItem {
   id: string;
@@ -72,12 +73,14 @@ interface AdminTabsProps {
     urgentReports: number;
     members: number;
     contact: number;
+    inviteCodes: number;
   };
 }
 
 const TABS = [
   { key: 'overview', label: 'Overview' },
   { key: 'members', label: 'Members' },
+  { key: 'invites', label: 'Invite Codes' },
   { key: 'moderation', label: 'Moderation' },
   { key: 'reports', label: 'Reports' },
   { key: 'disputes', label: 'Disputes' },
@@ -214,6 +217,7 @@ export function AdminTabs({
               <StatCard label="Urgent Reports" value={counts.urgentReports} color="var(--status-error)" />
               <StatCard label="Pending Disputes" value={counts.disputes} />
               <StatCard label="Total Members" value={counts.members} />
+              <StatCard label="Active Invite Codes" value={counts.inviteCodes} />
               <StatCard label="New Contact" value={counts.contact} />
             </div>
           </div>
@@ -221,6 +225,9 @@ export function AdminTabs({
 
         {/* Members tab */}
         {activeTab === 'members' && <MembersTab />}
+
+        {/* Invite Codes tab */}
+        {activeTab === 'invites' && <InviteCodesTab />}
 
         {/* Moderation tab */}
         {activeTab === 'moderation' && (

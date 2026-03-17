@@ -25,6 +25,7 @@ export function AuthModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +38,7 @@ export function AuthModal() {
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      setInviteCode('');
       setShowPassword(false);
       setLoading(false);
       setError(null);
@@ -89,22 +91,53 @@ export function AuthModal() {
   const handleOAuth = useCallback(async (provider: 'google' | 'apple') => {
     setLoading(true);
     setError(null);
+
+    // Validate invite code before OAuth redirect in signup mode
+    if (mode === 'signup') {
+      if (!inviteCode.trim()) {
+        setError(t('inviteCodeRequired'));
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/validate-invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: inviteCode.trim() }),
+        });
+        const data = await res.json();
+        if (!data.valid) {
+          setError(t('inviteCodeInvalid'));
+          setLoading(false);
+          return;
+        }
+        sessionStorage.setItem('mp_invite_code', inviteCode.trim().toUpperCase());
+      } catch {
+        setError(t('authError'));
+        setLoading(false);
+        return;
+      }
+    }
+
     const supabase = createClient();
+    const redirectTo = mode === 'signup'
+      ? `${window.location.origin}/auth/callback?invite_code=${encodeURIComponent(inviteCode.trim().toUpperCase())}`
+      : `${window.location.origin}/auth/callback`;
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo },
     });
     if (oauthError) {
       setError(oauthError.message);
       setLoading(false);
     }
-  }, []);
+  }, [mode, inviteCode, t]);
 
   const handleSignUp = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const result = signUpSchema.safeParse({ email: email.trim(), password, confirmPassword });
+    const result = signUpSchema.safeParse({ email: email.trim(), password, confirmPassword, inviteCode: inviteCode.trim() });
     if (!result.success) {
       setError(result.error.issues[0].message);
       return;
@@ -112,6 +145,19 @@ export function AuthModal() {
 
     setLoading(true);
     try {
+      // Validate invite code before creating account
+      const validateRes = await fetch('/api/auth/validate-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: inviteCode.trim() }),
+      });
+      const validateData = await validateRes.json();
+      if (!validateData.valid) {
+        setError(t('inviteCodeInvalid'));
+        setLoading(false);
+        return;
+      }
+
       const supabase = createClient();
       const { data, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
@@ -128,6 +174,8 @@ export function AuthModal() {
       } else if (data.user && data.user.identities?.length === 0) {
         setError(t('emailAlreadyRegistered'));
       } else {
+        // Store invite code for redemption after email confirmation
+        sessionStorage.setItem('mp_invite_code', inviteCode.trim().toUpperCase());
         setView('confirmEmail');
       }
     } catch {
@@ -135,7 +183,7 @@ export function AuthModal() {
     } finally {
       setLoading(false);
     }
-  }, [email, password, confirmPassword, t]);
+  }, [email, password, confirmPassword, inviteCode, t]);
 
   const handleSignIn = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -317,6 +365,28 @@ export function AuthModal() {
               </div>
             )}
 
+            {/* Invite code field shown above OAuth buttons in signup mode */}
+            {mode === 'signup' && (
+              <div className="mb-4">
+                <label htmlFor="auth-invite-code-top" className="mb-1 block" style={{ fontSize: 14, fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+                  {t('inviteCodeLabel')}
+                </label>
+                <input
+                  id="auth-invite-code-top"
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  placeholder={t('inviteCodePlaceholder')}
+                  required
+                  disabled={loading}
+                  autoComplete="off"
+                  maxLength={20}
+                  className="w-full rounded-xl border px-4 outline-none transition-colors focus:border-(--accent-primary)"
+                  style={inputStyle}
+                />
+              </div>
+            )}
+
             {/* Google OAuth */}
             <button
               type="button"
@@ -414,6 +484,7 @@ export function AuthModal() {
                     className="mb-3 w-full rounded-xl border px-4 outline-none transition-colors focus:border-(--accent-primary)"
                     style={inputStyle}
                   />
+
                 </>
               )}
 

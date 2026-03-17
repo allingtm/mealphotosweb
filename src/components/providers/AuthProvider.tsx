@@ -56,6 +56,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               : 'email';
 
         posthog.capture(ANALYTICS_EVENTS.AUTH_COMPLETED, { method });
+
+        // Redeem invite code stored during signup
+        const pendingCode = sessionStorage.getItem('mp_invite_code');
+        if (pendingCode) {
+          fetch('/api/auth/redeem-invite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: pendingCode }),
+          })
+            .then((res) => {
+              if (res.ok) {
+                sessionStorage.removeItem('mp_invite_code');
+                posthog.capture(ANALYTICS_EVENTS.INVITE_CODE_REDEEMED, { method });
+              }
+            })
+            .catch(() => {});
+        }
       }
 
       if (event === 'SIGNED_OUT') {
