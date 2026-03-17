@@ -685,6 +685,28 @@
     "discoverDesc": "Find restaurants, nutritionists, and food professionals near you.",
     "browseBusiness": "Browse businesses"
   },
+  "mePage": {
+    "heroTitle": "Discover what's cooking",
+    "heroSubtitle": "Join meal.photos to explore real food from local businesses.",
+    "businessTitle": "For Businesses",
+    "businessSubtitle": "Get your dishes in front of hungry locals.",
+    "businessFeature1": "Business profile & map pin",
+    "businessFeature2": "Unlimited dish posts",
+    "businessFeature3": "Analytics dashboard",
+    "businessFeature4": "Menu digitisation with AI",
+    "businessPrice": "From £49.95/month",
+    "businessCTA": "Get Started",
+    "consumerTitle": "For Food Lovers",
+    "consumerSubtitle": "Your free pass to the local food scene.",
+    "consumerFeature1": "Browse real dish photos",
+    "consumerFeature2": "Save your favourites",
+    "consumerFeature3": "Follow local businesses",
+    "consumerFeature4": "React to dishes you love",
+    "consumerPrice": "Free forever",
+    "consumerCTA": "Sign Up Free",
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
   "errors": {
     "somethingWentWrong": "Something went wrong",
     "unexpectedError": "An unexpected error occurred. Please try again.",

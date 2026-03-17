@@ -402,3 +402,31 @@ export interface ContactSubmission {
   created_at: string;
   updated_at: string;
 }
+
+export interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  og_image_id: string | null;
+  og_image_url: string | null;
+  featured: boolean;
+  published: boolean;
+  author_id: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+  // Joined fields
+  tags?: BlogTag[];
+  author?: { display_name: string | null; username: string };
+}

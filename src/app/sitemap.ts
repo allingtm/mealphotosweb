@@ -38,5 +38,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   })) ?? [];
 
-  return [...staticPages, ...businessPages, ...dishPages];
+  // Blog posts
+  const { data: blogPosts } = await supabase
+    .from('blog_posts')
+    .select('slug, updated_at')
+    .eq('published', true)
+    .order('published_at', { ascending: false });
+
+  const blogPages: MetadataRoute.Sitemap = [
+    {
+      url: 'https://meal.photos/blog',
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    ...(blogPosts ?? []).map((p) => ({
+      url: `https://meal.photos/blog/${p.slug}`,
+      lastModified: p.updated_at,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+  ];
+
+  // Blog tag pages
+  const { data: blogTags } = await supabase
+    .from('blog_tags')
+    .select('slug');
+
+  const blogTagPages: MetadataRoute.Sitemap = (blogTags ?? []).map((t) => ({
+    url: `https://meal.photos/blog/tag/${t.slug}`,
+    changeFrequency: 'weekly' as const,
+    priority: 0.4,
+  }));
+
+  return [...staticPages, ...businessPages, ...dishPages, ...blogPages, ...blogTagPages];
 }

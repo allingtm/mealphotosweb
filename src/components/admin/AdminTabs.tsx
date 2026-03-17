@@ -7,6 +7,7 @@ import { showToast } from '@/components/ui/Toast';
 import { MembersTab } from './MembersTab';
 import { ContactTab } from './ContactTab';
 import { InviteCodesTab } from './InviteCodesTab';
+import { BlogTab } from './BlogTab';
 
 interface ModerationItem {
   id: string;
@@ -74,6 +75,7 @@ interface AdminTabsProps {
     members: number;
     contact: number;
     inviteCodes: number;
+    blogPosts: number;
   };
 }
 
@@ -85,6 +87,7 @@ const TABS = [
   { key: 'reports', label: 'Reports' },
   { key: 'disputes', label: 'Disputes' },
   { key: 'contact', label: 'Contact' },
+  { key: 'blog', label: 'Blog' },
 ] as const;
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -219,6 +222,7 @@ export function AdminTabs({
               <StatCard label="Total Members" value={counts.members} />
               <StatCard label="Active Invite Codes" value={counts.inviteCodes} />
               <StatCard label="New Contact" value={counts.contact} />
+              <StatCard label="Blog Posts" value={counts.blogPosts} />
             </div>
           </div>
         )}
@@ -475,6 +479,9 @@ export function AdminTabs({
 
         {/* Contact tab */}
         {activeTab === 'contact' && <ContactTab />}
+
+        {/* Blog tab */}
+        {activeTab === 'blog' && <BlogTab />}
       </div>
     </div>
   );

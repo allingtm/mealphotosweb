@@ -613,6 +613,28 @@
     "discoverDesc": "Finde Restaurants, Ernährungsberater und Gastronomieprofis in deiner Nähe.",
     "browseBusiness": "Betriebe durchsuchen"
   },
+  "mePage": {
+    "heroTitle": "Entdecke, was gekocht wird",
+    "heroSubtitle": "Tritt meal.photos bei und entdecke echtes Essen von lokalen Betrieben.",
+    "businessTitle": "Für Betriebe",
+    "businessSubtitle": "Präsentiere deine Gerichte hungrigen Gästen in der Nähe.",
+    "businessFeature1": "Geschäftsprofil & Kartenpin",
+    "businessFeature2": "Unbegrenzte Gerichte posten",
+    "businessFeature3": "Analyse-Dashboard",
+    "businessFeature4": "Menü-Digitalisierung mit KI",
+    "businessPrice": "Ab £49,95/Monat",
+    "businessCTA": "Jetzt starten",
+    "consumerTitle": "Für Feinschmecker",
+    "consumerSubtitle": "Dein kostenloser Zugang zur lokalen Food-Szene.",
+    "consumerFeature1": "Echte Fotos von Gerichten durchstöbern",
+    "consumerFeature2": "Favoriten speichern",
+    "consumerFeature3": "Lokalen Betrieben folgen",
+    "consumerFeature4": "Auf Gerichte reagieren, die du liebst",
+    "consumerPrice": "Für immer kostenlos",
+    "consumerCTA": "Kostenlos registrieren",
+    "alreadyHaveAccount": "Bereits ein Konto?",
+    "signIn": "Anmelden"
+  },
   "errors": {
     "somethingWentWrong": "Etwas ist schiefgelaufen",
     "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",

@@ -613,6 +613,28 @@
     "discoverDesc": "Trouvez des restaurants, nutritionnistes et professionnels de la cuisine près de chez vous.",
     "browseBusiness": "Parcourir les établissements"
   },
+  "mePage": {
+    "heroTitle": "Découvrez ce qui se cuisine",
+    "heroSubtitle": "Rejoignez meal.photos pour explorer la vraie cuisine des commerces locaux.",
+    "businessTitle": "Pour les Professionnels",
+    "businessSubtitle": "Montrez vos plats aux gourmands de votre quartier.",
+    "businessFeature1": "Profil professionnel & épingle sur la carte",
+    "businessFeature2": "Publications de plats illimitées",
+    "businessFeature3": "Tableau de bord analytique",
+    "businessFeature4": "Numérisation du menu par IA",
+    "businessPrice": "À partir de £49,95/mois",
+    "businessCTA": "Commencer",
+    "consumerTitle": "Pour les Gourmands",
+    "consumerSubtitle": "Votre accès gratuit à la scène culinaire locale.",
+    "consumerFeature1": "Parcourez de vraies photos de plats",
+    "consumerFeature2": "Enregistrez vos favoris",
+    "consumerFeature3": "Suivez les commerces locaux",
+    "consumerFeature4": "Réagissez aux plats que vous adorez",
+    "consumerPrice": "Gratuit pour toujours",
+    "consumerCTA": "Inscription gratuite",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "signIn": "Se connecter"
+  },
   "errors": {
     "somethingWentWrong": "Une erreur est survenue",
     "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer.",

@@ -17,6 +17,7 @@ export function AuthModal() {
   const tCommon = useTranslations('common');
   const tFooter = useTranslations('footer');
   const isOpen = useAppStore((s) => s.isAuthModalOpen);
+  const authModalMode = useAppStore((s) => s.authModalMode);
   const closeModal = useAppStore((s) => s.closeAuthModal);
   const router = useRouter();
 
@@ -33,7 +34,7 @@ export function AuthModal() {
 
   useEffect(() => {
     if (isOpen) {
-      setMode('signin');
+      setMode(authModalMode);
       setView('form');
       setEmail('');
       setPassword('');
@@ -387,38 +388,9 @@ export function AuthModal() {
               </div>
             )}
 
-            {/* Google OAuth */}
-            <button
-              type="button"
-              onClick={() => handleOAuth('google')}
-              disabled={loading}
-              className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
-              style={{ height: 48, backgroundColor: '#FFFFFF', color: '#1F1F1F', fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}
-            >
-              <GoogleIcon />
-              {t('continueWithGoogle')}
-            </button>
-
-            {/* Apple OAuth */}
-            <button
-              type="button"
-              onClick={() => handleOAuth('apple')}
-              disabled={loading}
-              className="mb-4 flex w-full items-center justify-center gap-3 rounded-xl transition-opacity disabled:opacity-50"
-              style={{ height: 48, backgroundColor: '#000000', color: '#FFFFFF', fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 500 }}
-            >
-              <AppleIcon />
-              {t('continueWithApple')}
-            </button>
-
-            {/* Divider */}
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
-              <span style={{ color: 'var(--text-secondary)', fontSize: 14, fontFamily: 'var(--font-body)' }}>
-                {tCommon('or')}
-              </span>
-              <div className="flex-1" style={{ height: 1, backgroundColor: 'var(--bg-elevated)' }} />
-            </div>
+            {/* Google OAuth - hidden for now */}
+            {/* Apple OAuth - hidden for now */}
+            {/* Divider - hidden while OAuth buttons are hidden */}
 
             {/* Email/password form */}
             <form onSubmit={mode === 'signup' ? handleSignUp : handleSignIn} autoComplete="on">

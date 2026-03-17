@@ -8,8 +8,9 @@ interface AppState {
   // Auth
   user: User | null;
   isAuthModalOpen: boolean;
+  authModalMode: 'signup' | 'signin';
   setUser: (user: User | null) => void;
-  openAuthModal: () => void;
+  openAuthModal: (mode?: 'signup' | 'signin') => void;
   closeAuthModal: () => void;
 
   // User profile state
@@ -45,8 +46,9 @@ interface AppState {
 export const useAppStore = create<AppState>((set) => ({
   user: null,
   isAuthModalOpen: false,
+  authModalMode: 'signin',
   setUser: (user) => set({ user }),
-  openAuthModal: () => set({ isAuthModalOpen: true }),
+  openAuthModal: (mode) => set({ isAuthModalOpen: true, authModalMode: mode ?? 'signin' }),
   closeAuthModal: () => set({ isAuthModalOpen: false }),
 
   isBusiness: false,
