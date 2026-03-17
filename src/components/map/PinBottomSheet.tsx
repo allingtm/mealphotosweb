@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { BUSINESS_TYPE_LABELS } from '@/types/database';
-import type { MapBusinessPin } from '@/types/database';
+import { BUSINESS_TYPE_LABELS, TYPE_GROUP_COLORS, getBusinessTypeGroup } from '@/types/database';
+import type { MapBusinessPin, BusinessType } from '@/types/database';
 import { timeAgo } from '@/lib/utils/timeAgo';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 
@@ -16,6 +16,10 @@ interface PinBottomSheetProps {
 
 export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
   const typeLabel = BUSINESS_TYPE_LABELS[pin.business_type as keyof typeof BUSINESS_TYPE_LABELS] ?? pin.business_type;
+  const categories = pin.business_categories ?? [pin.business_type];
+  const premiseUrl = pin.country_slug && pin.region_slug && pin.city_slug && pin.premise_slug
+    ? `/${pin.country_slug}/${pin.region_slug}/${pin.city_slug}/${pin.premise_slug}`
+    : `/business/${pin.username}`;
   return (
     <Sheet open onOpenChange={(open) => { if (!open) onClose(); }}>
       <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 pt-4" style={{ backgroundColor: 'var(--bg-surface)' }}>
@@ -55,10 +59,19 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>
-                {typeLabel}
-              </span>
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {categories.slice(0, 3).map((cat) => {
+                const group = getBusinessTypeGroup(cat as BusinessType);
+                const color = TYPE_GROUP_COLORS[group];
+                return (
+                  <span key={cat} className="rounded-full px-2 py-0.5" style={{ fontSize: 11, fontFamily: 'var(--font-body)', fontWeight: 600, backgroundColor: `${color}20`, color }}>
+                    {BUSINESS_TYPE_LABELS[cat as keyof typeof BUSINESS_TYPE_LABELS] ?? cat}
+                  </span>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-1.5 mt-1">
               {pin.address_city && (
                 <>
                   <span style={{ color: 'var(--text-secondary)' }}>·</span>
@@ -77,7 +90,7 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
         </div>
 
         <Link
-          href={`/business/${pin.username}`}
+          href={premiseUrl}
           onClick={onClose}
           className="flex items-center justify-between mt-4 px-4 py-3 rounded-xl transition-colors"
           style={{ backgroundColor: 'var(--bg-elevated)', textDecoration: 'none' }}

@@ -41,8 +41,10 @@ export {
   businessProfileCreateSchema,
   businessProfileUpdateSchema,
   businessOnboardSchema,
+  premiseCreateSchema,
+  premiseUpdateSchema,
 } from './business';
-export type { BusinessProfileCreateInput, BusinessOnboardInput } from './business';
+export type { BusinessProfileCreateInput, BusinessOnboardInput, PremiseCreateInput, PremiseUpdateInput } from './business';
 
 // Profile & reports
 export { profileUpdateSchema, reportSchema } from './profile';

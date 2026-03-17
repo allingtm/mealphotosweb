@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { X, Camera, Plus, Loader2 } from 'lucide-react';
@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { showToast } from '@/components/ui/Toast';
+import { useAppStore } from '@/lib/store';
+import { PremiseSwitcher } from '@/components/business/PremiseSwitcher';
+import type { BusinessPremise } from '@/types/database';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -36,6 +39,26 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
   const [menuItemId, setMenuItemId] = useState('');
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const premises = useAppStore((s) => s.premises);
+  const activePremiseId = useAppStore((s) => s.activePremiseId);
+  const setPremises = useAppStore((s) => s.setPremises);
+  const setActivePremiseId = useAppStore((s) => s.setActivePremiseId);
+
+  // Load premises if not already loaded
+  useEffect(() => {
+    if (premises.length > 0) return;
+    fetch('/api/businesses/premises')
+      .then((r) => r.json())
+      .then((data) => {
+        const list: BusinessPremise[] = data.premises ?? [];
+        setPremises(list);
+        if (list.length > 0 && !activePremiseId) {
+          setActivePremiseId(list[0].id);
+        }
+      })
+      .catch(() => {});
+  }, [premises.length, activePremiseId, setPremises, setActivePremiseId]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -77,6 +100,7 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
         price_pence: price ? Math.round(parseFloat(price) * 100) : undefined,
         menu_item_id: menuItemId || undefined,
         comments_enabled: commentsEnabled,
+        premise_id: activePremiseId || undefined,
       }));
 
       images.forEach((img) => formData.append('images', img));
@@ -136,6 +160,13 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
             {submitting ? <Loader2 size={16} className="animate-spin" /> : 'Post'}
           </button>
         </div>
+
+        {/* Premise selector */}
+        {premises.length > 1 && (
+          <div className="mb-4">
+            <PremiseSwitcher />
+          </div>
+        )}
 
         {/* Photo area */}
         {images.length === 0 ? (

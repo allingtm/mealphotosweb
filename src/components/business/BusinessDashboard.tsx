@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
+import { PremiseSwitcher } from './PremiseSwitcher';
+import type { BusinessPremise } from '@/types/database';
 
 interface DashboardStats {
   today_dishes: number;
@@ -37,6 +39,10 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({ userId }: BusinessDashboardProps) {
   const userPlan = useAppStore((s) => s.userPlan);
+  const premises = useAppStore((s) => s.premises);
+  const setPremises = useAppStore((s) => s.setPremises);
+  const activePremiseId = useAppStore((s) => s.activePremiseId);
+  const setActivePremiseId = useAppStore((s) => s.setActivePremiseId);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -44,12 +50,29 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
   const [dishRequests, setDishRequests] = useState<DishRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [maxPremises, setMaxPremises] = useState(5);
 
   useEffect(() => {
     if (searchParams.get('subscription') === 'success') {
       setShowWelcome(true);
     }
   }, [searchParams]);
+
+  // Load premises
+  useEffect(() => {
+    async function fetchPremises() {
+      try {
+        const res = await fetch('/api/businesses/premises?include_inactive=true');
+        const data = await res.json();
+        const list: BusinessPremise[] = data.premises ?? [];
+        setPremises(list);
+        if (list.length > 0 && !activePremiseId) {
+          setActivePremiseId(list[0].id);
+        }
+      } catch { /* silently fail */ }
+    }
+    fetchPremises();
+  }, [setPremises, activePremiseId, setActivePremiseId]);
 
   useEffect(() => {
     async function fetchDashboard() {
@@ -59,6 +82,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
         setStats(data.stats);
         setTopDishes(data.topDishes ?? []);
         setDishRequests(data.dishRequests ?? []);
+        if (data.maxPremises) setMaxPremises(data.maxPremises);
       } catch { /* silently fail */ }
       finally { setLoading(false); }
     }
@@ -154,6 +178,16 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
       )}
 
       <div className="w-full px-4 pb-24 max-w-3xl md:max-w-none">
+        {/* Premise Switcher */}
+        {premises.length > 0 && (
+          <div className="flex items-center justify-between mb-4">
+            <PremiseSwitcher showAddButton maxPremises={maxPremises} />
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
+              {premises.filter((p) => p.is_active).length}/{maxPremises} premises
+            </span>
+          </div>
+        )}
+
         {/* Post a Dish CTA */}
         <Link
           href="/post"

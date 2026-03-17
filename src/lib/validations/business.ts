@@ -64,3 +64,41 @@ export const businessOnboardSchema = z.object({
 
 export type BusinessProfileCreateInput = z.infer<typeof businessProfileCreateSchema>;
 export type BusinessOnboardInput = z.infer<typeof businessOnboardSchema>;
+
+// ── Premise schemas ──────────────────────────────────────────────
+
+export const premiseCreateSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(100),
+  business_categories: z.array(z.enum(BUSINESS_TYPES)).min(1, 'At least one category required').max(5, 'Maximum 5 categories'),
+
+  // Address (city, region, country required for URL generation)
+  address_line_1: z.string().trim().max(200).optional().nullable(),
+  address_line_2: z.string().trim().max(200).optional().nullable(),
+  address_city: z.string().trim().min(1, 'City is required').max(100),
+  address_region: z.string().trim().min(1, 'Region is required').max(100),
+  address_postcode: z.string().trim().max(20).optional().nullable(),
+  address_country: z.string().trim().length(2).default('GB'),
+  latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
+  longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
+
+  // Contact
+  phone: z.string().trim().max(20).optional().nullable(),
+  email: z.string().email().optional().nullable().or(z.literal('')),
+  website_url: z.string().url().max(255).optional().nullable().or(z.literal('')),
+  booking_url: z.string().url().max(255).optional().nullable().or(z.literal('')),
+  menu_url: z.string().url().max(255).optional().nullable().or(z.literal('')),
+
+  // Details
+  opening_hours: z.record(z.string(), z.object({
+    open: z.string(),
+    close: z.string(),
+  })).optional().nullable(),
+  cuisine_types: z.array(z.string().max(50)).max(20).optional().nullable(),
+  delivery_available: z.boolean().optional(),
+  bio: z.string().trim().max(500).optional().nullable(),
+});
+
+export const premiseUpdateSchema = premiseCreateSchema.partial();
+
+export type PremiseCreateInput = z.infer<typeof premiseCreateSchema>;
+export type PremiseUpdateInput = z.infer<typeof premiseUpdateSchema>;

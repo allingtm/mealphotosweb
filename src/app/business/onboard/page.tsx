@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Loader2, Camera } from 'lucide-react';
 import { useRequireAuth } from '@/lib/hooks/useRequireAuth';
 import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import posthog from 'posthog-js';
-import TypeSelector from '@/components/business/TypeSelector';
+import CategorySelector from '@/components/business/CategorySelector';
 import BusinessProfileForm, {
   defaultBusinessFormData,
   type BusinessFormData,
@@ -19,7 +19,7 @@ const TOTAL_STEPS = 4; // 0: type, 1: details, 2: avatar, 3: payment
 export default function OnboardPage() {
   const requireAuth = useRequireAuth();
   const [step, setStep] = useState(0);
-  const [businessType, setBusinessType] = useState<BusinessType | null>(null);
+  const [businessCategories, setBusinessCategories] = useState<BusinessType[]>([]);
   const [formData, setFormData] = useState<BusinessFormData>(defaultBusinessFormData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +36,8 @@ export default function OnboardPage() {
       if (saved) {
         const state = JSON.parse(saved);
         if (state.step != null) setStep(state.step);
-        if (state.businessType) setBusinessType(state.businessType);
+        if (state.businessCategories) setBusinessCategories(state.businessCategories);
+        else if (state.businessType) setBusinessCategories([state.businessType]);
         if (state.formData) setFormData({ ...defaultBusinessFormData, ...state.formData });
       }
     } catch {
@@ -49,17 +50,22 @@ export default function OnboardPage() {
     try {
       sessionStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ step, businessType, formData }),
+        JSON.stringify({ step, businessCategories, formData }),
       );
     } catch {
       // Ignore storage errors
     }
-  }, [step, businessType, formData]);
+  }, [step, businessCategories, formData]);
 
-  const handleTypeSelect = (type: BusinessType) => {
-    setBusinessType(type);
-    posthog.capture(ANALYTICS_EVENTS.BUSINESS_ONBOARDING_STARTED, { business_type: type });
+  const handleCategoriesChange = (categories: BusinessType[]) => {
+    setBusinessCategories(categories);
+    if (categories.length === 1) {
+      posthog.capture(ANALYTICS_EVENTS.BUSINESS_ONBOARDING_STARTED, { business_type: categories[0] });
+    }
   };
+
+  // Primary type for form field visibility (uses first selected category)
+  const businessType = businessCategories[0] ?? null;
 
   const handleFormChange = (partial: Partial<BusinessFormData>) => {
     setFormData((prev) => ({ ...prev, ...partial }));
@@ -82,18 +88,18 @@ export default function OnboardPage() {
   }, [avatarFile]);
 
   const handleSubmit = async () => {
-    if (!businessType || !formData.business_name.trim()) return;
+    if (businessCategories.length === 0 || !formData.business_name.trim()) return;
 
     try {
       await requireAuth();
       setLoading(true);
       setError(null);
 
-      const group = getBusinessTypeGroup(businessType);
+      const group = getBusinessTypeGroup(businessCategories[0]);
 
-      // 1. Create business profile
+      // 1. Create business profile (legacy — still needed for subscription tracking)
       const profilePayload: Record<string, unknown> = {
-        business_type: businessType,
+        business_type: businessCategories[0],
         business_name: formData.business_name.trim(),
         bio: formData.bio || null,
         phone: formData.phone || null,
@@ -107,7 +113,7 @@ export default function OnboardPage() {
         address_country: formData.address_country || 'GB',
       };
 
-      if (group === 'food_service' || businessType === 'other') {
+      if (group === 'food_service' || businessCategories[0] === 'other') {
         profilePayload.menu_url = formData.menu_url || null;
         profilePayload.delivery_available = formData.delivery_available;
         if (formData.cuisine_types) {
@@ -156,12 +162,48 @@ export default function OnboardPage() {
 
       if (!profileRes.ok) {
         const data = await profileRes.json();
-        // If profile already exists (409), continue to Stripe
         if (profileRes.status !== 409) {
           setError(data.error || 'Failed to create business profile');
           setLoading(false);
           return;
         }
+      }
+
+      // 1b. Create first premise
+      const premisePayload: Record<string, unknown> = {
+        name: formData.business_name.trim(),
+        business_categories: businessCategories,
+        address_line_1: formData.address_line_1 || null,
+        address_line_2: formData.address_line_2 || null,
+        address_city: formData.address_city || 'Unknown',
+        address_region: formData.address_city || 'Unknown', // Default region to city for now
+        address_postcode: formData.address_postcode || null,
+        address_country: formData.address_country || 'GB',
+        phone: formData.phone || null,
+        email: formData.email || null,
+        website_url: formData.website_url || null,
+        booking_url: formData.booking_url || null,
+        bio: formData.bio || null,
+        delivery_available: formData.delivery_available,
+      };
+
+      if (formData.cuisine_types) {
+        premisePayload.cuisine_types = formData.cuisine_types
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter(Boolean);
+      }
+
+      const premiseRes = await fetch('/api/businesses/premises', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(premisePayload),
+      });
+
+      if (!premiseRes.ok) {
+        const premiseData = await premiseRes.json();
+        // Not fatal — premise can be created later
+        console.warn('Premise creation failed:', premiseData.error);
       }
 
       // 2. Create Stripe checkout session
@@ -178,7 +220,8 @@ export default function OnboardPage() {
       }
 
       posthog.capture(ANALYTICS_EVENTS.BUSINESS_ONBOARDING_COMPLETED, {
-        business_type: businessType,
+        business_type: businessCategories[0],
+        business_categories: businessCategories,
       });
 
       // Clear sessionStorage on successful submission
@@ -217,15 +260,15 @@ export default function OnboardPage() {
         {/* Step 0: Type selection */}
         {step === 0 && (
           <>
-            <TypeSelector selected={businessType} onSelect={handleTypeSelect} />
+            <CategorySelector selected={businessCategories} onSelect={handleCategoriesChange} />
             <button
-              onClick={() => businessType && setStep(1)}
-              disabled={!businessType}
+              onClick={() => businessCategories.length > 0 && setStep(1)}
+              disabled={businessCategories.length === 0}
               className="w-full py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
               style={{
                 marginTop: 24,
-                backgroundColor: businessType ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                color: businessType ? '#121212' : 'var(--text-secondary)',
+                backgroundColor: businessCategories.length > 0 ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                color: businessCategories.length > 0 ? '#121212' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-body)',
                 fontSize: 16,
                 fontWeight: 600,

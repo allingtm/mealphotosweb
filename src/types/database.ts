@@ -173,9 +173,41 @@ export interface BusinessProfile {
   updated_at: string;
 }
 
+export interface BusinessPremise {
+  id: string;
+  owner_id: string;
+  name: string;
+  slug: string;
+  country_slug: string;
+  region_slug: string;
+  city_slug: string;
+  business_categories: BusinessType[];
+  address_region: string | null;
+  address_line_1: string | null;
+  address_line_2: string | null;
+  address_city: string | null;
+  address_postcode: string | null;
+  address_country: string;
+  location: unknown | null;
+  phone: string | null;
+  email: string | null;
+  website_url: string | null;
+  booking_url: string | null;
+  opening_hours: Record<string, { open: string; close: string }> | null;
+  cuisine_types: string[] | null;
+  delivery_available: boolean;
+  menu_url: string | null;
+  bio: string | null;
+  dish_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Dish {
   id: string;
   business_id: string;
+  premise_id: string | null;
   title: string;
   description: string | null;
   price_pence: number | null;
@@ -341,6 +373,11 @@ export interface MapBusinessPin {
   id: string;
   business_name: string;
   business_type: BusinessType;
+  business_categories?: BusinessType[];
+  premise_slug?: string;
+  country_slug?: string;
+  region_slug?: string;
+  city_slug?: string;
   avatar_url: string | null;
   address_city: string | null;
   plan: 'free' | 'business';

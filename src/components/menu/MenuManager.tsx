@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, Camera, Pencil, Trash2, Loader2, GripVertical, X } from 'lucide-react';
 import posthog from 'posthog-js';
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
@@ -14,6 +14,9 @@ import { BackButton } from '@/components/ui/BackButton';
 import { DietaryBadge } from '@/components/ui/DietaryBadge';
 import { showToast } from '@/components/ui/Toast';
 import { formatPrice } from '@/lib/utils';
+import { useAppStore } from '@/lib/store';
+import { PremiseSwitcher } from '@/components/business/PremiseSwitcher';
+import type { BusinessPremise } from '@/types/database';
 
 interface MenuSection {
   id: string;
@@ -48,6 +51,26 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
   const scanInputRef = useRef<HTMLInputElement>(null);
   const [sections, setSections] = useState<MenuSection[]>(initialSections);
   const [scanning, setScanning] = useState(false);
+
+  const premises = useAppStore((s) => s.premises);
+  const activePremiseId = useAppStore((s) => s.activePremiseId);
+  const setPremises = useAppStore((s) => s.setPremises);
+  const setActivePremiseId = useAppStore((s) => s.setActivePremiseId);
+
+  // Load premises if not already loaded
+  useEffect(() => {
+    if (premises.length > 0) return;
+    fetch('/api/businesses/premises')
+      .then((r) => r.json())
+      .then((data) => {
+        const list: BusinessPremise[] = data.premises ?? [];
+        setPremises(list);
+        if (list.length > 0 && !activePremiseId) {
+          setActivePremiseId(list[0].id);
+        }
+      })
+      .catch(() => {});
+  }, [premises.length, activePremiseId, setPremises, setActivePremiseId]);
 
   // Add section
   const [showAddSection, setShowAddSection] = useState(false);
@@ -312,6 +335,13 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
           <BackButton />
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)' }}>Manage Menu</h1>
         </div>
+
+        {/* Premise selector */}
+        {premises.length > 1 && (
+          <div className="mb-4">
+            <PremiseSwitcher />
+          </div>
+        )}
 
         {/* Action cards */}
         <div className="flex flex-col gap-3 mb-6">

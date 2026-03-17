@@ -119,11 +119,38 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Validate premise ownership if premise_id provided
+  let premiseId: string | null = null;
+  if (parsed.data.premise_id) {
+    const { data: premise } = await supabase
+      .from('business_premises')
+      .select('id')
+      .eq('id', parsed.data.premise_id)
+      .eq('owner_id', user.id)
+      .eq('is_active', true)
+      .single();
+    if (!premise) {
+      return NextResponse.json({ error: 'Invalid premise' }, { status: 400 });
+    }
+    premiseId = premise.id;
+  } else {
+    // Auto-select single premise if user has exactly one
+    const { data: premises } = await supabase
+      .from('business_premises')
+      .select('id')
+      .eq('owner_id', user.id)
+      .eq('is_active', true);
+    if (premises?.length === 1) {
+      premiseId = premises[0].id;
+    }
+  }
+
   // Create dish record
   const { data: dish, error: dishError } = await supabase
     .from('dishes')
     .insert({
       business_id: user.id,
+      premise_id: premiseId,
       title: parsed.data.title,
       description: parsed.data.description ?? null,
       price_pence: parsed.data.price_pence ?? null,
@@ -168,21 +195,34 @@ export async function POST(req: NextRequest) {
   // Push notifications to followers (fire-and-forget)
   (async () => {
     try {
-      const { data: bizProfile } = await supabase
-        .from('business_profiles')
-        .select('business_name')
-        .eq('id', user.id)
-        .single();
+      // Try premise name first, fall back to business_profiles
+      let businessName: string | null = null;
+      if (premiseId) {
+        const { data: prem } = await supabase
+          .from('business_premises')
+          .select('name')
+          .eq('id', premiseId)
+          .single();
+        businessName = prem?.name ?? null;
+      }
+      if (!businessName) {
+        const { data: bizProfile } = await supabase
+          .from('business_profiles')
+          .select('business_name')
+          .eq('id', user.id)
+          .single();
+        businessName = bizProfile?.business_name ?? null;
+      }
 
       const { data: followers } = await supabase
         .from('follows')
         .select('follower_id')
         .eq('following_id', user.id);
 
-      if (followers?.length && bizProfile?.business_name) {
+      if (followers?.length && businessName) {
         const pushRequests = followers.map((f) => ({
           user_id: f.follower_id,
-          title: `${bizProfile.business_name} posted a new dish`,
+          title: `${businessName} posted a new dish`,
           body: dish.title,
           url: `/dish/${dish.id}`,
         }));

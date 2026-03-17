@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
-import type { BusinessType, BusinessTypeGroup } from '@/types/database';
+import type { BusinessType, BusinessTypeGroup, BusinessPremise } from '@/types/database';
 
 export type FeedTab = 'following' | 'nearby' | 'trending';
 
@@ -26,6 +26,12 @@ interface AppState {
   // Feed
   feedTab: FeedTab;
   setFeedTab: (tab: FeedTab) => void;
+
+  // Premises
+  premises: BusinessPremise[];
+  activePremiseId: string | null;
+  setPremises: (premises: BusinessPremise[]) => void;
+  setActivePremiseId: (id: string | null) => void;
 
   // Map
   mapTypeFilter: BusinessType | BusinessTypeGroup | 'all';
@@ -59,6 +65,11 @@ export const useAppStore = create<AppState>((set) => ({
   setIsAdmin: (isAdmin) => set({ isAdmin }),
   profileAvatarUrl: null,
   setProfileAvatarUrl: (url) => set({ profileAvatarUrl: url }),
+
+  premises: [],
+  activePremiseId: null,
+  setPremises: (premises) => set({ premises }),
+  setActivePremiseId: (id) => set({ activePremiseId: id }),
 
   feedTab: 'nearby',
   setFeedTab: (tab) => set({ feedTab: tab }),

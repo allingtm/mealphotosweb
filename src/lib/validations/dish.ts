@@ -6,6 +6,7 @@ export const createDishSchema = z.object({
   price_pence: z.number().int().positive().optional(),
   comments_enabled: z.boolean().default(true),
   menu_item_id: z.string().uuid().optional(),
+  premise_id: z.string().uuid().optional(),
 });
 
 export const deleteDishSchema = z.object({
