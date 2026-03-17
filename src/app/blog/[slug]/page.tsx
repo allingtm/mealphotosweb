@@ -99,7 +99,7 @@ export default async function BlogDetailPage({ params }: Props) {
   };
 
   return (
-    <article style={{ minHeight: 'calc(100dvh - 8rem)', padding: '24px 16px 64px', maxWidth: 760, margin: '0 auto' }}>
+    <article className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ padding: '24px 16px 64px', maxWidth: 760 }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -101,7 +101,7 @@ export default async function BlogTagPage({ params }: Props) {
   const nextCursor = hasMore && posts.length > 0 ? posts[posts.length - 1].published_at : null;
 
   return (
-    <div style={{ minHeight: 'calc(100dvh - 8rem)', padding: '24px 16px 64px', maxWidth: 900, margin: '0 auto' }}>
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ padding: '24px 16px 64px', maxWidth: 768 }}>
       <Link
         href="/blog"
         style={{

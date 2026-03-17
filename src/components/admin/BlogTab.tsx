@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { showToast } from '@/components/ui/Toast';
 import { ConfirmDialog } from './ConfirmDialog';
 import { generateSlug } from '@/lib/utils';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import type { BlogPost, BlogTag } from '@/types/database';
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
@@ -59,6 +60,18 @@ interface PostWithTags extends BlogPost {
 }
 
 export function BlogTab() {
+  const { theme } = useTheme();
+  const [resolvedColorMode, setResolvedColorMode] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    if (theme === 'system') {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setResolvedColorMode(isDark ? 'dark' : 'light');
+    } else {
+      setResolvedColorMode(theme);
+    }
+  }, [theme]);
+
   const [posts, setPosts] = useState<PostWithTags[]>([]);
   const [tags, setTags] = useState<BlogTag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -312,7 +325,7 @@ export function BlogTab() {
   // --- Form view ---
   if (creating) {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4" style={{ paddingBottom: 80 }}>
         <button
           type="button"
           onClick={() => { setCreating(false); resetForm(); setEditing(null); }}
@@ -357,12 +370,11 @@ export function BlogTab() {
         {/* Markdown editor */}
         <div className="flex flex-col gap-1">
           <label style={labelStyle}>Content</label>
-          <div data-color-mode="dark">
+          <div data-color-mode={resolvedColorMode}>
             <MDEditor
               value={content}
               onChange={(val) => setContent(val ?? '')}
               height={400}
-              style={{ backgroundColor: 'var(--bg-elevated)' }}
             />
           </div>
         </div>

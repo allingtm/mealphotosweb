@@ -158,8 +158,8 @@ export default async function AdminPage({
 
   return (
     <div
+      className="md:overflow-y-auto md:flex-1 md:min-h-0"
       style={{
-        minHeight: '100dvh',
         backgroundColor: 'var(--bg-primary)',
       }}
     >

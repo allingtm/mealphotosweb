@@ -119,7 +119,7 @@ export default async function BlogPage({ searchParams }: Props) {
   };
 
   return (
-    <div style={{ minHeight: 'calc(100dvh - 8rem)', padding: '24px 16px 64px', maxWidth: 900, margin: '0 auto' }}>
+    <div className="md:overflow-y-auto md:flex-1 md:min-h-0" style={{ padding: '24px 16px 64px', maxWidth: 768 }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
