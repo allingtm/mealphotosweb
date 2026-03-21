@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Globe, Phone, FileText, CalendarDays, Navigation } from 'lucide-react';
+import Link from 'next/link';
+import { Globe, Phone, FileText, CalendarDays, Navigation, Pencil } from 'lucide-react';
 import posthog from 'posthog-js';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 import { BackButton } from '@/components/ui/BackButton';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { ShareButton } from '@/components/feed/ShareButton';
 import { BUSINESS_TYPE_LABELS, type BusinessProfile } from '@/types/database';
 import { useAppStore } from '@/lib/store';
@@ -21,9 +23,10 @@ interface BusinessProfileHeaderProps {
   businessProfile: BusinessProfile;
   isFollowing: boolean;
   totalSaves: number;
+  isOwner?: boolean;
 }
 
-export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowing: initialFollowing, totalSaves }: BusinessProfileHeaderProps) {
+export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowing: initialFollowing, totalSaves, isOwner = false }: BusinessProfileHeaderProps) {
   const [isFollowing, setIsFollowing] = useState(initialFollowing);
   const [followerCount, setFollowerCount] = useState(profile.follower_count);
   const user = useAppStore((s) => s.user);
@@ -98,6 +101,7 @@ export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowin
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)', margin: 0 }}>
           {bp.business_name}
         </h1>
+        {profile.plan === 'business' && <VerifiedBadge size={16} />}
       </div>
 
       {/* Type + cuisine */}
@@ -125,6 +129,24 @@ export function BusinessProfileHeader({ profile, businessProfile: bp, isFollowin
         <p className="text-center mt-2" style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)', maxWidth: 360 }}>
           {bp.bio}
         </p>
+      )}
+
+      {/* Edit button — own profile only */}
+      {isOwner && (
+        <Link
+          href="/settings/business-profile"
+          className="flex items-center gap-1 rounded-xl px-3 py-1.5 mt-3"
+          style={{
+            border: '1px solid var(--bg-elevated)',
+            textDecoration: 'none',
+            fontSize: 13,
+            fontFamily: 'var(--font-body)',
+            color: 'var(--text-primary)',
+          }}
+        >
+          <Pencil size={14} strokeWidth={1.5} />
+          Edit
+        </Link>
       )}
 
       {/* Action buttons */}

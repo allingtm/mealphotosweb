@@ -431,7 +431,9 @@
     "theme": "Theme",
     "themeDark": "Dark",
     "themeLight": "Light",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "businessProfile": "Business Profile",
+    "editBusinessDetails": "Edit business details"
   },
   "footer": {
     "privacy": "Privacy",

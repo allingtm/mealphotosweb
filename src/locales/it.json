@@ -431,7 +431,9 @@
     "theme": "Tema",
     "themeDark": "Scuro",
     "themeLight": "Chiaro",
-    "themeSystem": "Sistema"
+    "themeSystem": "Sistema",
+    "businessProfile": "Profilo Aziendale",
+    "editBusinessDetails": "Modifica dettagli attività"
   },
   "footer": {
     "privacy": "Privacy",

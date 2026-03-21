@@ -38,9 +38,10 @@ interface BusinessProfileClientProps {
   }[];
   isFollowing: boolean;
   totalSaves: number;
+  isOwner?: boolean;
 }
 
-export function BusinessProfileClient({ profile, dishes, menuSections, isFollowing, totalSaves }: BusinessProfileClientProps) {
+export function BusinessProfileClient({ profile, dishes, menuSections, isFollowing, totalSaves, isOwner = false }: BusinessProfileClientProps) {
   const bp = profile.business_profiles;
 
   return (
@@ -51,6 +52,7 @@ export function BusinessProfileClient({ profile, dishes, menuSections, isFollowi
           businessProfile={bp}
           isFollowing={isFollowing}
           totalSaves={totalSaves}
+          isOwner={isOwner}
         />
         <BusinessProfileTabs
           businessType={bp.business_type}

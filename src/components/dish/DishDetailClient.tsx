@@ -8,9 +8,11 @@ import { BackButton } from '@/components/ui/BackButton';
 import { ReactionButton } from '@/components/feed/ReactionButton';
 import { SaveButton } from '@/components/feed/SaveButton';
 import { ShareButton } from '@/components/feed/ShareButton';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { CommentsSection } from '@/components/comments/CommentsSection';
 import { timeAgo } from '@/lib/utils/timeAgo';
 import { formatPrice } from '@/lib/utils';
+import { ImageCarousel } from '@/components/feed/ImageCarousel';
 import type { DishImage } from '@/types/database';
 
 interface DishDetailClientProps {
@@ -59,20 +61,32 @@ export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }:
 
         {/* Photo */}
         <div className="relative w-full" style={{ aspectRatio: '4/5' }}>
-          <Image
-            src={dish.photo_url}
-            alt={dish.title}
-            fill
-            sizes="(max-width: 600px) 100vw, 600px"
-            className="object-cover"
-            loader={cloudflareLoader}
-            priority
-          />
+          {images && images.length > 1 ? (
+            <ImageCarousel
+              dishId={dish.id}
+              dishTitle={dish.title}
+              primaryImageUrl={dish.photo_url}
+              imageCount={images.length}
+              blurHash={dish.photo_blur_hash}
+              preloadedImages={images}
+              priority
+            />
+          ) : (
+            <Image
+              src={dish.photo_url}
+              alt={dish.title}
+              fill
+              sizes="(max-width: 600px) 100vw, 600px"
+              className="object-cover"
+              loader={cloudflareLoader}
+              priority
+            />
+          )}
 
           {/* Reaction count badge */}
           {dish.reaction_count > 0 && (
             <div
-              className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full px-3 py-1.5"
+              className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full px-3 py-1.5 z-10"
               style={{
                 backgroundColor: 'var(--status-success)',
                 color: '#FFFFFF',
@@ -134,6 +148,7 @@ export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }:
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--text-primary)', fontWeight: 500 }}>
               {bp.business_name}
             </span>
+            {dish.profiles?.plan === 'business' && <VerifiedBadge size={14} />}
           </Link>
 
           {/* Location */}

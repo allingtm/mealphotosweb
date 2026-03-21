@@ -363,6 +363,7 @@ export interface FeedItem {
   avatar_url: string | null;
   address_city: string | null;
   plan: 'free' | 'business';
+  username: string;
   user_has_reacted: boolean;
   user_has_saved: boolean;
   is_followed: boolean;

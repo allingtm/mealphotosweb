@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, LogOut, CreditCard, Users, Mail } from 'lucide-react';
+import { ChevronRight, LogOut, CreditCard, Users, Mail, Store } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { LanguagePicker } from '@/components/settings/LanguagePicker';
@@ -14,6 +14,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const user = useAppStore((s) => s.user);
   const userPlan = useAppStore((s) => s.userPlan);
+  const isBusiness = useAppStore((s) => s.isBusiness);
   const planLabel = userPlan === 'business' ? 'Business' : 'Free';
 
   const handleSignOut = async () => {
@@ -61,6 +62,35 @@ export default function SettingsPage() {
       {/* Account section */}
       {user ? (
         <>
+          {/* Business Profile section */}
+          {isBusiness && (
+            <section className="mb-8">
+              <h2
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 12,
+                }}
+              >
+                {t('businessProfile')}
+              </h2>
+              <div
+                className="rounded-2xl overflow-hidden"
+                style={{ backgroundColor: 'var(--bg-surface)' }}
+              >
+                <SettingsLink
+                  href="/settings/business-profile"
+                  icon={<Store size={20} strokeWidth={1.5} />}
+                  label={t('editBusinessDetails')}
+                />
+              </div>
+            </section>
+          )}
+
           {/* Subscription section */}
           <section className="mb-8">
             <h2

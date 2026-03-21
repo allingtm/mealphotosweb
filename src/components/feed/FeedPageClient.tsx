@@ -106,8 +106,8 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
           <EmptyState tab={feedTab} />
         ) : (
           <div className="flex flex-col gap-8 pt-4 pb-8">
-            {items.map((dish) => (
-              <DishCard key={dish.id} dish={dish} />
+            {items.map((dish, index) => (
+              <DishCard key={dish.id} dish={dish} index={index} />
             ))}
             <div ref={sentinelRef} className="h-1" />
             {loading && (

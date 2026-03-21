@@ -7,6 +7,7 @@ interface BusinessProfileFormProps {
   data: BusinessFormData;
   onChange: (data: Partial<BusinessFormData>) => void;
   errors?: Record<string, string>;
+  hideTitle?: boolean;
 }
 
 export interface BusinessFormData {
@@ -31,6 +32,7 @@ export interface BusinessFormData {
   service_area: string;
   class_types: string[];
   price_from: string;
+  opening_hours: Record<string, { open: string; close: string }> | null;
 }
 
 export const defaultBusinessFormData: BusinessFormData = {
@@ -55,6 +57,7 @@ export const defaultBusinessFormData: BusinessFormData = {
   service_area: '',
   class_types: [],
   price_from: '',
+  opening_hours: null,
 };
 
 const inputStyle = {
@@ -132,11 +135,28 @@ function PillSelect({ options, selected, onToggle, labels }: {
   );
 }
 
+const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const DAY_LABELS: Record<string, string> = {
+  mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday',
+  thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
+};
+
+const timeInputStyle = {
+  padding: '6px 10px',
+  borderRadius: 8,
+  border: '1px solid var(--bg-elevated)',
+  backgroundColor: 'var(--bg-primary)',
+  color: 'var(--text-primary)',
+  fontFamily: 'var(--font-body)',
+  fontSize: 14,
+};
+
 export default function BusinessProfileForm({
   businessType,
   data,
   onChange,
   errors = {},
+  hideTitle = false,
 }: BusinessProfileFormProps) {
   const group = getBusinessTypeGroup(businessType);
   const isFoodService = group === 'food_service';
@@ -155,17 +175,19 @@ export default function BusinessProfileForm({
 
   return (
     <div className="flex flex-col gap-4">
-      <h2
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 22,
-          color: 'var(--text-primary)',
-          textAlign: 'center',
-          marginBottom: 8,
-        }}
-      >
-        Set up your business profile
-      </h2>
+      {!hideTitle && (
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 22,
+            color: 'var(--text-primary)',
+            textAlign: 'center',
+            marginBottom: 8,
+          }}
+        >
+          Set up your business profile
+        </h2>
+      )}
 
       {/* Common fields */}
       <Field label="Business name" required error={errors.business_name}>
@@ -312,6 +334,65 @@ export default function BusinessProfileForm({
             Delivery available
           </span>
         </label>
+      )}
+
+      {/* Opening Hours — for address-based types */}
+      {showAddress && (
+        <div>
+          <span style={labelStyle}>Opening Hours</span>
+          <div className="flex flex-col gap-2 mt-1">
+            {DAYS.map((day) => {
+              const hours = data.opening_hours?.[day];
+              const isClosed = !hours;
+              return (
+                <div key={day} className="flex items-center gap-3">
+                  <span style={{ width: 80, fontSize: 14, fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                    {DAY_LABELS[day]}
+                  </span>
+                  <label className="flex items-center gap-1" style={{ fontSize: 13, fontFamily: 'var(--font-body)', color: 'var(--text-secondary)' }}>
+                    <input
+                      type="checkbox"
+                      checked={isClosed}
+                      onChange={(e) => {
+                        const updated = { ...data.opening_hours };
+                        if (e.target.checked) {
+                          delete updated[day];
+                        } else {
+                          updated[day] = { open: '09:00', close: '17:00' };
+                        }
+                        onChange({ opening_hours: Object.keys(updated).length > 0 ? updated : null });
+                      }}
+                    />
+                    Closed
+                  </label>
+                  {!isClosed && (
+                    <>
+                      <input
+                        type="time"
+                        value={hours?.open ?? '09:00'}
+                        aria-label={`${DAY_LABELS[day]} opening time`}
+                        onChange={(e) => onChange({
+                          opening_hours: { ...data.opening_hours, [day]: { ...hours!, open: e.target.value } }
+                        })}
+                        style={timeInputStyle}
+                      />
+                      <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>–</span>
+                      <input
+                        type="time"
+                        value={hours?.close ?? '17:00'}
+                        aria-label={`${DAY_LABELS[day]} closing time`}
+                        onChange={(e) => onChange({
+                          opening_hours: { ...data.opening_hours, [day]: { ...hours!, close: e.target.value } }
+                        })}
+                        style={timeInputStyle}
+                      />
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* Chefs & Experiences specific */}

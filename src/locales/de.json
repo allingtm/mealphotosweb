@@ -431,7 +431,9 @@
     "theme": "Design",
     "themeDark": "Dunkel",
     "themeLight": "Hell",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "businessProfile": "Geschäftsprofil",
+    "editBusinessDetails": "Geschäftsdetails bearbeiten"
   },
   "footer": {
     "privacy": "Datenschutz",

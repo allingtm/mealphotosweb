@@ -431,7 +431,9 @@
     "theme": "Thème",
     "themeDark": "Sombre",
     "themeLight": "Clair",
-    "themeSystem": "Système"
+    "themeSystem": "Système",
+    "businessProfile": "Profil Entreprise",
+    "editBusinessDetails": "Modifier les détails de l'entreprise"
   },
   "footer": {
     "privacy": "Confidentialité",

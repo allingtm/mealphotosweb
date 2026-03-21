@@ -3,34 +3,39 @@
 import { useState, useCallback, useEffect } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
+import cloudflareLoader from '@/lib/cloudflare-loader';
 import type { DishImage } from '@/types/database';
 
-// Alias for backward compatibility within this component
-type MealImage = DishImage;
-
 interface ImageCarouselProps {
-  mealId: string;
+  dishId: string;
+  dishTitle: string;
   primaryImageUrl: string;
   imageCount: number;
   blurHash?: string | null;
   blurDataURL?: string;
   priority?: boolean;
+  preloadedImages?: DishImage[];
   onImageLoad?: () => void;
 }
 
 export function ImageCarousel({
-  mealId,
+  dishId,
+  dishTitle,
   primaryImageUrl,
   imageCount,
   blurHash,
   blurDataURL,
   priority,
+  preloadedImages,
   onImageLoad,
 }: ImageCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false });
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [additionalImages, setAdditionalImages] = useState<MealImage[] | null>(null);
-  const [fetchedImages, setFetchedImages] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState<DishImage[] | null>(
+    preloadedImages ?? null
+  );
+  const [fetchedImages, setFetchedImages] = useState(!!preloadedImages);
+  const [effectiveImageCount, setEffectiveImageCount] = useState(imageCount);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
@@ -44,36 +49,43 @@ export function ImageCarousel({
     return () => { emblaApi.off('select', onSelect); };
   }, [emblaApi, onSelect]);
 
-  // Lazy-fetch additional images on first interaction
+  // Lazy-fetch additional images on mount (if multi-photo and not preloaded)
   const fetchImages = useCallback(async () => {
     if (fetchedImages || imageCount <= 1) return;
     setFetchedImages(true);
     try {
-      const res = await fetch(`/api/meals/${mealId}/images`);
+      const res = await fetch(`/api/dishes/${dishId}/images`);
       if (res.ok) {
         const data = await res.json();
         setAdditionalImages(data.images ?? []);
+      } else {
+        setEffectiveImageCount(1);
       }
     } catch {
-      // Silently fail — user still sees primary image
+      setEffectiveImageCount(1);
     }
-  }, [mealId, imageCount, fetchedImages]);
+  }, [dishId, imageCount, fetchedImages]);
 
-  // Pre-fetch images when carousel mounts (if multi-photo)
   useEffect(() => {
     if (imageCount > 1 && !fetchedImages) {
       fetchImages();
     }
   }, [imageCount, fetchedImages, fetchImages]);
 
-  // Build image list: primary + additional (skipping position 1 from additional since it's the primary)
+  // Build image list: use fetched images or fall back to primary
   const allImages = additionalImages
     ? additionalImages
     : [{ position: 1, photo_url: primaryImageUrl, photo_blur_hash: blurHash ?? null }];
 
   return (
     <div className="absolute inset-0">
-      <div ref={emblaRef} className="overflow-hidden h-full">
+      <div
+        ref={emblaRef}
+        className="overflow-hidden h-full"
+        role="region"
+        aria-label={`${dishTitle} photos, ${effectiveImageCount} images`}
+        aria-roledescription="carousel"
+      >
         <div className="flex h-full">
           {allImages.map((img, i) => (
             <div
@@ -82,10 +94,11 @@ export function ImageCarousel({
             >
               <Image
                 src={img.photo_url}
-                alt=""
+                alt={`${dishTitle} — photo ${i + 1} of ${effectiveImageCount}`}
                 fill
-                className="object-cover"
-                sizes="100vw"
+                className="object-cover rounded-2xl"
+                sizes="(max-width: 480px) 100vw, 480px"
+                loader={cloudflareLoader}
                 priority={priority && i === 0}
                 {...(i === 0 && blurDataURL
                   ? { placeholder: 'blur' as const, blurDataURL }
@@ -97,23 +110,30 @@ export function ImageCarousel({
         </div>
       </div>
 
-      {/* Dot indicator */}
-      {imageCount > 1 && (
+      {/* Dot indicators */}
+      {effectiveImageCount > 1 && (
         <div
           className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20"
-          style={{ pointerEvents: 'none' }}
+          role="tablist"
+          aria-label="Image navigation"
+          style={{
+            pointerEvents: 'none',
+            filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
+          }}
         >
-          {Array.from({ length: imageCount }).map((_, i) => (
+          {Array.from({ length: effectiveImageCount }).map((_, i) => (
             <div
               key={i}
+              role="tab"
+              aria-selected={i === selectedIndex ? true : false}
+              aria-label={`Photo ${i + 1} of ${effectiveImageCount}`}
+              className="rounded-full transition-colors duration-200"
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: 'var(--radius-full)',
+                width: 8,
+                height: 8,
                 backgroundColor: i === selectedIndex
-                  ? 'var(--text-emphasis)'
+                  ? '#FFFFFF'
                   : 'rgba(255, 255, 255, 0.4)',
-                transition: 'background-color 200ms',
               }}
             />
           ))}

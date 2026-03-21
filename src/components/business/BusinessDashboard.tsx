@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check } from 'lucide-react';
+import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check, BookOpen, User, Settings } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
 import { PremiseSwitcher } from './PremiseSwitcher';
@@ -35,9 +36,10 @@ interface DishRequest {
 
 interface BusinessDashboardProps {
   userId: string;
+  username: string;
 }
 
-export function BusinessDashboard({ userId }: BusinessDashboardProps) {
+export function BusinessDashboard({ userId, username }: BusinessDashboardProps) {
   const userPlan = useAppStore((s) => s.userPlan);
   const premises = useAppStore((s) => s.premises);
   const setPremises = useAppStore((s) => s.setPremises);
@@ -195,7 +197,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
           style={{
             height: 48,
             backgroundColor: 'var(--accent-primary)',
-            color: 'var(--bg-primary)',
+            color: 'var(--primary-foreground)',
             fontFamily: 'var(--font-body)',
             fontSize: 16,
             fontWeight: 600,
@@ -205,6 +207,13 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
           <PlusCircle size={20} strokeWidth={1.5} />
           Post a Dish
         </Link>
+
+        {/* Quick action links */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <QuickLink href="/business/menu" icon={BookOpen} label="Menu" />
+          <QuickLink href={`/business/${username}`} icon={User} label="Profile" />
+          <QuickLink href="/settings" icon={Settings} label="Settings" />
+        </div>
 
         {loading ? (
           <div className="flex flex-col gap-6">
@@ -281,6 +290,30 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
         )}
       </div>
     </div>
+  );
+}
+
+function QuickLink({ href, icon: Icon, label }: { href: string; icon: LucideIcon; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-center gap-2 py-3 rounded-2xl"
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        border: '1px solid var(--bg-elevated)',
+        textDecoration: 'none',
+      }}
+    >
+      <Icon size={20} strokeWidth={1.5} style={{ color: 'var(--accent-primary)' }} />
+      <span style={{
+        fontFamily: 'var(--font-body)',
+        fontSize: 13,
+        fontWeight: 500,
+        color: 'var(--text-primary)',
+      }}>
+        {label}
+      </span>
+    </Link>
   );
 }
 

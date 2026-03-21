@@ -82,6 +82,8 @@ export default async function BusinessProfilePage({ params }: Props) {
   // Total saves across all dishes
   const totalSaves = (dishes ?? []).reduce((sum, d) => sum + (d as { reaction_count: number }).reaction_count, 0);
 
+  const isOwner = user?.id === profile.id;
+
   return (
     <BusinessProfileClient
       profile={normalizedProfile as Parameters<typeof BusinessProfileClient>[0]['profile']}
@@ -89,6 +91,7 @@ export default async function BusinessProfilePage({ params }: Props) {
       menuSections={(menuSections ?? []) as Parameters<typeof BusinessProfileClient>[0]['menuSections']}
       isFollowing={isFollowing}
       totalSaves={totalSaves}
+      isOwner={isOwner}
     />
   );
 }

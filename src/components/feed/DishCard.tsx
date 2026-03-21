@@ -7,14 +7,17 @@ import type { FeedItem } from '@/types/database';
 import { ReactionButton } from './ReactionButton';
 import { SaveButton } from './SaveButton';
 import { ShareButton } from './ShareButton';
+import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { timeAgo } from '@/lib/utils/timeAgo';
 import cloudflareLoader from '@/lib/cloudflare-loader';
+import { ImageCarousel } from './ImageCarousel';
 
 interface DishCardProps {
   dish: FeedItem;
+  index: number;
 }
 
-export function DishCard({ dish }: DishCardProps) {
+export function DishCard({ dish, index }: DishCardProps) {
   const distanceMiles = dish.distance_km != null
     ? (dish.distance_km * 0.621371).toFixed(1)
     : null;
@@ -23,17 +26,29 @@ export function DishCard({ dish }: DishCardProps) {
     <article className="flex flex-col" style={{ width: '100%' }}>
       {/* Photo */}
       <Link href={`/dish/${dish.id}`} className="relative block w-full" style={{ aspectRatio: '4/5' }}>
-        <Image
-          src={dish.photo_url}
-          alt={dish.title}
-          fill
-          sizes="(max-width: 480px) 100vw, 480px"
-          className="object-cover rounded-2xl"
-          loader={cloudflareLoader}
-          placeholder={dish.blurDataURL ? 'blur' : 'empty'}
-          blurDataURL={dish.blurDataURL}
-          priority={false}
-        />
+        {dish.image_count > 1 ? (
+          <ImageCarousel
+            dishId={dish.id}
+            dishTitle={dish.title}
+            primaryImageUrl={dish.photo_url}
+            imageCount={dish.image_count}
+            blurHash={dish.photo_blur_hash}
+            blurDataURL={dish.blurDataURL}
+            priority={index < 2}
+          />
+        ) : (
+          <Image
+            src={dish.photo_url}
+            alt={dish.title}
+            fill
+            sizes="(max-width: 480px) 100vw, 480px"
+            className="object-cover rounded-2xl"
+            loader={cloudflareLoader}
+            placeholder={dish.blurDataURL ? 'blur' : 'empty'}
+            blurDataURL={dish.blurDataURL}
+            priority={index < 2}
+          />
+        )}
 
         {/* Reaction count badge — bottom right */}
         {dish.reaction_count > 0 && (
@@ -81,7 +96,8 @@ export function DishCard({ dish }: DishCardProps) {
             />
           )}
           <Link
-            href={`/business/${dish.business_name.toLowerCase().replace(/\s+/g, '-')}`}
+            href={`/business/${dish.username}`}
+            className="flex items-center gap-1"
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: 14,
@@ -90,6 +106,7 @@ export function DishCard({ dish }: DishCardProps) {
             }}
           >
             {dish.business_name}
+            {dish.plan === 'business' && <VerifiedBadge size={14} />}
           </Link>
           <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>·</span>
           <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)' }}>

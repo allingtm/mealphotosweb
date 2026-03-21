@@ -21,7 +21,7 @@ export default async function MePage() {
   if (!profile) return <UnauthenticatedState />;
 
   if (profile.is_business && profile.subscription_status === 'active') {
-    return <BusinessDashboard userId={user.id} />;
+    return <BusinessDashboard userId={user.id} username={profile.username} />;
   }
 
   return (
