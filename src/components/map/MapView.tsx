@@ -302,7 +302,8 @@ export default function MapView() {
       if (!feature?.properties) return;
       const clusterId = feature.properties.cluster_id as number;
       const source = map.getSource('businesses') as mapboxgl.GeoJSONSource;
-      source.getClusterExpansionZoom(clusterId).then((zoom) => {
+      source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) return;
         const coords = (feature.geometry as GeoJSON.Point).coordinates;
         map.flyTo({
           center: [coords[0], coords[1]] as [number, number],
