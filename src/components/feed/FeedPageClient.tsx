@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useAppStore } from '@/lib/store';
 import type { FeedItem } from '@/types/database';
 import { FeedTabBar } from './FeedTabBar';
@@ -36,6 +37,14 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Lift reaction/save state to items array
+  const updateItem = useCallback((dishId: string, updates: Partial<FeedItem>) => {
+    setItems(prev => prev.map(item =>
+      item.id === dishId ? { ...item, ...updates } : item
+    ));
+  }, []);
 
   // Fetch feed when tab changes
   useEffect(() => {
@@ -50,6 +59,7 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
         const data = await res.json();
         setItems(data.items ?? []);
         setCursor(data.cursor ?? null);
+        scrollRef.current?.scrollTo({ top: 0 });
       } catch {
         if (!cancelled) setItems([]);
       } finally {
@@ -89,11 +99,20 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
     return () => observer.disconnect();
   }, [loadMore]);
 
+  // Virtualizer
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 600,
+    overscan: 2,
+  });
+
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
       <FeedTabBar />
 
       <div
+        ref={scrollRef}
         className="flex-1 overflow-y-auto px-4 w-full max-w-(--feed-max-width) md:max-w-none"
       >
         {initialLoading ? (
@@ -105,17 +124,55 @@ export function FeedPageClient({ initialItems, initialCursor }: FeedPageClientPr
         ) : items.length === 0 ? (
           <EmptyState tab={feedTab} />
         ) : (
-          <div className="flex flex-col gap-8 pt-4 pb-8">
-            {items.map((dish, index) => (
-              <DishCard key={dish.id} dish={dish} index={index} />
-            ))}
+          <>
+            <div
+              className="pt-4 pb-8"
+              style={{
+                height: virtualizer.getTotalSize(),
+                position: 'relative',
+                width: '100%',
+              }}
+            >
+              {virtualizer.getVirtualItems().map((virtualItem) => {
+                const dish = items[virtualItem.index];
+                return (
+                  <div
+                    key={dish.id}
+                    ref={virtualizer.measureElement}
+                    data-index={virtualItem.index}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      transform: `translateY(${virtualItem.start}px)`,
+                      paddingBottom: 32,
+                    }}
+                  >
+                    <DishCard
+                      dish={dish}
+                      index={virtualItem.index}
+                      onReact={(dishId) => updateItem(dishId, {
+                        user_has_reacted: true,
+                        reaction_count: dish.reaction_count + 1,
+                      })}
+                      onSave={(dishId, saved) => updateItem(dishId, {
+                        user_has_saved: saved,
+                        save_count: dish.save_count + (saved ? 1 : -1),
+                      })}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
             <div ref={sentinelRef} className="h-1" />
             {loading && (
               <div className="flex justify-center py-4">
                 <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
     </div>

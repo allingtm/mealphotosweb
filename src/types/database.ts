@@ -278,6 +278,27 @@ export interface CommentWithProfile {
   };
 }
 
+export interface InboxComment {
+  id: string;
+  dish_id: string;
+  user_id: string;
+  text: string;
+  visible: boolean;
+  created_at: string;
+  profiles: {
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    is_business: boolean;
+  };
+  dishes: {
+    id: string;
+    title: string;
+    photo_url: string;
+    business_id: string;
+  };
+}
+
 export interface MenuSection {
   id: string;
   business_id: string;

@@ -24,9 +24,10 @@ const TYPE_GROUPS = [
 interface CategorySelectorProps {
   selected: BusinessType[];
   onSelect: (categories: BusinessType[]) => void;
+  hideTitle?: boolean;
 }
 
-export default function CategorySelector({ selected, onSelect }: CategorySelectorProps) {
+export default function CategorySelector({ selected, onSelect, hideTitle = false }: CategorySelectorProps) {
   const toggle = (type: BusinessType) => {
     if (selected.includes(type)) {
       onSelect(selected.filter((t) => t !== type));
@@ -37,36 +38,38 @@ export default function CategorySelector({ selected, onSelect }: CategorySelecto
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="text-center">
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 22,
-            color: 'var(--text-primary)',
-          }}
-        >
-          What type of business are you?
-        </h2>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 14,
-            color: 'var(--text-secondary)',
-            marginTop: 8,
-          }}
-        >
-          Select up to {MAX_CATEGORIES} categories
-          <span
+      {!hideTitle && (
+        <div className="text-center">
+          <h2
             style={{
-              marginLeft: 8,
-              fontWeight: 600,
-              color: selected.length >= MAX_CATEGORIES ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 22,
+              color: 'var(--text-primary)',
             }}
           >
-            {selected.length}/{MAX_CATEGORIES}
-          </span>
-        </p>
-      </div>
+            What type of business are you?
+          </h2>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 14,
+              color: 'var(--text-secondary)',
+              marginTop: 8,
+            }}
+          >
+            Select up to {MAX_CATEGORIES} categories
+            <span
+              style={{
+                marginLeft: 8,
+                fontWeight: 600,
+                color: selected.length >= MAX_CATEGORIES ? 'var(--accent-primary)' : 'var(--text-secondary)',
+              }}
+            >
+              {selected.length}/{MAX_CATEGORIES}
+            </span>
+          </p>
+        </div>
+      )}
 
       {TYPE_GROUPS.map((group) => (
         <div key={group.label}>

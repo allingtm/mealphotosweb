@@ -433,7 +433,8 @@
     "themeLight": "Clair",
     "themeSystem": "Système",
     "businessProfile": "Profil Entreprise",
-    "editBusinessDetails": "Modifier les détails de l'entreprise"
+    "editBusinessDetails": "Modifier les détails de l'entreprise",
+    "managePremises": "Gérer les établissements"
   },
   "footer": {
     "privacy": "Confidentialité",

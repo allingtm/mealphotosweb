@@ -46,9 +46,24 @@ export async function GET(req: NextRequest) {
 
   const { data: dishRequests } = await dishRequestsQuery;
 
+  // Recent comments from customers
+  const { data: recentComments } = await supabase
+    .from('comments')
+    .select(`
+      id, dish_id, text, created_at,
+      profiles!inner(username, display_name, avatar_url, is_business),
+      dishes!inner(id, title, photo_url, business_id)
+    `)
+    .eq('dishes.business_id', user.id)
+    .eq('visible', true)
+    .neq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
   return NextResponse.json({
     stats: stats ?? {},
     topDishes: topDishes ?? [],
     dishRequests: dishRequests ?? [],
+    recentComments: recentComments ?? [],
   });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, MapPin, Plus } from 'lucide-react';
+import { ChevronDown, MapPin, Plus, Settings } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
@@ -82,39 +82,68 @@ export function PremiseSwitcher({ showAddButton = false, maxPremises = 5 }: Prem
           }}
         >
           {premises.map((premise) => (
-            <button
+            <div
               key={premise.id}
-              type="button"
-              onClick={() => {
-                setActivePremiseId(premise.id);
-                setIsOpen(false);
-              }}
-              className="flex flex-col gap-0.5 w-full px-3 py-2.5 text-left transition-colors"
+              className="flex items-center justify-between px-3 py-2.5 transition-colors"
               style={{
                 backgroundColor: premise.id === activePremiseId ? 'rgba(232, 168, 56, 0.1)' : 'transparent',
                 borderLeft: premise.id === activePremiseId ? '3px solid var(--accent-primary)' : '3px solid transparent',
+                opacity: premise.is_active ? 1 : 0.5,
+                cursor: premise.is_active ? 'pointer' : 'default',
               }}
+              onClick={premise.is_active ? () => {
+                setActivePremiseId(premise.id);
+                setIsOpen(false);
+              } : undefined}
             >
-              <span
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
+              <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    {premise.name}
+                  </span>
+                  {!premise.is_active && (
+                    <span style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'var(--bg-elevated)',
+                      padding: '1px 6px',
+                      borderRadius: 4,
+                      textTransform: 'uppercase',
+                    }}>
+                      Inactive
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {[premise.address_city, premise.address_postcode].filter(Boolean).join(', ')}
+                </span>
+              </div>
+              <Link
+                href={`/settings/premises/${premise.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
                 }}
+                style={{ padding: 4, color: 'var(--text-secondary)', flexShrink: 0 }}
+                aria-label={`Manage ${premise.name}`}
               >
-                {premise.name}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 12,
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                {[premise.address_city, premise.address_postcode].filter(Boolean).join(', ')}
-              </span>
-            </button>
+                <Settings size={16} strokeWidth={1.5} />
+              </Link>
+            </div>
           ))}
 
           {showAddButton && premises.length < maxPremises && (

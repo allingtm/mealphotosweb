@@ -6,6 +6,7 @@ import posthog from 'posthog-js';
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
@@ -14,6 +15,7 @@ import { BackButton } from '@/components/ui/BackButton';
 import { DietaryBadge } from '@/components/ui/DietaryBadge';
 import { showToast } from '@/components/ui/Toast';
 import { formatPrice } from '@/lib/utils';
+import cloudflareLoader from '@/lib/cloudflare-loader';
 import { useAppStore } from '@/lib/store';
 import { PremiseSwitcher } from '@/components/business/PremiseSwitcher';
 import type { BusinessPremise } from '@/types/database';
@@ -83,10 +85,16 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
   // Add item
   const [showAddItem, setShowAddItem] = useState<string | null>(null);
   const [newItem, setNewItem] = useState({ name: '', price: '', description: '', dietary_tags: [] as string[], available: true });
+  const [newItemPhoto, setNewItemPhoto] = useState<File | null>(null);
+  const [newItemPhotoPreview, setNewItemPhotoPreview] = useState<string | null>(null);
 
   // Edit item
   const [editingItem, setEditingItem] = useState<{ sectionId: string; item: MenuItem } | null>(null);
   const [editItem, setEditItem] = useState({ name: '', price: '', description: '', dietary_tags: [] as string[], available: true });
+  const [editItemPhoto, setEditItemPhoto] = useState<File | null>(null);
+  const [editItemPhotoPreview, setEditItemPhotoPreview] = useState<string | null>(null);
+
+  const [itemSaving, setItemSaving] = useState(false);
 
   // Scan review
   const [scanResults, setScanResults] = useState<ExtractedSection[] | null>(null);
@@ -133,10 +141,56 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
     } catch { showToast('Failed to delete section', 'error'); }
   };
 
+  // --- Photo helpers ---
+  function handleItemPhotoSelect(
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFile: (f: File | null) => void,
+    setPreview: (p: string | null) => void,
+  ) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { showToast('Photo must be under 10MB', 'error'); return; }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { showToast('Photo must be JPEG, PNG, or WebP', 'error'); return; }
+    setFile(file);
+    setPreview(URL.createObjectURL(file));
+  }
+
+  async function uploadItemPhoto(file: File): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/uploads/image', { method: 'POST', body: formData });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.images?.[0]?.url ?? null;
+    } catch { return null; }
+  }
+
+  function clearNewItemPhoto() {
+    if (newItemPhotoPreview) URL.revokeObjectURL(newItemPhotoPreview);
+    setNewItemPhoto(null);
+    setNewItemPhotoPreview(null);
+  }
+
+  function clearEditItemPhoto() {
+    if (editItemPhotoPreview && editItemPhotoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(editItemPhotoPreview);
+    }
+    setEditItemPhoto(null);
+    setEditItemPhotoPreview(null);
+  }
+
   // --- Item CRUD ---
   const handleAddItem = async (sectionId: string) => {
     if (!newItem.name.trim()) return;
+    setItemSaving(true);
     try {
+      let photo_url: string | null = null;
+      if (newItemPhoto) {
+        photo_url = await uploadItemPhoto(newItemPhoto);
+        if (!photo_url) { showToast('Failed to upload photo', 'error'); setItemSaving(false); return; }
+      }
+
       const res = await fetch('/api/businesses/menu/items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,32 +201,46 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
           price_pence: newItem.price ? Math.round(parseFloat(newItem.price) * 100) : undefined,
           dietary_tags: newItem.dietary_tags,
           available: newItem.available,
+          photo_url,
         }),
       });
       const data = await res.json();
       if (res.ok) {
         setSections((prev) => prev.map((s) => s.id === sectionId ? { ...s, menu_items: [...s.menu_items, data.item] } : s));
         setNewItem({ name: '', price: '', description: '', dietary_tags: [], available: true });
+        clearNewItemPhoto();
         setShowAddItem(null);
       } else showToast(data.error || 'Failed to add item', 'error');
     } catch { showToast('Failed to add item', 'error'); }
+    finally { setItemSaving(false); }
   };
 
   const handleUpdateItem = async () => {
     if (!editingItem) return;
     const { sectionId, item } = editingItem;
+    setItemSaving(true);
     try {
+      const updates: Record<string, unknown> = {
+        id: item.id,
+        name: editItem.name.trim(),
+        description: editItem.description.trim() || null,
+        price_pence: editItem.price ? Math.round(parseFloat(editItem.price) * 100) : null,
+        dietary_tags: editItem.dietary_tags,
+        available: editItem.available,
+      };
+
+      if (editItemPhoto) {
+        const url = await uploadItemPhoto(editItemPhoto);
+        if (!url) { showToast('Failed to upload photo', 'error'); setItemSaving(false); return; }
+        updates.photo_url = url;
+      } else if (editItemPhotoPreview === null && item.photo_url) {
+        updates.photo_url = null;
+      }
+
       const res = await fetch('/api/businesses/menu/items', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: item.id,
-          name: editItem.name.trim(),
-          description: editItem.description.trim() || null,
-          price_pence: editItem.price ? Math.round(parseFloat(editItem.price) * 100) : null,
-          dietary_tags: editItem.dietary_tags,
-          available: editItem.available,
-        }),
+        body: JSON.stringify(updates),
       });
       if (res.ok) {
         const updated = await res.json();
@@ -180,9 +248,11 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
           ...s,
           menu_items: s.menu_items.map((i) => i.id === item.id ? updated.item : i),
         } : s));
+        clearEditItemPhoto();
         setEditingItem(null);
       } else showToast('Failed to update item', 'error');
     } catch { showToast('Failed to update item', 'error'); }
+    finally { setItemSaving(false); }
   };
 
   const handleDeleteItem = async (sectionId: string, itemId: string) => {
@@ -202,6 +272,8 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
       dietary_tags: [...item.dietary_tags],
       available: item.available,
     });
+    setEditItemPhoto(null);
+    setEditItemPhotoPreview(item.photo_url);
   };
 
   // --- DnD reorder ---
@@ -468,7 +540,18 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
                           {section.menu_items.map((item) => (
                             <SortableItem key={item.id} id={item.id}>
                               <div className="flex items-start justify-between flex-1 min-w-0" style={{ opacity: item.available ? 1 : 0.5 }}>
-                                <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  {item.photo_url && (
+                                    <Image
+                                      src={item.photo_url}
+                                      alt={item.name}
+                                      width={40}
+                                      height={40}
+                                      className="rounded-md object-cover shrink-0"
+                                      loader={cloudflareLoader}
+                                    />
+                                  )}
+                                  <div className="min-w-0">
                                   <div className="flex items-center gap-2">
                                     <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>{item.name}</span>
                                     {item.price_pence != null && (
@@ -480,6 +563,7 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
                                       {item.dietary_tags.map((tag) => <DietaryBadge key={tag} tag={tag} />)}
                                     </div>
                                   )}
+                                  </div>
                                 </div>
                                 <div className="flex items-center gap-1 shrink-0">
                                   <button type="button" onClick={() => openEditItem(section.id, item)} className="p-1" style={{ color: 'var(--text-secondary)' }} aria-label="Edit item">
@@ -533,12 +617,27 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
         </Dialog>
 
         {/* Add Item Dialog */}
-        <Dialog open={!!showAddItem} onOpenChange={(open) => { if (!open) setShowAddItem(null); }}>
+        <Dialog open={!!showAddItem} onOpenChange={(open) => { if (!open) { clearNewItemPhoto(); setShowAddItem(null); } }}>
           <DialogContent style={{ backgroundColor: 'var(--bg-surface)' }}>
             <DialogHeader>
               <DialogTitle style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)' }}>Add Item</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-3">
+              {/* Photo upload */}
+              {newItemPhotoPreview ? (
+                <div className="relative" style={{ width: 80, height: 80 }}>
+                  <img src={newItemPhotoPreview} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--bg-elevated)' }} />
+                  <button type="button" onClick={clearNewItemPhoto} className="absolute -top-2 -right-2 flex items-center justify-center rounded-full" style={{ width: 20, height: 20, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--bg-elevated)', cursor: 'pointer' }} aria-label="Remove photo">
+                    <X size={12} strokeWidth={2} style={{ color: 'var(--text-secondary)' }} />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2" style={{ border: '1px dashed var(--bg-elevated)', color: 'var(--text-secondary)', fontSize: 13, fontFamily: 'var(--font-body)' }}>
+                  <Camera size={16} strokeWidth={1.5} />
+                  Add photo
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => handleItemPhotoSelect(e, setNewItemPhoto, setNewItemPhotoPreview)} />
+                </label>
+              )}
               <Input value={newItem.name} onChange={(e) => setNewItem((p) => ({ ...p, name: e.target.value }))} maxLength={100} placeholder="Item name" />
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-secondary)' }}>£</span>
@@ -556,20 +655,35 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
                 <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>Available</span>
                 <Switch checked={newItem.available} onCheckedChange={(checked) => setNewItem((p) => ({ ...p, available: checked }))} />
               </div>
-              <button type="button" onClick={() => showAddItem && handleAddItem(showAddItem)} disabled={!newItem.name.trim()} className="w-full rounded-xl py-2.5 font-semibold transition-opacity disabled:opacity-40" style={{ backgroundColor: 'var(--accent-primary)', color: 'var(--bg-primary)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
-                Add Item
+              <button type="button" onClick={() => showAddItem && handleAddItem(showAddItem)} disabled={!newItem.name.trim() || itemSaving} className="w-full rounded-xl py-2.5 font-semibold transition-opacity disabled:opacity-40" style={{ backgroundColor: 'var(--accent-primary)', color: 'var(--bg-primary)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
+                {itemSaving ? 'Adding...' : 'Add Item'}
               </button>
             </div>
           </DialogContent>
         </Dialog>
 
         {/* Edit Item Dialog */}
-        <Dialog open={!!editingItem} onOpenChange={(open) => { if (!open) setEditingItem(null); }}>
+        <Dialog open={!!editingItem} onOpenChange={(open) => { if (!open) { clearEditItemPhoto(); setEditingItem(null); } }}>
           <DialogContent style={{ backgroundColor: 'var(--bg-surface)' }}>
             <DialogHeader>
               <DialogTitle style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)' }}>Edit Item</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-3">
+              {/* Photo upload/change */}
+              {editItemPhotoPreview ? (
+                <div className="relative" style={{ width: 80, height: 80 }}>
+                  <img src={editItemPhotoPreview} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--bg-elevated)' }} />
+                  <button type="button" onClick={() => { if (editItemPhotoPreview.startsWith('blob:')) URL.revokeObjectURL(editItemPhotoPreview); setEditItemPhoto(null); setEditItemPhotoPreview(null); }} className="absolute -top-2 -right-2 flex items-center justify-center rounded-full" style={{ width: 20, height: 20, backgroundColor: 'var(--bg-surface)', border: '1px solid var(--bg-elevated)', cursor: 'pointer' }} aria-label="Remove photo">
+                    <X size={12} strokeWidth={2} style={{ color: 'var(--text-secondary)' }} />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2" style={{ border: '1px dashed var(--bg-elevated)', color: 'var(--text-secondary)', fontSize: 13, fontFamily: 'var(--font-body)' }}>
+                  <Camera size={16} strokeWidth={1.5} />
+                  Add photo
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => handleItemPhotoSelect(e, setEditItemPhoto, setEditItemPhotoPreview)} />
+                </label>
+              )}
               <Input value={editItem.name} onChange={(e) => setEditItem((p) => ({ ...p, name: e.target.value }))} maxLength={100} placeholder="Item name" />
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-secondary)' }}>£</span>
@@ -587,8 +701,8 @@ export function MenuManager({ sections: initialSections }: MenuManagerProps) {
                 <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-primary)' }}>Available</span>
                 <Switch checked={editItem.available} onCheckedChange={(checked) => setEditItem((p) => ({ ...p, available: checked }))} />
               </div>
-              <button type="button" onClick={handleUpdateItem} disabled={!editItem.name.trim()} className="w-full rounded-xl py-2.5 font-semibold transition-opacity disabled:opacity-40" style={{ backgroundColor: 'var(--accent-primary)', color: 'var(--bg-primary)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
-                Save Changes
+              <button type="button" onClick={handleUpdateItem} disabled={!editItem.name.trim() || itemSaving} className="w-full rounded-xl py-2.5 font-semibold transition-opacity disabled:opacity-40" style={{ backgroundColor: 'var(--accent-primary)', color: 'var(--bg-primary)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
+                {itemSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </DialogContent>

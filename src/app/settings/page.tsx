@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, LogOut, CreditCard, Users, Mail, Store } from 'lucide-react';
+import { ChevronRight, LogOut, CreditCard, Users, Mail, Store, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { LanguagePicker } from '@/components/settings/LanguagePicker';
@@ -86,6 +86,12 @@ export default function SettingsPage() {
                   href="/settings/business-profile"
                   icon={<Store size={20} strokeWidth={1.5} />}
                   label={t('editBusinessDetails')}
+                />
+                <SettingsDivider />
+                <SettingsLink
+                  href="/settings/premises"
+                  icon={<MapPin size={20} strokeWidth={1.5} />}
+                  label={t('managePremises')}
                 />
               </div>
             </section>

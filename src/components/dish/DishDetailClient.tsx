@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { UtensilsCrossed, MapPin } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { UtensilsCrossed, MapPin, Pencil, Trash2 } from 'lucide-react';
 import cloudflareLoader from '@/lib/cloudflare-loader';
 import { BackButton } from '@/components/ui/BackButton';
 import { ReactionButton } from '@/components/feed/ReactionButton';
@@ -10,6 +12,7 @@ import { SaveButton } from '@/components/feed/SaveButton';
 import { ShareButton } from '@/components/feed/ShareButton';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { CommentsSection } from '@/components/comments/CommentsSection';
+import { DishEditDialog } from './DishEditDialog';
 import { timeAgo } from '@/lib/utils/timeAgo';
 import { formatPrice } from '@/lib/utils';
 import { ImageCarousel } from '@/components/feed/ImageCarousel';
@@ -45,18 +48,81 @@ interface DishDetailClientProps {
   images: DishImage[];
   userHasReacted: boolean;
   userHasSaved: boolean;
+  isOwner?: boolean;
 }
 
-export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }: DishDetailClientProps) {
+export function DishDetailClient({ dish: initialDish, images, userHasReacted, userHasSaved, isOwner = false }: DishDetailClientProps) {
+  const router = useRouter();
+  const [dish, setDish] = useState(initialDish);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const bp = dish.business_profiles;
   const profile = dish.profiles;
+
+  function handleEditSaved(updated: { title?: string; description?: string | null; price_pence?: number | null; comments_enabled?: boolean }) {
+    setDish((prev) => ({ ...prev, ...updated }));
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/dishes/${dish.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        router.push('/me');
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
       <div className="mx-auto w-full pb-24 max-w-xl md:max-w-none">
-        {/* Header bar — Back + Share */}
+        {/* Header bar — Back + Share + Owner controls */}
         <div className="flex items-center justify-between px-4 py-3">
           <BackButton />
-          <ShareButton dishId={dish.id} title={dish.title} businessName={bp.business_name} />
+          <div className="flex items-center gap-2">
+            {isOwner && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowEditDialog(true)}
+                  className="flex items-center gap-1 rounded-xl px-3 py-1.5"
+                  style={{
+                    border: '1px solid var(--bg-elevated)',
+                    background: 'none',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--text-primary)',
+                  }}
+                  aria-label={`Edit ${dish.title}`}
+                >
+                  <Pencil size={14} strokeWidth={1.5} />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="flex items-center justify-center rounded-xl px-3 py-1.5"
+                  style={{
+                    border: '1px solid var(--bg-elevated)',
+                    background: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--status-error)',
+                  }}
+                  aria-label={`Delete ${dish.title}`}
+                >
+                  <Trash2 size={14} strokeWidth={1.5} />
+                </button>
+              </>
+            )}
+            <ShareButton dishId={dish.id} title={dish.title} businessName={bp.business_name} />
+          </div>
         </div>
 
         {/* Photo */}
@@ -200,6 +266,61 @@ export function DishDetailClient({ dish, images, userHasReacted, userHasSaved }:
           />
         </div>
       </div>
+
+      {/* Edit dialog */}
+      {showEditDialog && (
+        <DishEditDialog
+          dish={dish}
+          onClose={() => setShowEditDialog(false)}
+          onSaved={handleEditSaved}
+        />
+      )}
+
+      {/* Delete confirmation */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+        >
+          <div
+            className="w-full max-w-sm"
+            style={{ backgroundColor: 'var(--bg-surface)', borderRadius: 24, padding: '32px 24px' }}
+          >
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)', textAlign: 'center', marginBottom: 8 }}>
+              Delete dish?
+            </h3>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', marginBottom: 24 }}>
+              This will permanently remove &ldquo;{dish.title}&rdquo; and all its reactions, saves, and comments.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 rounded-2xl"
+                style={{
+                  border: '1px solid var(--bg-elevated)', background: 'none',
+                  fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 py-3 rounded-2xl"
+                style={{
+                  backgroundColor: 'var(--status-error)', color: '#FFFFFF', border: 'none',
+                  fontFamily: 'var(--font-body)', fontSize: 15, fontWeight: 600,
+                  cursor: deleting ? 'wait' : 'pointer', opacity: deleting ? 0.6 : 1,
+                }}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

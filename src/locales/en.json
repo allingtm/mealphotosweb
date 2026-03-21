@@ -433,7 +433,8 @@
     "themeLight": "Light",
     "themeSystem": "System",
     "businessProfile": "Business Profile",
-    "editBusinessDetails": "Edit business details"
+    "editBusinessDetails": "Edit business details",
+    "managePremises": "Manage premises"
   },
   "footer": {
     "privacy": "Privacy",

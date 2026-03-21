@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { UtensilsCrossed, MapPin } from 'lucide-react';
@@ -15,9 +16,11 @@ import { ImageCarousel } from './ImageCarousel';
 interface DishCardProps {
   dish: FeedItem;
   index: number;
+  onReact?: (dishId: string) => void;
+  onSave?: (dishId: string, saved: boolean) => void;
 }
 
-export function DishCard({ dish, index }: DishCardProps) {
+export const DishCard = memo(function DishCard({ dish, index, onReact, onSave }: DishCardProps) {
   const distanceMiles = dish.distance_km != null
     ? (dish.distance_km * 0.621371).toFixed(1)
     : null;
@@ -140,12 +143,14 @@ export function DishCard({ dish, index }: DishCardProps) {
             hasReacted={dish.user_has_reacted}
             count={dish.reaction_count}
             distanceKm={dish.distance_km}
+            onReacted={() => onReact?.(dish.id)}
           />
           <SaveButton
             dishId={dish.id}
             businessId={dish.business_id}
             hasSaved={dish.user_has_saved}
             title={dish.title}
+            onToggled={(saved) => onSave?.(dish.id, saved)}
           />
           <ShareButton
             dishId={dish.id}
@@ -156,4 +161,4 @@ export function DishCard({ dish, index }: DishCardProps) {
       </div>
     </article>
   );
-}
+});

@@ -8,7 +8,8 @@ import type { LucideIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
 import { PremiseSwitcher } from './PremiseSwitcher';
-import type { BusinessPremise } from '@/types/database';
+import { InboxCommentCard } from './InboxCommentCard';
+import type { BusinessPremise, InboxComment } from '@/types/database';
 
 interface DashboardStats {
   today_dishes: number;
@@ -50,6 +51,7 @@ export function BusinessDashboard({ userId, username }: BusinessDashboardProps) 
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [topDishes, setTopDishes] = useState<TopDish[]>([]);
   const [dishRequests, setDishRequests] = useState<DishRequest[]>([]);
+  const [recentComments, setRecentComments] = useState<InboxComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [maxPremises, setMaxPremises] = useState(5);
@@ -84,6 +86,7 @@ export function BusinessDashboard({ userId, username }: BusinessDashboardProps) 
         setStats(data.stats);
         setTopDishes(data.topDishes ?? []);
         setDishRequests(data.dishRequests ?? []);
+        setRecentComments(data.recentComments ?? []);
         if (data.maxPremises) setMaxPremises(data.maxPremises);
       } catch { /* silently fail */ }
       finally { setLoading(false); }
@@ -239,10 +242,50 @@ export function BusinessDashboard({ userId, username }: BusinessDashboardProps) 
               { icon: Users, label: 'new followers', value: stats?.week_followers ?? 0 },
             ]} />
 
+            {/* Recent Comments */}
+            {recentComments.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between">
+                  <SectionHeader title="Recent Comments" />
+                  <Link
+                    href="/business/comments"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--accent-primary)',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    View all →
+                  </Link>
+                </div>
+                <div className="flex flex-col">
+                  {recentComments.map((comment) => (
+                    <InboxCommentCard key={comment.id} comment={comment} />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Top Dishes */}
             {topDishes.length > 0 && (
               <div>
-                <SectionHeader title="Top Dishes" />
+                <div className="flex items-center justify-between">
+                  <SectionHeader title="Top Dishes" />
+                  <Link
+                    href="/business/dishes"
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--accent-primary)',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    View all →
+                  </Link>
+                </div>
                 <div className="flex flex-col gap-2">
                   {topDishes.map((dish, i) => (
                     <Link

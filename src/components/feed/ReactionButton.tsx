@@ -11,9 +11,10 @@ interface ReactionButtonProps {
   hasReacted: boolean;
   count: number;
   distanceKm: number | null;
+  onReacted?: () => void;
 }
 
-export function ReactionButton({ dishId, businessId, hasReacted: initialHasReacted, count: initialCount, distanceKm }: ReactionButtonProps) {
+export function ReactionButton({ dishId, businessId, hasReacted: initialHasReacted, count: initialCount, distanceKm, onReacted }: ReactionButtonProps) {
   const [hasReacted, setHasReacted] = useState(initialHasReacted);
   const [count, setCount] = useState(initialCount);
   const user = useAppStore((s) => s.user);
@@ -38,6 +39,8 @@ export function ReactionButton({ dishId, businessId, hasReacted: initialHasReact
         // Revert on error (409 means already reacted, which is fine)
         setHasReacted(false);
         setCount((c) => c - 1);
+      } else {
+        onReacted?.();
       }
 
       posthog.capture('dish_reacted', { dish_id: dishId, business_id: businessId, distance_km: distanceKm });

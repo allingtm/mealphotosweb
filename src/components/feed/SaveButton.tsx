@@ -10,9 +10,10 @@ interface SaveButtonProps {
   businessId: string;
   hasSaved: boolean;
   title: string;
+  onToggled?: (saved: boolean) => void;
 }
 
-export function SaveButton({ dishId, businessId, hasSaved: initialHasSaved, title }: SaveButtonProps) {
+export function SaveButton({ dishId, businessId, hasSaved: initialHasSaved, title, onToggled }: SaveButtonProps) {
   const [hasSaved, setHasSaved] = useState(initialHasSaved);
   const user = useAppStore((s) => s.user);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
@@ -27,7 +28,7 @@ export function SaveButton({ dishId, businessId, hasSaved: initialHasSaved, titl
       if (wasSaved) {
         const res = await fetch(`/api/saves/${dishId}`, { method: 'DELETE' });
         if (!res.ok) setHasSaved(true); // Revert
-        else posthog.capture('dish_unsaved', { dish_id: dishId });
+        else { posthog.capture('dish_unsaved', { dish_id: dishId }); onToggled?.(false); }
       } else {
         const res = await fetch('/api/saves', {
           method: 'POST',
@@ -35,7 +36,7 @@ export function SaveButton({ dishId, businessId, hasSaved: initialHasSaved, titl
           body: JSON.stringify({ dish_id: dishId }),
         });
         if (!res.ok && res.status !== 409) setHasSaved(false); // Revert
-        else posthog.capture('dish_saved', { dish_id: dishId, business_id: businessId });
+        else { posthog.capture('dish_saved', { dish_id: dishId, business_id: businessId }); onToggled?.(true); }
       }
     } catch {
       setHasSaved(wasSaved); // Revert on network error

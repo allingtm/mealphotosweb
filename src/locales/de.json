@@ -433,7 +433,8 @@
     "themeLight": "Hell",
     "themeSystem": "System",
     "businessProfile": "Geschäftsprofil",
-    "editBusinessDetails": "Geschäftsdetails bearbeiten"
+    "editBusinessDetails": "Geschäftsdetails bearbeiten",
+    "managePremises": "Standorte verwalten"
   },
   "footer": {
     "privacy": "Datenschutz",

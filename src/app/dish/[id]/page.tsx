@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: dish.title,
     description: dish.description ?? dish.title,
     openGraph: { images: [dish.photo_url] },
+    alternates: { canonical: `https://meal.photos/dish/${id}` },
   };
 }
 
@@ -67,12 +68,63 @@ export default async function DishDetailPage({ params }: Props) {
     userHasSaved = !!saveResult.data;
   }
 
+  const isOwner = user?.id === dish.business_id;
+
+  const bp = Array.isArray(dish.business_profiles)
+    ? dish.business_profiles[0]
+    : dish.business_profiles;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MenuItem',
+    name: dish.title,
+    description: dish.description ?? undefined,
+    image: dish.photo_url,
+    datePublished: dish.created_at,
+    ...(dish.price_pence && {
+      offers: {
+        '@type': 'Offer',
+        price: (dish.price_pence / 100).toFixed(2),
+        priceCurrency: 'GBP',
+        availability: 'https://schema.org/InStock',
+      },
+    }),
+    ...(dish.reaction_count > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: 5,
+        ratingCount: dish.reaction_count,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+    ...(bp && {
+      provider: {
+        '@type': 'FoodEstablishment',
+        name: bp.business_name,
+        ...(bp.address_city && {
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: bp.address_city,
+          },
+        }),
+      },
+    }),
+  };
+
   return (
-    <DishDetailClient
-      dish={dish}
-      images={images}
-      userHasReacted={userHasReacted}
-      userHasSaved={userHasSaved}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <DishDetailClient
+        dish={dish}
+        images={images}
+        userHasReacted={userHasReacted}
+        userHasSaved={userHasSaved}
+        isOwner={isOwner}
+      />
+    </>
   );
 }

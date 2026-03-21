@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^8.9.0",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
+    "@tanstack/react-virtual": "^3.13.23",
     "@uiw/react-md-editor": "^4.0.11",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.3",

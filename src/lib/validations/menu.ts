@@ -13,6 +13,7 @@ export const createMenuItemSchema = z.object({
   dietary_tags: z.array(z.enum(['V', 'VG', 'GF', 'DF'])).default([]),
   available: z.boolean().default(true),
   sort_order: z.number().int().min(0).default(0),
+  photo_url: z.string().url().nullable().optional(),
 });
 
 export type CreateMenuSectionInput = z.infer<typeof createMenuSectionSchema>;

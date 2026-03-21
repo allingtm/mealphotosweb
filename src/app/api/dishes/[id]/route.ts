@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/rate-limit';
+import { updateDishSchema } from '@/lib/validations/dish';
 
 export async function GET(
   req: NextRequest,
@@ -40,6 +41,52 @@ export async function GET(
   }
 
   return NextResponse.json({ ...dish, user_has_reacted, user_has_saved });
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const ip = req.headers.get('x-forwarded-for') ?? 'anonymous';
+  const rateLimited = await applyRateLimit(ip, 'write');
+  if (rateLimited) return rateLimited;
+
+  const { id } = await params;
+  const body = await req.json();
+
+  const parsed = updateDishSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Validation failed', details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  // Verify ownership
+  const { data: dish } = await supabase
+    .from('dishes')
+    .select('business_id')
+    .eq('id', id)
+    .single();
+
+  if (!dish || dish.business_id !== user.id) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
+  const { error } = await supabase
+    .from('dishes')
+    .update(parsed.data)
+    .eq('id', id);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
 }
 
 export async function DELETE(

@@ -433,7 +433,8 @@
     "themeLight": "Claro",
     "themeSystem": "Sistema",
     "businessProfile": "Perfil Comercial",
-    "editBusinessDetails": "Editar detalles del negocio"
+    "editBusinessDetails": "Editar detalles del negocio",
+    "managePremises": "Gestionar locales"
   },
   "footer": {
     "privacy": "Privacidad",
