@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
               // unsafe-inline for styles: required by Next.js / Tailwind CSS
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://imagedelivery.net https://api.mapbox.com https://lh3.googleusercontent.com https://*.googleusercontent.com data: blob:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.tiles.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://app.posthog.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.tiles.mapbox.com https://challenges.cloudflare.com https://onesignal.com https://*.posthog.com",
               "font-src 'self'",
               "frame-src https://challenges.cloudflare.com https://js.stripe.com",
               "worker-src 'self' blob:",
