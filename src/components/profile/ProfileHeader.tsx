@@ -409,7 +409,7 @@ export function ProfileHeader({ profile, businessProfile, isOwnProfile, isFollow
                   fontFamily: 'var(--font-body)',
                   fontWeight: 600,
                   backgroundColor: bpGroup === 'health_nutrition' ? 'var(--accent-primary)' : 'var(--bg-surface)',
-                  color: bpGroup === 'health_nutrition' ? '#121212' : 'var(--text-primary)',
+                  color: bpGroup === 'health_nutrition' ? 'var(--primary-foreground)' : 'var(--text-primary)',
                   border: bpGroup === 'health_nutrition' ? 'none' : '1px solid var(--bg-elevated)',
                   textDecoration: 'none',
                 }}

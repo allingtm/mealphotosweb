@@ -669,7 +669,7 @@ export function BlogTab() {
                       padding: '2px 6px', borderRadius: 6, fontSize: 10, fontWeight: 600,
                       fontFamily: 'var(--font-body)', textTransform: 'uppercase',
                       backgroundColor: post.published ? 'var(--status-success)' : 'var(--bg-elevated)',
-                      color: post.published ? '#121212' : 'var(--text-secondary)',
+                      color: post.published ? 'var(--primary-foreground)' : 'var(--text-secondary)',
                     }}>
                       {post.published ? 'Published' : 'Draft'}
                     </span>

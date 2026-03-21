@@ -258,7 +258,7 @@ export function CommentMoreMenu({
                 fontFamily: 'var(--font-body)',
                 fontSize: 16,
                 fontWeight: 600,
-                color: selectedReason ? '#121212' : 'var(--text-secondary)',
+                color: selectedReason ? 'var(--primary-foreground)' : 'var(--text-secondary)',
                 backgroundColor: selectedReason
                   ? 'var(--accent-primary)'
                   : 'var(--bg-elevated)',

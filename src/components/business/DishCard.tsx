@@ -64,7 +64,7 @@ export function DishCard({ title, photoUrl, avgRating, ratingCount, revealed }: 
             fontFamily: 'var(--font-body)',
             fontSize: 10,
             fontWeight: 600,
-            color: revealed ? '#121212' : 'var(--text-secondary)',
+            color: revealed ? 'var(--primary-foreground)' : 'var(--text-secondary)',
           }}
         >
           {revealed ? 'pub' : 'anon'}

@@ -69,14 +69,14 @@ export function MembersTab() {
     }
     if (member.suspended_until && new Date(member.suspended_until) > new Date()) {
       return (
-        <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: '#121212', backgroundColor: 'var(--accent-primary)' }}>
+        <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--primary-foreground)', backgroundColor: 'var(--accent-primary)' }}>
           <Clock size={10} /> Suspended
         </span>
       );
     }
     if (member.is_admin) {
       return (
-        <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: '#121212', backgroundColor: 'var(--status-success)' }}>
+        <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--primary-foreground)', backgroundColor: 'var(--status-success)' }}>
           <Shield size={10} /> Admin
         </span>
       );

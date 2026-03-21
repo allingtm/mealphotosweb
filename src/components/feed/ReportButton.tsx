@@ -271,7 +271,7 @@ export function ReportButton({ mealId }: ReportButtonProps) {
                 backgroundColor: selectedReason
                   ? 'var(--accent-primary)'
                   : 'var(--bg-elevated)',
-                color: selectedReason ? '#121212' : 'var(--text-secondary)',
+                color: selectedReason ? 'var(--primary-foreground)' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-body)',
                 fontSize: 15,
                 fontWeight: 600,

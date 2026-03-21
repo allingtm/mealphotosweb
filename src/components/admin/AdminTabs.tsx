@@ -195,7 +195,7 @@ export function AdminTabs({
               fontFamily: 'var(--font-body)',
               fontSize: 14,
               fontWeight: activeTab === key ? 600 : 400,
-              color: activeTab === key ? '#121212' : 'var(--text-secondary)',
+              color: activeTab === key ? 'var(--primary-foreground)' : 'var(--text-secondary)',
               backgroundColor: activeTab === key ? 'var(--accent-primary)' : 'transparent',
               border: 'none',
               cursor: 'pointer',
@@ -336,7 +336,7 @@ export function AdminTabs({
                       fontSize: 11,
                       fontWeight: 600,
                       fontFamily: 'var(--font-body)',
-                      color: '#121212',
+                      color: 'var(--primary-foreground)',
                       backgroundColor: PRIORITY_COLORS[item.priority] ?? 'var(--text-secondary)',
                       textTransform: 'uppercase',
                     }}

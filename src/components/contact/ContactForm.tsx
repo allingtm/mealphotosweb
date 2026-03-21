@@ -292,7 +292,7 @@ export function ContactForm() {
           padding: '14px 24px',
           borderRadius: 16,
           backgroundColor: 'var(--accent-primary)',
-          color: '#121212',
+          color: 'var(--primary-foreground)',
           fontFamily: 'var(--font-body)',
           fontSize: 15,
           fontWeight: 600,

@@ -119,7 +119,7 @@ function PillSelect({ options, selected, onToggle, labels }: {
               fontSize: 14,
               fontFamily: 'var(--font-body)',
               backgroundColor: isChecked ? 'var(--accent-primary)' : 'var(--bg-surface)',
-              color: isChecked ? '#121212' : 'var(--text-secondary)',
+              color: isChecked ? 'var(--primary-foreground)' : 'var(--text-secondary)',
               border: isChecked ? 'none' : '1px solid var(--bg-elevated)',
               fontWeight: isChecked ? 600 : 400,
             }}

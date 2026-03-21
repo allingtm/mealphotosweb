@@ -330,7 +330,7 @@ export function AuthModal() {
                 border: '1px solid var(--bg-elevated)',
               }}
             >
-              No, just browsing
+              I'm here to eat
             </button>
           </div>
         )}

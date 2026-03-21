@@ -305,7 +305,7 @@ export function InviteCodesTab() {
                         fontSize: 10,
                         fontWeight: 600,
                         fontFamily: 'var(--font-body)',
-                        color: status === 'Active' ? '#121212' : '#FFFFFF',
+                        color: status === 'Active' ? 'var(--primary-foreground)' : '#FFFFFF',
                         backgroundColor: statusColor,
                         textTransform: 'uppercase',
                       }}
@@ -340,7 +340,7 @@ export function InviteCodesTab() {
                     padding: '6px 12px',
                     borderRadius: 8,
                     backgroundColor: code.is_active ? 'var(--status-error)' : 'var(--status-success)',
-                    color: code.is_active ? '#FFFFFF' : '#121212',
+                    color: code.is_active ? '#FFFFFF' : 'var(--primary-foreground)',
                     fontFamily: 'var(--font-body)',
                     fontSize: 12,
                     fontWeight: 600,

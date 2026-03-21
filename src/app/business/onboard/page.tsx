@@ -268,7 +268,7 @@ export default function OnboardPage() {
               style={{
                 marginTop: 24,
                 backgroundColor: businessCategories.length > 0 ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                color: businessCategories.length > 0 ? '#121212' : 'var(--text-secondary)',
+                color: businessCategories.length > 0 ? 'var(--primary-foreground)' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-body)',
                 fontSize: 16,
                 fontWeight: 600,
@@ -439,7 +439,7 @@ export default function OnboardPage() {
                 className="flex-1 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
                 style={{
                   backgroundColor: loading ? 'var(--bg-elevated)' : 'var(--accent-primary)',
-                  color: loading ? 'var(--text-secondary)' : '#121212',
+                  color: loading ? 'var(--text-secondary)' : 'var(--primary-foreground)',
                   fontFamily: 'var(--font-body)',
                   fontSize: 16,
                   fontWeight: 600,

@@ -391,12 +391,12 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                 </span>
               )}
               {isSuspended && (
-                <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: '#121212', backgroundColor: 'var(--accent-primary)' }}>
+                <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--primary-foreground)', backgroundColor: 'var(--accent-primary)' }}>
                   <Clock size={10} /> Suspended until {new Date(member.suspended_until!).toLocaleDateString()}
                 </span>
               )}
               {member.is_admin && (
-                <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: '#121212', backgroundColor: 'var(--status-success)' }}>
+                <span className="inline-flex items-center gap-1" style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--primary-foreground)', backgroundColor: 'var(--status-success)' }}>
                   <Shield size={10} /> Admin
                 </span>
               )}
@@ -471,7 +471,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                   onClick={handleSaveProfile}
                   disabled={saving}
                   className="inline-flex items-center gap-1"
-                  style={{ padding: '6px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: saving ? 'wait' : 'pointer', opacity: saving ? 0.6 : 1 }}
+                  style={{ padding: '6px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: saving ? 'wait' : 'pointer', opacity: saving ? 0.6 : 1 }}
                 >
                   <Save size={14} /> {saving ? '...' : 'Save'}
                 </button>
@@ -546,7 +546,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                   onClick={handleUnban}
                   disabled={actionLoading}
                   className="inline-flex items-center gap-1"
-                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
+                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
                 >
                   Unban
                 </button>
@@ -569,7 +569,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                   onClick={handleUnsuspend}
                   disabled={actionLoading}
                   className="inline-flex items-center gap-1"
-                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
+                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--status-success)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
                 >
                   Unsuspend
                 </button>
@@ -579,7 +579,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                   onClick={() => setSuspendDialogOpen(true)}
                   disabled={actionLoading}
                   className="inline-flex items-center gap-1"
-                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--accent-primary)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
+                  style={{ padding: '8px 14px', borderRadius: 8, backgroundColor: 'var(--accent-primary)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, border: 'none', cursor: actionLoading ? 'wait' : 'pointer', opacity: actionLoading ? 0.6 : 1 }}
                 >
                   <Clock size={14} /> Suspend
                 </button>
@@ -667,7 +667,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                             onClick={handleSaveMeal}
                             disabled={mealSaving}
                             className="inline-flex items-center gap-1"
-                            style={{ padding: '4px 10px', borderRadius: 6, backgroundColor: 'var(--status-success)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600, border: 'none', cursor: mealSaving ? 'wait' : 'pointer', opacity: mealSaving ? 0.6 : 1 }}
+                            style={{ padding: '4px 10px', borderRadius: 6, backgroundColor: 'var(--status-success)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 600, border: 'none', cursor: mealSaving ? 'wait' : 'pointer', opacity: mealSaving ? 0.6 : 1 }}
                           >
                             <Save size={12} /> {mealSaving ? '...' : 'Save'}
                           </button>
@@ -835,7 +835,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                 type="button"
                 onClick={handleSuspend}
                 disabled={actionLoading || !suspendUntil}
-                style={{ padding: '8px 16px', borderRadius: 8, backgroundColor: 'var(--accent-primary)', color: '#121212', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, border: 'none', cursor: (actionLoading || !suspendUntil) ? 'not-allowed' : 'pointer', opacity: (actionLoading || !suspendUntil) ? 0.6 : 1 }}
+                style={{ padding: '8px 16px', borderRadius: 8, backgroundColor: 'var(--accent-primary)', color: 'var(--primary-foreground)', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, border: 'none', cursor: (actionLoading || !suspendUntil) ? 'not-allowed' : 'pointer', opacity: (actionLoading || !suspendUntil) ? 0.6 : 1 }}
               >
                 {actionLoading ? '...' : 'Suspend'}
               </button>

@@ -163,7 +163,7 @@ export function BusinessDashboard({ userId }: BusinessDashboardProps) {
               className="w-full py-3 rounded-2xl"
               style={{
                 backgroundColor: 'var(--accent-primary)',
-                color: '#121212',
+                color: 'var(--primary-foreground)',
                 fontFamily: 'var(--font-body)',
                 fontSize: 16,
                 fontWeight: 600,
