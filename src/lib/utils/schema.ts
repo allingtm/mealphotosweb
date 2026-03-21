@@ -23,16 +23,18 @@ const DAY_MAP: Record<string, string> = {
 };
 
 export function formatOpeningHours(
-  hours: Record<string, { open: string; close: string }> | null
+  hours: Record<string, Array<{ open: string; close: string }>> | null
 ): object[] | undefined {
   if (!hours || Object.keys(hours).length === 0) return undefined;
 
   return Object.entries(hours)
     .filter(([day]) => DAY_MAP[day])
-    .map(([day, { open, close }]) => ({
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: DAY_MAP[day],
-      opens: open,
-      closes: close,
-    }));
+    .flatMap(([day, periods]) =>
+      periods.map(({ open, close }) => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: DAY_MAP[day],
+        opens: open,
+        closes: close,
+      }))
+    );
 }

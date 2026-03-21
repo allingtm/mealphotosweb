@@ -28,10 +28,10 @@ export const businessProfileCreateSchema = z.object({
   longitude: z.number().min(-180).max(180).optional().nullable(),
 
   // Food Service specific
-  opening_hours: z.record(z.string(), z.object({
+  opening_hours: z.record(z.string(), z.array(z.object({
     open: z.string(),
     close: z.string(),
-  })).optional().nullable(),
+  }))).optional().nullable(),
   cuisine_types: z.array(z.string()).optional().nullable(),
 
   // Retail specific
@@ -89,10 +89,10 @@ export const premiseCreateSchema = z.object({
   menu_url: z.string().url().max(255).optional().nullable().or(z.literal('')),
 
   // Details
-  opening_hours: z.record(z.string(), z.object({
+  opening_hours: z.record(z.string(), z.array(z.object({
     open: z.string(),
     close: z.string(),
-  })).optional().nullable(),
+  }))).optional().nullable(),
   cuisine_types: z.array(z.string().max(50)).max(20).optional().nullable(),
   delivery_available: z.boolean().optional(),
   bio: z.string().trim().max(500).optional().nullable(),

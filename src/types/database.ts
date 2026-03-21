@@ -159,7 +159,7 @@ export interface BusinessProfile {
   address_postcode: string | null;
   address_country: string | null;
   location: unknown | null;
-  opening_hours: Record<string, { open: string; close: string }> | null;
+  opening_hours: Record<string, Array<{ open: string; close: string }>> | null;
   cuisine_types: string[];
   qualifications: string[];
   specialisms: string[];
@@ -193,7 +193,7 @@ export interface BusinessPremise {
   email: string | null;
   website_url: string | null;
   booking_url: string | null;
-  opening_hours: Record<string, { open: string; close: string }> | null;
+  opening_hours: Record<string, Array<{ open: string; close: string }>> | null;
   cuisine_types: string[] | null;
   delivery_available: boolean;
   menu_url: string | null;

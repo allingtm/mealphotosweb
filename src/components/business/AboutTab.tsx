@@ -33,12 +33,14 @@ export function AboutTab({ businessProfile: bp }: AboutTabProps) {
           </div>
           <div className="flex flex-col gap-1">
             {DAY_KEYS.map((key, i) => {
-              const hours = bp.opening_hours?.[key];
+              const periods = bp.opening_hours?.[key];
               return (
                 <div key={key} className="flex justify-between" style={{ fontFamily: 'var(--font-body)', fontSize: 13 }}>
                   <span style={{ color: 'var(--text-secondary)' }}>{DAY_NAMES[i]}</span>
                   <span style={{ color: 'var(--text-primary)' }}>
-                    {hours ? `${hours.open} – ${hours.close}` : 'Closed'}
+                    {periods && periods.length > 0
+                      ? periods.map(p => `${p.open} – ${p.close}`).join(', ')
+                      : 'Closed'}
                   </span>
                 </div>
               );
