@@ -35,11 +35,6 @@ export const ANALYTICS_EVENTS = {
   PLAN_UPGRADE_STARTED: 'plan_upgrade_started',
   PLAN_UPGRADE_COMPLETED: 'plan_upgrade_completed',
   PLAN_DOWNGRADED: 'plan_downgraded',
-  PRIVATE_FEED_INVITE_SENT: 'private_feed_invite_sent',
-  PRIVATE_FEED_INVITE_ACCEPTED: 'private_feed_invite_accepted',
-  PRIVATE_FEED_INVITE_DECLINED: 'private_feed_invite_declined',
-  PRIVATE_FEED_MEMBER_LEFT: 'private_feed_member_left',
-  PRIVATE_MEAL_RATED: 'private_meal_rated',
   MULTI_PHOTO_UPSELL_SHOWN: 'multi_photo_upsell_shown',
   MULTI_PHOTO_UPSELL_TAPPED: 'multi_photo_upsell_tapped',
 

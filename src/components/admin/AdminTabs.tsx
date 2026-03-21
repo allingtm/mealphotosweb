@@ -71,7 +71,6 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 const REASON_LABELS: Record<string, string> = {
-  not_food: 'Not food',
   inappropriate: 'Inappropriate',
   spam: 'Spam',
   harassment: 'Harassment',

@@ -220,6 +220,16 @@ export interface Dish {
   save_count: number;
   comment_count: number;
   comments_enabled: boolean;
+  ingredients: string[];
+  created_at: string;
+}
+
+export interface Ingredient {
+  id: string;
+  name: string;
+  normalized_name: string;
+  category: string | null;
+  usage_count: number;
   created_at: string;
 }
 

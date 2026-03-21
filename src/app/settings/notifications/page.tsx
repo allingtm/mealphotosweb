@@ -50,7 +50,7 @@ export default function NotificationPreferencesPage() {
 
   return (
     <div className="flex flex-col md:overflow-y-auto md:flex-1 md:min-h-0">
-      <div className="w-full max-w-lg mx-auto px-4 pb-24">
+      <div className="w-full px-4 pb-24" style={{ maxWidth: 960 }}>
         <div className="flex items-center gap-3 py-4">
           <button
             type="button"

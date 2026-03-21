@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid params', details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { q, limit, cuisine, dietary, minPrice, maxPrice, cursor } = parsed.data;
+  const { q, limit, cuisine, dietary, ingredients, minPrice, maxPrice, cursor } = parsed.data;
 
   // --- Dishes search ---
   let dishQuery = supabase
@@ -28,6 +28,14 @@ export async function GET(req: NextRequest) {
     `)
     .textSearch('title', q, { type: 'websearch' })
     .order('reaction_count', { ascending: false });
+
+  // Ingredient filter (uses GIN index)
+  if (ingredients) {
+    const ingredientList = ingredients.split(',').map((s) => s.trim()).filter(Boolean);
+    if (ingredientList.length > 0) {
+      dishQuery = dishQuery.contains('ingredients', ingredientList);
+    }
+  }
 
   // Price filters
   if (minPrice) dishQuery = dishQuery.gte('price_pence', parseInt(minPrice));

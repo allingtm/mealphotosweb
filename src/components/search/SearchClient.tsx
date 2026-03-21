@@ -78,9 +78,16 @@ interface DishRequestItem {
   user_has_upvoted: boolean;
 }
 
+interface IngredientSuggestion {
+  id: string;
+  name: string;
+  category: string | null;
+}
+
 interface Filters {
   cuisine?: string;
   dietary?: string;
+  ingredients?: string;
   minPrice?: string;
   maxPrice?: string;
 }
@@ -99,6 +106,9 @@ export function SearchClient() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
   const [openFilter, setOpenFilter] = useState<string | null>(null);
+  const [ingredientQuery, setIngredientQuery] = useState('');
+  const [ingredientSuggestions, setIngredientSuggestions] = useState<IngredientSuggestion[]>([]);
+  const ingredientDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load popular + dish requests on mount
@@ -132,6 +142,7 @@ export function SearchClient() {
     const params = new URLSearchParams({ q, limit: '20' });
     if (f.cuisine) params.set('cuisine', f.cuisine);
     if (f.dietary) params.set('dietary', f.dietary);
+    if (f.ingredients) params.set('ingredients', f.ingredients);
     if (f.minPrice) params.set('minPrice', f.minPrice);
     if (f.maxPrice) params.set('maxPrice', f.maxPrice);
 
@@ -220,6 +231,7 @@ export function SearchClient() {
     setLoadingMore(true);
     const params = new URLSearchParams({ q: query, limit: '20', cursor: nextCursor });
     if (filters.cuisine) params.set('cuisine', filters.cuisine);
+    if (filters.ingredients) params.set('ingredients', filters.ingredients);
     if (filters.minPrice) params.set('minPrice', filters.minPrice);
     if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
 
@@ -350,6 +362,119 @@ export function SearchClient() {
                     {range.label}
                   </button>
                 ))}
+              </div>
+            </FilterPill>
+
+            {/* Ingredients filter */}
+            <FilterPill
+              label="Ingredients"
+              active={!!filters.ingredients}
+              activeLabel={filters.ingredients?.split(',').length === 1 ? filters.ingredients : `${filters.ingredients?.split(',').length} ingredients`}
+              isOpen={openFilter === 'ingredients'}
+              onToggle={() => {
+                setOpenFilter(openFilter === 'ingredients' ? null : 'ingredients');
+                setIngredientQuery('');
+                setIngredientSuggestions([]);
+              }}
+              onClear={() => handleFilterChange('ingredients', undefined)}
+            >
+              <div className="p-2">
+                <input
+                  type="text"
+                  value={ingredientQuery}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setIngredientQuery(val);
+                    if (ingredientDebounceRef.current) clearTimeout(ingredientDebounceRef.current);
+                    if (val.trim()) {
+                      ingredientDebounceRef.current = setTimeout(async () => {
+                        try {
+                          const res = await fetch(`/api/ingredients?q=${encodeURIComponent(val.trim())}&limit=8`);
+                          const data = await res.json();
+                          setIngredientSuggestions(data.ingredients ?? []);
+                        } catch { setIngredientSuggestions([]); }
+                      }, 250);
+                    } else {
+                      setIngredientSuggestions([]);
+                    }
+                  }}
+                  placeholder="Search ingredients..."
+                  className="w-full px-3 py-2 rounded-lg mb-1"
+                  style={{
+                    backgroundColor: 'var(--bg-primary)',
+                    border: '1px solid var(--bg-elevated)',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 13,
+                    outline: 'none',
+                  }}
+                  autoFocus
+                />
+                {/* Selected ingredients */}
+                {filters.ingredients && (
+                  <div className="flex flex-wrap gap-1 mb-1 px-1">
+                    {filters.ingredients.split(',').map((ing) => (
+                      <span
+                        key={ing}
+                        className="flex items-center gap-0.5 rounded-full px-2 py-0.5"
+                        style={{
+                          backgroundColor: 'rgba(232, 168, 56, 0.15)',
+                          color: 'var(--accent-primary)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 11,
+                        }}
+                      >
+                        {ing}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const current = filters.ingredients!.split(',').filter((i) => i !== ing);
+                            handleFilterChange('ingredients', current.length > 0 ? current.join(',') : undefined);
+                          }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--accent-primary)' }}
+                          aria-label={`Remove ${ing}`}
+                        >
+                          <X size={10} strokeWidth={2} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {/* Suggestions */}
+                <div className="flex flex-col gap-0.5">
+                  {ingredientSuggestions.map((s) => {
+                    const alreadySelected = filters.ingredients?.split(',').includes(s.name);
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          if (alreadySelected) return;
+                          const current = filters.ingredients ? filters.ingredients.split(',') : [];
+                          handleFilterChange('ingredients', [...current, s.name].join(','));
+                          setIngredientQuery('');
+                          setIngredientSuggestions([]);
+                        }}
+                        className="text-left px-3 py-2 rounded-lg"
+                        style={{
+                          backgroundColor: alreadySelected ? 'rgba(232, 168, 56, 0.15)' : 'transparent',
+                          color: alreadySelected ? 'var(--accent-primary)' : 'var(--text-primary)',
+                          fontFamily: 'var(--font-body)',
+                          fontSize: 13,
+                          opacity: alreadySelected ? 0.6 : 1,
+                        }}
+                        disabled={alreadySelected}
+                      >
+                        {s.name}
+                        {s.category && (
+                          <span style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 6, textTransform: 'capitalize' }}>
+                            {s.category}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </FilterPill>
 

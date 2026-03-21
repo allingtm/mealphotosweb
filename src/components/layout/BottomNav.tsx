@@ -3,17 +3,19 @@
 import { Home, Compass, Search, BookOpen, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const tabs = [
-  { href: '/', icon: Home, label: 'Feed' },
-  { href: '/map', icon: Compass, label: 'Map' },
-  { href: '/search', icon: Search, label: 'Search' },
-  { href: '/blog', icon: BookOpen, label: 'Blog' },
-  { href: '/me', icon: User, label: 'Me' },
+  { href: '/', icon: Home, key: 'feed' },
+  { href: '/map', icon: Compass, key: 'map' },
+  { href: '/search', icon: Search, key: 'search' },
+  { href: '/blog', icon: BookOpen, key: 'blog' },
+  { href: '/me', icon: User, key: 'me' },
 ] as const;
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations('nav');
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
@@ -27,7 +29,7 @@ export function BottomNav() {
         borderColor: 'var(--bg-elevated)',
       }}
     >
-      {tabs.map(({ href, icon: Icon, label }) => (
+      {tabs.map(({ href, icon: Icon, key }) => (
         <Link
           key={href}
           href={href}
@@ -46,7 +48,7 @@ export function BottomNav() {
               color: isActive(href) ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
           >
-            {label}
+            {t(key)}
           </span>
         </Link>
       ))}

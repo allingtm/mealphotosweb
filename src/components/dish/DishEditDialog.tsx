@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { IngredientInput } from '@/components/post/IngredientInput';
 
 interface DishEditDialogProps {
   dish: {
@@ -10,9 +11,10 @@ interface DishEditDialogProps {
     description: string | null;
     price_pence: number | null;
     comments_enabled: boolean;
+    ingredients: string[];
   };
   onClose: () => void;
-  onSaved: (updated: { title?: string; description?: string | null; price_pence?: number | null; comments_enabled?: boolean }) => void;
+  onSaved: (updated: { title?: string; description?: string | null; price_pence?: number | null; comments_enabled?: boolean; ingredients?: string[] }) => void;
 }
 
 export function DishEditDialog({ dish, onClose, onSaved }: DishEditDialogProps) {
@@ -21,6 +23,7 @@ export function DishEditDialog({ dish, onClose, onSaved }: DishEditDialogProps) 
   const [pricePounds, setPricePounds] = useState(
     dish.price_pence != null ? (dish.price_pence / 100).toFixed(2) : ''
   );
+  const [ingredients, setIngredients] = useState<string[]>(dish.ingredients ?? []);
   const [commentsEnabled, setCommentsEnabled] = useState(dish.comments_enabled);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +40,7 @@ export function DishEditDialog({ dish, onClose, onSaved }: DishEditDialogProps) 
       title: title.trim(),
       description: description.trim() || null,
       price_pence: pricePounds ? Math.round(parseFloat(pricePounds) * 100) : null,
+      ingredients,
       comments_enabled: commentsEnabled,
     };
 
@@ -182,6 +186,14 @@ export function DishEditDialog({ dish, onClose, onSaved }: DishEditDialogProps) 
               }}
             />
           </label>
+
+          {/* Ingredients */}
+          <div className="flex flex-col gap-1">
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Ingredients
+            </span>
+            <IngredientInput value={ingredients} onChange={setIngredients} />
+          </div>
 
           {/* Comments toggle */}
           <label className="flex items-center gap-3" style={{ padding: '4px 0' }}>

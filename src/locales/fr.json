@@ -29,7 +29,12 @@
     "pricing": "Tarifs",
     "menu": "Menu",
     "myMeals": "Mes repas",
-    "uploadMealPhoto": "Publier une photo de repas"
+    "uploadMealPhoto": "Publier une photo de repas",
+    "search": "Rechercher",
+    "blog": "Blog",
+    "me": "Moi",
+    "post": "Publier",
+    "admin": "Admin"
   },
   "feed": {
     "title": "meal.photos",
@@ -252,7 +257,6 @@
     "visibility": "Visibilité",
     "public": "Public",
     "private": "Privé",
-    "privateHelper": "Seuls les membres de votre liste privée peuvent voir ce repas.",
     "upgradeMultiPhoto": "Passez à l'offre supérieure pour les albums photos",
     "cuisines": {
       "italian": "Italienne",
@@ -285,7 +289,6 @@
     "detailPlaceholder": "Détails supplémentaires (facultatif)",
     "disclaimer": "Les signalements sont examinés sous 48h et sont toujours anonymes.",
     "reasons": {
-      "not_food": "Ce n'est pas de la nourriture",
       "inappropriate": "Contenu inapproprié",
       "spam": "Spam / contenu promotionnel",
       "stolen_photo": "Photo volée",
@@ -391,9 +394,6 @@
     "businessPlan": "Business",
     "upgrade": "Passer à l'offre supérieure",
     "manageSubscription": "Gérer l'abonnement",
-    "privateFeed": "Fil privé",
-    "manageFeedList": "Gérer la liste du fil",
-    "viewInvitations": "Voir les invitations",
     "language": "Langue",
     "languageLabel": "Langue de l'application",
     "theme": "Thème",
@@ -501,19 +501,16 @@
     "freeFeatures": [
       "5 publications/jour",
       "1 photo par repas",
-      "5 membres en fil privé",
       "Noter et demander des recettes"
     ],
     "personalFeatures": [
       "15 publications/jour",
       "Jusqu'à 4 photos par repas",
-      "25 membres en fil privé",
       "Support prioritaire"
     ],
     "businessFeatures": [
       "20 publications/jour",
       "Jusqu'à 4 photos par repas",
-      "100 membres en fil privé",
       "Test anonyme de plats",
       "Statistiques restaurant"
     ],
@@ -527,7 +524,6 @@
     "freeDetailFeatures": [
       "5 publications par jour",
       "1 photo par repas",
-      "5 membres en fil privé",
       "Noter les repas et demander des recettes",
       "Séries de publications et badges",
       "Repas affichés sur la carte mondiale"
@@ -535,7 +531,6 @@
     "personalDetailFeatures": [
       "15 publications par jour",
       "Jusqu'à 4 photos par repas",
-      "25 membres en fil privé",
       "Support prioritaire"
     ],
     "businessDetailFeatures": [
@@ -547,8 +542,7 @@
       "Test anonyme de plats",
       "Placement prioritaire sur la carte",
       "Badges « Les mieux notés »",
-      "Publications de contenu sur votre profil",
-      "100 membres en fil privé"
+      "Publications de contenu sur votre profil"
     ],
     "comparison": {
       "uploading": "Publications",
@@ -557,7 +551,6 @@
       "community": "Communauté",
       "rateMeals": "Noter les repas",
       "requestRecipes": "Demander des recettes",
-      "privateFeedMembers": "Membres en fil privé",
       "visibility": "Visibilité",
       "mealsOnMap": "Repas sur la carte mondiale",
       "verifiedBadge": "Badge professionnel vérifié",
@@ -580,48 +573,26 @@
       "a2": "Tous vos repas, notes et votre profil restent exactement tels quels. Vous repassez simplement aux limites de l'offre Gratuit.",
       "q3": "Puis-je changer d'offre plus tard ?",
       "a3": "Absolument. Passez à une offre supérieure ou inférieure à tout moment depuis les Paramètres. Les changements prennent effet immédiatement.",
-      "q4": "Qu'est-ce qu'un fil privé ?",
-      "a4": "Un fil privé vous permet de partager des repas avec un groupe restreint d'amis ou de famille. Seuls les membres invités peuvent voir et noter vos repas privés.",
-      "q5": "Comment fonctionne le test anonyme de plats ?",
-      "a5": "Les abonnés Business peuvent publier des plats sans que le nom de leur restaurant apparaisse. La communauté les note honnêtement — puis vous révélez votre identité quand vous êtes prêt.",
-      "q6": "Ai-je besoin de l'offre Business pour apparaître sur la carte ?",
-      "a6": "Non — les repas de tous les utilisateurs apparaissent sur la carte mondiale. L'offre Business vous donne une épingle dédiée pour que les clients puissent trouver votre établissement directement.",
-      "q7": "Comment annuler mon abonnement ?",
-      "a7": "Allez dans Paramètres et appuyez sur « Gérer l'abonnement ». Cela ouvre le portail client Stripe où vous pouvez annuler, mettre à jour votre moyen de paiement ou changer d'offre."
+      "q4": "Comment fonctionne le test anonyme de plats ?",
+      "a4": "Les abonnés Business peuvent publier des plats sans que le nom de leur restaurant apparaisse. La communauté les note honnêtement — puis vous révélez votre identité quand vous êtes prêt.",
+      "q5": "Ai-je besoin de l'offre Business pour apparaître sur la carte ?",
+      "a5": "Non — les repas de tous les utilisateurs apparaissent sur la carte mondiale. L'offre Business vous donne une épingle dédiée pour que les clients puissent trouver votre établissement directement.",
+      "q6": "Comment annuler mon abonnement ?",
+      "a6": "Allez dans Paramètres et appuyez sur « Gérer l'abonnement ». Cela ouvre le portail client Stripe où vous pouvez annuler, mettre à jour votre moyen de paiement ou changer d'offre."
     }
-  },
-  "privateFeed": {
-    "title": "Liste du fil privé",
-    "invitationsTitle": "Invitations",
-    "members": "Membres",
-    "memberCount": "{count} / {limit} membres",
-    "invite": "Inviter",
-    "inviteByUsername": "Inviter par nom d'utilisateur",
-    "usernamePlaceholder": "@nomdutilisateur",
-    "sendInvite": "Envoyer l'invitation",
-    "pending": "En attente",
-    "accepted": "Acceptée",
-    "remove": "Supprimer",
-    "removeMember": "Supprimer {name} de votre fil privé ?",
-    "leave": "Quitter",
-    "leaveConfirm": "Quitter le fil privé de {name} ?",
-    "accept": "Accepter",
-    "decline": "Refuser",
-    "noMembers": "Aucun membre pour le moment. Invitez quelqu'un pour partager vos repas privés.",
-    "noInvitations": "Aucune invitation en attente.",
-    "inviteSent": "Invitation envoyée",
-    "inviteFailed": "Impossible d'envoyer l'invitation",
-    "memberRemoved": "Membre supprimé",
-    "listLeft": "Fil privé quitté"
   },
   "sidebar": {
     "uploadMeal": "Publier un repas",
     "trending": "Tendances",
-    "trendingDesc": "Explorez les cuisines tendance et les repas populaires sur la carte.",
+    "trendingDesc": "Découvrez les plats les plus populaires publiés en ce moment. Voyez ce que tout le monde mange et apprécie.",
+    "viewTrending": "Voir les tendances",
     "openMap": "Ouvrir la carte",
-    "discover": "Découvrir",
-    "discoverDesc": "Trouvez des restaurants, nutritionnistes et professionnels de la cuisine près de chez vous.",
-    "browseBusiness": "Parcourir les établissements"
+    "discover": "Explorer",
+    "discoverDesc": "Parcourez les restaurants, cafés et commerces alimentaires près de chez vous sur une carte interactive — découvrez ce qui est servi dans votre quartier et au-delà.",
+    "browseBusiness": "Parcourir les établissements",
+    "searchTitle": "Rechercher",
+    "searchDesc": "Recherchez des plats, des cuisines ou des établissements spécifiques — trouvez exactement ce dont vous avez envie ou explorez de nouvelles saveurs.",
+    "searchLink": "Rechercher"
   },
   "mePage": {
     "heroTitle": "Découvrez ce qui se cuisine",

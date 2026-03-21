@@ -7,6 +7,7 @@ export const createDishSchema = z.object({
   comments_enabled: z.boolean().default(true),
   menu_item_id: z.string().uuid().optional(),
   premise_id: z.string().uuid().optional(),
+  ingredients: z.array(z.string().min(1).max(60).trim()).max(30).optional(),
 });
 
 export const updateDishSchema = z.object({
@@ -14,6 +15,7 @@ export const updateDishSchema = z.object({
   description: z.string().max(160).nullable().optional(),
   price_pence: z.number().int().positive().nullable().optional(),
   comments_enabled: z.boolean().optional(),
+  ingredients: z.array(z.string().min(1).max(60).trim()).max(30).nullable().optional(),
 });
 
 export const deleteDishSchema = z.object({

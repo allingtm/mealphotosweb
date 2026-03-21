@@ -8,7 +8,6 @@ import { useAppStore } from '@/lib/store';
 import { showToast } from '@/components/ui/Toast';
 
 const REPORT_REASONS = [
-  { value: 'not_food', label: 'Not food' },
   { value: 'inappropriate', label: 'Inappropriate content' },
   { value: 'spam', label: 'Spam / promotional' },
   { value: 'stolen_photo', label: 'Stolen photo' },

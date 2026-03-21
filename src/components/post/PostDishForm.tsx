@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { showToast } from '@/components/ui/Toast';
 import { useAppStore } from '@/lib/store';
 import { PremiseSwitcher } from '@/components/business/PremiseSwitcher';
+import { IngredientInput } from '@/components/post/IngredientInput';
 import type { BusinessPremise } from '@/types/database';
 
 declare global {
@@ -48,6 +49,7 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [menuItemId, setMenuItemId] = useState('');
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -133,6 +135,7 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
         description: description.trim() || undefined,
         price_pence: price ? Math.round(parseFloat(price) * 100) : undefined,
         menu_item_id: menuItemId || undefined,
+        ingredients: ingredients.length > 0 ? ingredients : undefined,
         comments_enabled: commentsEnabled,
         premise_id: activePremiseId || undefined,
       }));
@@ -159,6 +162,8 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
       posthog.capture('dish_posted', {
         has_price: !!price,
         has_description: !!description.trim(),
+        has_ingredients: ingredients.length > 0,
+        ingredient_count: ingredients.length,
         image_count: images.length,
       });
 
@@ -326,6 +331,15 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
             <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)', float: 'right' }}>
               {description.length}/160
             </span>
+          </div>
+
+          <div>
+            <label style={{ fontFamily: 'var(--font-body)', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Ingredients (optional)
+            </label>
+            <div className="mt-1">
+              <IngredientInput value={ingredients} onChange={setIngredients} />
+            </div>
           </div>
 
           {menuItems.length > 0 && (

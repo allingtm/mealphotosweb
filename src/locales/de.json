@@ -29,7 +29,12 @@
     "pricing": "Preise",
     "menu": "Menü",
     "myMeals": "Meine Gerichte",
-    "uploadMealPhoto": "Essens-Foto hochladen"
+    "uploadMealPhoto": "Essens-Foto hochladen",
+    "search": "Suchen",
+    "blog": "Blog",
+    "me": "Ich",
+    "post": "Posten",
+    "admin": "Admin"
   },
   "feed": {
     "title": "meal.photos",
@@ -252,7 +257,6 @@
     "visibility": "Sichtbarkeit",
     "public": "Öffentlich",
     "private": "Privat",
-    "privateHelper": "Nur Mitglieder deiner privaten Feed-Liste können dieses Gericht sehen.",
     "upgradeMultiPhoto": "Upgrade für Multi-Foto",
     "cuisines": {
       "italian": "Italienisch",
@@ -285,7 +289,6 @@
     "detailPlaceholder": "Zusätzliche Details (optional)",
     "disclaimer": "Meldungen werden innerhalb von 48 Stunden geprüft und sind immer anonym.",
     "reasons": {
-      "not_food": "Kein Essen",
       "inappropriate": "Unangemessener Inhalt",
       "spam": "Spam / Werbung",
       "stolen_photo": "Gestohlenes Foto",
@@ -391,9 +394,6 @@
     "businessPlan": "Business",
     "upgrade": "Upgrade",
     "manageSubscription": "Abonnement verwalten",
-    "privateFeed": "Privater Feed",
-    "manageFeedList": "Feed-Liste verwalten",
-    "viewInvitations": "Einladungen ansehen",
     "language": "Sprache",
     "languageLabel": "App-Sprache",
     "theme": "Design",
@@ -501,19 +501,16 @@
     "freeFeatures": [
       "5 Uploads/Tag",
       "1 Foto pro Gericht",
-      "5 private Feed-Mitglieder",
       "Bewerten & Rezepte anfragen"
     ],
     "personalFeatures": [
       "15 Uploads/Tag",
       "Bis zu 4 Fotos pro Gericht",
-      "25 private Feed-Mitglieder",
       "Bevorzugter Support"
     ],
     "businessFeatures": [
       "20 Uploads/Tag",
       "Bis zu 4 Fotos pro Gericht",
-      "100 private Feed-Mitglieder",
       "Anonymes Gericht-Testen",
       "Restaurant-Analysen"
     ],
@@ -527,7 +524,6 @@
     "freeDetailFeatures": [
       "5 Uploads pro Tag",
       "1 Foto pro Gericht",
-      "5 private Feed-Mitglieder",
       "Gerichte bewerten & Rezepte anfragen",
       "Upload-Serien & Abzeichen",
       "Gerichte auf der Weltkarte"
@@ -535,7 +531,6 @@
     "personalDetailFeatures": [
       "15 Uploads pro Tag",
       "Bis zu 4 Fotos pro Gericht",
-      "25 private Feed-Mitglieder",
       "Bevorzugter Support"
     ],
     "businessDetailFeatures": [
@@ -547,8 +542,7 @@
       "Anonymes Gericht-Testen",
       "Bevorzugte Kartenplatzierung",
       "„Top Bewertet“-Abzeichen",
-      "Inhalts-Beiträge auf deinem Profil",
-      "100 private Feed-Mitglieder"
+      "Inhalts-Beiträge auf deinem Profil"
     ],
     "comparison": {
       "uploading": "Hochladen",
@@ -557,7 +551,6 @@
       "community": "Community",
       "rateMeals": "Gerichte bewerten",
       "requestRecipes": "Rezepte anfragen",
-      "privateFeedMembers": "Private Feed-Mitglieder",
       "visibility": "Sichtbarkeit",
       "mealsOnMap": "Gerichte auf der Weltkarte",
       "verifiedBadge": "Verifiziertes Business-Abzeichen",
@@ -580,48 +573,26 @@
       "a2": "Alle deine Gerichte, Bewertungen und dein Profil bleiben genau so, wie sie sind. Du kehrst einfach zu den Free-Plan-Limits zurück.",
       "q3": "Kann ich den Plan später wechseln?",
       "a3": "Natürlich. Upgrade oder Downgrade jederzeit in den Einstellungen. Änderungen werden sofort wirksam.",
-      "q4": "Was ist ein privater Feed?",
-      "a4": "Ein privater Feed ermöglicht es dir, Gerichte mit einer ausgewählten Gruppe von Freunden oder Familie zu teilen. Nur eingeladene Mitglieder können deine privaten Gerichte sehen und bewerten.",
-      "q5": "Wie funktioniert das anonyme Gericht-Testen?",
-      "a5": "Business-Abonnenten können Gerichte hochladen, ohne dass ihr Restaurantname angezeigt wird. Die Community bewertet sie ehrlich — und du enthüllst deine Identität, wenn du bereit bist.",
-      "q6": "Brauche ich einen Business-Plan, um auf der Karte zu erscheinen?",
-      "a6": "Nein — die Gerichte jedes Nutzers erscheinen auf der Weltkarte. Der Business-Plan gibt dir einen eigenen Venue-Pin, damit Kunden deinen Standort direkt finden können.",
-      "q7": "Wie kündige ich mein Abonnement?",
-      "a7": "Gehe zu den Einstellungen und tippe auf „Abonnement verwalten“. Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
+      "q4": "Wie funktioniert das anonyme Gericht-Testen?",
+      "a4": "Business-Abonnenten können Gerichte hochladen, ohne dass ihr Restaurantname angezeigt wird. Die Community bewertet sie ehrlich — und du enthüllst deine Identität, wenn du bereit bist.",
+      "q5": "Brauche ich einen Business-Plan, um auf der Karte zu erscheinen?",
+      "a5": "Nein — die Gerichte jedes Nutzers erscheinen auf der Weltkarte. Der Business-Plan gibt dir einen eigenen Venue-Pin, damit Kunden deinen Standort direkt finden können.",
+      "q6": "Wie kündige ich mein Abonnement?",
+      "a6": "Gehe zu den Einstellungen und tippe auf \u201eAbonnement verwalten\u201c. Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
     }
-  },
-  "privateFeed": {
-    "title": "Private Feed-Liste",
-    "invitationsTitle": "Einladungen",
-    "members": "Mitglieder",
-    "memberCount": "{count} / {limit} Mitglieder",
-    "invite": "Einladen",
-    "inviteByUsername": "Per Benutzername einladen",
-    "usernamePlaceholder": "@benutzername",
-    "sendInvite": "Einladung senden",
-    "pending": "Ausstehend",
-    "accepted": "Angenommen",
-    "remove": "Entfernen",
-    "removeMember": "{name} aus deinem privaten Feed entfernen?",
-    "leave": "Verlassen",
-    "leaveConfirm": "{name}s privaten Feed verlassen?",
-    "accept": "Annehmen",
-    "decline": "Ablehnen",
-    "noMembers": "Noch keine Mitglieder. Lade jemanden ein, um deine privaten Gerichte zu teilen.",
-    "noInvitations": "Keine ausstehenden Einladungen.",
-    "inviteSent": "Einladung gesendet",
-    "inviteFailed": "Einladung konnte nicht gesendet werden",
-    "memberRemoved": "Mitglied entfernt",
-    "listLeft": "Privaten Feed verlassen"
   },
   "sidebar": {
     "uploadMeal": "Gericht hochladen",
     "trending": "Im Trend",
-    "trendingDesc": "Entdecke angesagte Küchen und beliebte Gerichte auf der Karte.",
+    "trendingDesc": "Entdecke die beliebtesten Gerichte, die gerade gepostet werden. Sieh, was alle essen und worauf sie reagieren.",
+    "viewTrending": "Trends ansehen",
     "openMap": "Karte öffnen",
     "discover": "Entdecken",
-    "discoverDesc": "Finde Restaurants, Ernährungsberater und Gastronomieprofis in deiner Nähe.",
-    "browseBusiness": "Betriebe durchsuchen"
+    "discoverDesc": "Durchstöbere Restaurants, Cafés und Gastronomiebetriebe in deiner Nähe auf einer interaktiven Karte — entdecke, was in deiner Gegend und darüber hinaus serviert wird.",
+    "browseBusiness": "Betriebe durchsuchen",
+    "searchTitle": "Suchen",
+    "searchDesc": "Suche nach bestimmten Gerichten, Küchen oder Betrieben — finde genau das, worauf du Lust hast, oder entdecke etwas Neues.",
+    "searchLink": "Suchen"
   },
   "mePage": {
     "heroTitle": "Entdecke, was gekocht wird",

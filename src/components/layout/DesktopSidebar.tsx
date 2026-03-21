@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { TrendingUp, Search, MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function DesktopSidebar() {
+  const t = useTranslations('sidebar');
   return (
     <aside
       className="flex flex-col gap-6 overflow-y-auto h-full"
@@ -30,7 +32,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Trending
+            {t('trending')}
           </h3>
         </div>
         <p
@@ -39,7 +41,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Discover the most popular dishes being posted right now. See what everyone is eating and reacting to.
+          {t('trendingDesc')}
         </p>
         <Link
           href="/?tab=trending"
@@ -50,7 +52,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          View trending →
+          {t('viewTrending')} →
         </Link>
       </div>
 
@@ -71,7 +73,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Explore
+            {t('discover')}
           </h3>
         </div>
         <p
@@ -80,7 +82,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Browse restaurants, cafes, and food businesses near you on an interactive map — discover what's being served in your area and beyond.
+          {t('discoverDesc')}
         </p>
         <Link
           href="/map"
@@ -91,7 +93,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          Open map →
+          {t('openMap')} →
         </Link>
       </div>
 
@@ -112,7 +114,7 @@ export function DesktopSidebar() {
               color: 'var(--text-primary)',
             }}
           >
-            Search
+            {t('searchTitle')}
           </h3>
         </div>
         <p
@@ -121,7 +123,7 @@ export function DesktopSidebar() {
             color: 'var(--text-secondary)',
           }}
         >
-          Search for specific dishes, cuisines, or businesses — find exactly what you're craving or explore something new.
+          {t('searchDesc')}
         </p>
         <Link
           href="/search"
@@ -132,7 +134,7 @@ export function DesktopSidebar() {
             color: 'var(--accent-primary)',
           }}
         >
-          Search →
+          {t('searchLink')} →
         </Link>
       </div>
 

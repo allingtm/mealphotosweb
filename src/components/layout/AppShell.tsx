@@ -4,6 +4,7 @@ import { UtensilsCrossed, Globe, Search, BookOpen, User, PlusCircle, Shield } fr
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
@@ -11,15 +12,17 @@ import { FeedHeader } from '@/components/feed/FeedHeader';
 import { AuthModal } from '@/components/auth/AuthModal';
 
 const navItems = [
-  { href: '/', icon: UtensilsCrossed, label: 'Feed' },
-  { href: '/map', icon: Globe, label: 'Map' },
-  { href: '/search', icon: Search, label: 'Search' },
-  { href: '/blog', icon: BookOpen, label: 'Blog' },
-  { href: '/me', icon: User, label: 'Me' },
+  { href: '/', icon: UtensilsCrossed, key: 'feed' },
+  { href: '/map', icon: Globe, key: 'map' },
+  { href: '/search', icon: Search, key: 'search' },
+  { href: '/blog', icon: BookOpen, key: 'blog' },
+  { href: '/me', icon: User, key: 'me' },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations('nav');
+  const tFooter = useTranslations('footer');
   const user = useAppStore((s) => s.user);
   const isAdmin = useAppStore((s) => s.isAdmin);
   const isBusiness = useAppStore((s) => s.isBusiness);
@@ -44,8 +47,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }}
       aria-label="Main navigation"
     >
-      {navItems.map(({ href, icon: Icon, label }) => {
+      {navItems.map(({ href, icon: Icon, key }) => {
         const active = isActive(href);
+        const label = t(key);
         return (
           <Link
             key={href}
@@ -54,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             style={{ minWidth: 48, minHeight: 48 }}
             aria-current={active ? 'page' : undefined}
           >
-            {label === 'Me' && profileAvatarUrl ? (
+            {key === 'me' && profileAvatarUrl ? (
               <Image
                 src={profileAvatarUrl}
                 alt="Profile"
@@ -105,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               color: isActive('/post') ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
           >
-            Post
+            {t('post')}
           </span>
         </Link>
       )}
@@ -130,7 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               color: isActive('/admin') ? 'var(--accent-primary)' : 'var(--text-secondary)',
             }}
           >
-            Admin
+            {t('admin')}
           </span>
         </Link>
       )}
@@ -203,13 +207,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           style={{ maxWidth: 'var(--layout-max-width)' }}
         >
           <Link href="/legal/privacy" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Privacy
+            {tFooter('privacy')}
           </Link>
           <Link href="/legal/terms" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Terms
+            {tFooter('terms')}
           </Link>
           <Link href="/legal/cookies" style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-            Cookies
+            {tFooter('cookieSettings')}
           </Link>
         </div>
       </footer>

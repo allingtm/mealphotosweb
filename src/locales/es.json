@@ -29,7 +29,12 @@
     "pricing": "Precios",
     "menu": "Menú",
     "myMeals": "Mis platos",
-    "uploadMealPhoto": "Subir foto de plato"
+    "uploadMealPhoto": "Subir foto de plato",
+    "search": "Buscar",
+    "blog": "Blog",
+    "me": "Yo",
+    "post": "Publicar",
+    "admin": "Admin"
   },
   "feed": {
     "title": "meal.photos",
@@ -252,7 +257,6 @@
     "visibility": "Visibilidad",
     "public": "Público",
     "private": "Privado",
-    "privateHelper": "Solo los miembros de tu lista de feed privado pueden ver este plato.",
     "upgradeMultiPhoto": "Mejora tu plan para subir varias fotos",
     "cuisines": {
       "italian": "Italiana",
@@ -285,7 +289,6 @@
     "detailPlaceholder": "Detalle adicional (opcional)",
     "disclaimer": "Los reportes se revisan en un plazo de 48 horas y siempre son anónimos.",
     "reasons": {
-      "not_food": "No es comida",
       "inappropriate": "Contenido inapropiado",
       "spam": "Spam / promocional",
       "stolen_photo": "Foto robada",
@@ -391,9 +394,6 @@
     "businessPlan": "Business",
     "upgrade": "Mejorar plan",
     "manageSubscription": "Gestionar suscripción",
-    "privateFeed": "Feed privado",
-    "manageFeedList": "Gestionar lista del feed",
-    "viewInvitations": "Ver invitaciones",
     "language": "Idioma",
     "languageLabel": "Idioma de la app",
     "theme": "Tema",
@@ -501,19 +501,16 @@
     "freeFeatures": [
       "5 subidas/día",
       "1 foto por plato",
-      "5 miembros en feed privado",
       "Puntuar y pedir recetas"
     ],
     "personalFeatures": [
       "15 subidas/día",
       "Hasta 4 fotos por plato",
-      "25 miembros en feed privado",
       "Soporte prioritario"
     ],
     "businessFeatures": [
       "20 subidas/día",
       "Hasta 4 fotos por plato",
-      "100 miembros en feed privado",
       "Testeo anónimo de platos",
       "Análisis para restaurantes"
     ],
@@ -527,7 +524,6 @@
     "freeDetailFeatures": [
       "5 subidas al día",
       "1 foto por plato",
-      "5 miembros en feed privado",
       "Puntuar platos y pedir recetas",
       "Rachas y medallas",
       "Platos en el mapa global"
@@ -535,7 +531,6 @@
     "personalDetailFeatures": [
       "15 subidas al día",
       "Hasta 4 fotos por plato",
-      "25 miembros en feed privado",
       "Soporte prioritario"
     ],
     "businessDetailFeatures": [
@@ -547,8 +542,7 @@
       "Testeo anónimo de platos",
       "Posicionamiento prioritario en el mapa",
       "Medallas de \"Mejor Puntuado\"",
-      "Publicaciones de contenido en tu perfil",
-      "100 miembros en feed privado"
+      "Publicaciones de contenido en tu perfil"
     ],
     "comparison": {
       "uploading": "Subidas",
@@ -557,7 +551,6 @@
       "community": "Comunidad",
       "rateMeals": "Puntuar platos",
       "requestRecipes": "Pedir recetas",
-      "privateFeedMembers": "Miembros en feed privado",
       "visibility": "Visibilidad",
       "mealsOnMap": "Platos en el mapa global",
       "verifiedBadge": "Medalla de negocio verificado",
@@ -580,48 +573,26 @@
       "a2": "Todos tus platos, puntuaciones y perfil se mantienen exactamente como están. Simplemente vuelves a los límites del plan Free.",
       "q3": "¿Puedo cambiar de plan más adelante?",
       "a3": "Por supuesto. Sube o baja de plan en cualquier momento desde Ajustes. Los cambios se aplican de inmediato.",
-      "q4": "¿Qué es un feed privado?",
-      "a4": "Un feed privado te permite compartir platos con un grupo selecto de amigos o familiares. Solo los miembros invitados pueden ver y puntuar tus platos privados.",
-      "q5": "¿Cómo funciona el testeo anónimo de platos?",
-      "a5": "Los suscriptores Business pueden subir platos sin que aparezca el nombre de su restaurante. La comunidad los puntuará con honestidad, y tú revelas tu identidad cuando estés listo.",
-      "q6": "¿Necesito el plan Business para aparecer en el mapa?",
-      "a6": "No: los platos de todos los usuarios aparecen en el mapa global. El plan Business te da un pin dedicado para que los clientes encuentren tu local directamente.",
-      "q7": "¿Cómo cancelo mi suscripción?",
-      "a7": "Ve a Ajustes y toca \"Gestionar suscripción\". Se abrirá el portal de clientes de Stripe, donde puedes cancelar, actualizar el método de pago o cambiar de plan."
+      "q4": "¿Cómo funciona el testeo anónimo de platos?",
+      "a4": "Los suscriptores Business pueden subir platos sin que aparezca el nombre de su restaurante. La comunidad los puntuará con honestidad, y tú revelas tu identidad cuando estés listo.",
+      "q5": "¿Necesito el plan Business para aparecer en el mapa?",
+      "a5": "No: los platos de todos los usuarios aparecen en el mapa global. El plan Business te da un pin dedicado para que los clientes encuentren tu local directamente.",
+      "q6": "¿Cómo cancelo mi suscripción?",
+      "a6": "Ve a Ajustes y toca \"Gestionar suscripción\". Se abrirá el portal de clientes de Stripe, donde puedes cancelar, actualizar el método de pago o cambiar de plan."
     }
-  },
-  "privateFeed": {
-    "title": "Lista de feed privado",
-    "invitationsTitle": "Invitaciones",
-    "members": "Miembros",
-    "memberCount": "{count} / {limit} miembros",
-    "invite": "Invitar",
-    "inviteByUsername": "Invitar por nombre de usuario",
-    "usernamePlaceholder": "@nombreusuario",
-    "sendInvite": "Enviar invitación",
-    "pending": "Pendiente",
-    "accepted": "Aceptada",
-    "remove": "Eliminar",
-    "removeMember": "¿Eliminar a {name} de tu feed privado?",
-    "leave": "Salir",
-    "leaveConfirm": "¿Salir del feed privado de {name}?",
-    "accept": "Aceptar",
-    "decline": "Rechazar",
-    "noMembers": "Aún no hay miembros. Invita a alguien para compartir tus platos privados.",
-    "noInvitations": "No hay invitaciones pendientes.",
-    "inviteSent": "Invitación enviada",
-    "inviteFailed": "No se pudo enviar la invitación",
-    "memberRemoved": "Miembro eliminado",
-    "listLeft": "Has salido del feed privado"
   },
   "sidebar": {
     "uploadMeal": "Subir una comida",
     "trending": "Tendencias",
-    "trendingDesc": "Explora las cocinas de moda y las comidas populares en el mapa.",
+    "trendingDesc": "Descubre los platos más populares que se publican ahora mismo. Mira lo que todos están comiendo y disfrutando.",
+    "viewTrending": "Ver tendencias",
     "openMap": "Abrir mapa",
-    "discover": "Descubrir",
-    "discoverDesc": "Encuentra restaurantes, nutricionistas y profesionales gastronómicos cerca de ti.",
-    "browseBusiness": "Explorar negocios"
+    "discover": "Explorar",
+    "discoverDesc": "Explora restaurantes, cafeterías y negocios de comida cerca de ti en un mapa interactivo — descubre lo que se sirve en tu zona y más allá.",
+    "browseBusiness": "Explorar negocios",
+    "searchTitle": "Buscar",
+    "searchDesc": "Busca platos, cocinas o negocios específicos — encuentra exactamente lo que se te antoja o explora algo nuevo.",
+    "searchLink": "Buscar"
   },
   "mePage": {
     "heroTitle": "Descubre qué se está cocinando",

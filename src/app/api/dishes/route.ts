@@ -178,6 +178,7 @@ export async function POST(req: NextRequest) {
       photo_blur_hash: uploadedImages[0].blur_hash || null,
       image_count: uploadedImages.length,
       menu_item_id: parsed.data.menu_item_id ?? null,
+      ingredients: parsed.data.ingredients ?? [],
       comments_enabled: parsed.data.comments_enabled,
     })
     .select()
@@ -198,6 +199,18 @@ export async function POST(req: NextRequest) {
         photo_blur_hash: img.blur_hash || null,
       }))
     );
+  }
+
+  // Upsert ingredients into lookup table (fire-and-forget)
+  if (parsed.data.ingredients?.length) {
+    for (const name of parsed.data.ingredients) {
+      Promise.resolve(
+        supabase.rpc('upsert_ingredient', {
+          p_name: name.trim(),
+          p_normalized_name: name.trim().toLowerCase(),
+        })
+      ).catch(() => {});
+    }
   }
 
   // Fire SafeSearch moderation (async, fire-and-forget)

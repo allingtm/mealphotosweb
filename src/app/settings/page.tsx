@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, LogOut, CreditCard, Users, Mail, Store, MapPin, Bell, Briefcase } from 'lucide-react';
+import { ChevronRight, LogOut, CreditCard, Store, MapPin, Bell, Briefcase } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useAppStore } from '@/lib/store';
 import { LanguagePicker } from '@/components/settings/LanguagePicker';
@@ -213,39 +213,6 @@ export default function SettingsPage() {
               </div>
             </section>
           )}
-
-          {/* Private Feed section */}
-          <section className="mb-8">
-            <h2
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'var(--text-secondary)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                marginBottom: 12,
-              }}
-            >
-              {t('privateFeed')}
-            </h2>
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-surface)' }}
-            >
-              <SettingsLink
-                href="/settings/private-feed-list"
-                icon={<Users size={20} strokeWidth={1.5} />}
-                label={t('manageFeedList')}
-              />
-              <SettingsDivider />
-              <SettingsLink
-                href="/settings/private-feed-list/invitations"
-                icon={<Mail size={20} strokeWidth={1.5} />}
-                label={t('viewInvitations')}
-              />
-            </div>
-          </section>
 
           <section className="mb-8">
             <h2

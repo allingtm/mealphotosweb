@@ -32,6 +32,7 @@ interface DishDetailClientProps {
     save_count: number;
     comment_count: number;
     comments_enabled: boolean;
+    ingredients: string[];
     created_at: string;
     profiles: {
       username: string;
@@ -235,6 +236,27 @@ export function DishDetailClient({ dish: initialDish, images, userHasReacted, us
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
               {dish.description}
             </p>
+          )}
+
+          {/* Ingredients */}
+          {dish.ingredients && dish.ingredients.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {dish.ingredients.map((ing) => (
+                <span
+                  key={ing}
+                  className="rounded-full px-2.5 py-1"
+                  style={{
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 12,
+                    fontWeight: 500,
+                  }}
+                >
+                  {ing}
+                </span>
+              ))}
+            </div>
           )}
 
           {/* Action buttons */}
