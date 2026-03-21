@@ -1,9 +1,6 @@
 export const ANALYTICS_EVENTS = {
   MEAL_UPLOADED: 'meal_uploaded',
   MEAL_RATED: 'meal_rated',
-  RECIPE_REQUESTED: 'recipe_requested',
-  RECIPE_UNREQUESTED: 'recipe_unrequested',
-  RECIPE_UNLOCKED: 'recipe_unlocked',
   RECIPE_ADDED: 'recipe_added',
   SCORECARD_SHARED: 'scorecard_shared',
   FEED_SCROLLED: 'feed_scrolled',
@@ -11,7 +8,6 @@ export const ANALYTICS_EVENTS = {
   AUTH_COMPLETED: 'auth_completed',
 
   RESTAURANT_SUBSCRIBED: 'restaurant_subscribed',
-  RESTAURANT_REVEALED: 'restaurant_revealed',
   MEAL_DELETED: 'meal_deleted',
   PROFILE_VIEWED: 'profile_viewed',
   PROFILE_FOLLOW: 'profile_follow',
@@ -70,4 +66,7 @@ export const ANALYTICS_EVENTS = {
   COMMENTS_LOADED: 'comments_loaded',
   MEAL_COMMENTS_MUTED: 'meal_muted',
   MEAL_COMMENTS_UNMUTED: 'meal_unmuted',
+
+  // Notifications
+  PROXIMITY_NOTIFICATION_TAPPED: 'proximity_notification_tapped',
 } as const;

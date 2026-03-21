@@ -35,16 +35,16 @@
     "title": "meal.photos",
     "noMeals": "Nessun piatto ancora",
     "beFirst": "Sii il primo a caricare un piatto nella tua zona!",
-    "seenEverything": "Hai visto tutto! Carica un piatto o torna pi\u00f9 tardi.",
+    "seenEverything": "Hai visto tutto! Carica un piatto o torna più tardi.",
     "mealPhotoAlt": "Foto del piatto: {title} di {username}",
     "failedToLoad": "Impossibile caricare il feed",
     "failedToLoadDesc": "Non siamo riusciti a caricare il tuo feed. Controlla la connessione e riprova.",
     "following": "Seguiti",
     "discover": "Scopri",
-    "emptyFollowingNoFollows": "Il tuo feed Seguiti \u00e8 vuoto",
+    "emptyFollowingNoFollows": "Il tuo feed Seguiti è vuoto",
     "emptyFollowingNoFollowsDesc": "Segui delle persone per vedere i loro piatti qui. Scopri nuovi cuochi nella scheda Scopri.",
     "emptyFollowingCaughtUp": "Sei in pari",
-    "emptyFollowingCaughtUpDesc": "Nessun nuovo piatto dalle persone che segui. Torna pi\u00f9 tardi o scopri nuovi piatti.",
+    "emptyFollowingCaughtUpDesc": "Nessun nuovo piatto dalle persone che segui. Torna più tardi o scopri nuovi piatti.",
     "switchToDiscover": "Passa a Scopri",
     "newMeals": "{count} nuovi piatti",
     "newMeal": "1 nuovo piatto",
@@ -52,9 +52,9 @@
     "followPrompt": "Segui @{username}",
     "followPromptRated": "Hai valutato il piatto di @{username} {score}",
     "suggestionsTitle": "Persone da seguire",
-    "suggestionStats": "{count} piatti \u00b7 {rating} media",
+    "suggestionStats": "{count} piatti · {rating} media",
     "journal": "Diario",
-    "emptyJournal": "Il tuo diario \u00e8 vuoto",
+    "emptyJournal": "Il tuo diario è vuoto",
     "emptyJournalDesc": "I pasti privati che carichi appariranno qui. Solo tu puoi vederli.",
     "uploadPrivateMeal": "Carica un pasto privato",
     "endOfJournal": "Hai visto tutto nel tuo diario"
@@ -83,10 +83,10 @@
     "serves": "Porzioni",
     "addIngredient": "Aggiungi ingrediente",
     "addStep": "Aggiungi passaggio",
-    "ingredientQty": "Qt\u00e0",
+    "ingredientQty": "Qtà",
     "ingredientName": "Nome ingrediente",
-    "ingredientQtyLabel": "Quantit\u00e0 ingrediente {n}",
-    "ingredientUnitLabel": "Unit\u00e0 ingrediente {n}",
+    "ingredientQtyLabel": "Quantità ingrediente {n}",
+    "ingredientUnitLabel": "Unità ingrediente {n}",
     "ingredientNameLabel": "Nome ingrediente {n}",
     "removeIngredient": "Rimuovi ingrediente {n}",
     "stepPlaceholder": "Passaggio {n}",
@@ -98,8 +98,8 @@
     "requestRecipe": "Richiedi ricetta",
     "requested": "Richiesta inviata",
     "wantThisRecipe": "{count} / {threshold} vogliono questa ricetta",
-    "almostUnlocked": "Quasi sbloccata! Condividi per ottenere pi\u00f9 richieste.",
-    "comingSoon": "Ricetta in arrivo \u2014 @{username} \u00e8 stato avvisato!",
+    "almostUnlocked": "Quasi sbloccata! Condividi per ottenere più richieste.",
+    "comingSoon": "Ricetta in arrivo — @{username} è stato avvisato!",
     "wantRecipe": "{count} vogliono la ricetta"
   },
   "score": {
@@ -113,7 +113,7 @@
   "auth": {
     "joinTitle": "Unisciti a meal.photos",
     "welcomeBack": "Bentornato",
-    "signupDesc": "Che voto prende il tuo cibo? \u00c8 gratis!",
+    "signupDesc": "Che voto prende il tuo cibo? È gratis!",
     "signinDesc": "Accedi al tuo account.",
     "continueWithGoogle": "Continua con Google",
     "continueWithApple": "Continua con Apple",
@@ -124,7 +124,7 @@
     "passwordPlaceholder": "Min. 8 caratteri",
     "signUpButton": "Registrati",
     "signInButton": "Accedi",
-    "alreadyHaveAccount": "Hai gi\u00e0 un account? ",
+    "alreadyHaveAccount": "Hai già un account? ",
     "dontHaveAccount": "Non hai un account? ",
     "signIn": "Accedi",
     "signUp": "Registrati",
@@ -140,15 +140,15 @@
     "passwordTooShort": "La password deve avere almeno 8 caratteri",
     "passwordsDoNotMatch": "Le password non corrispondono",
     "invalidCredentials": "Email o password non validi",
-    "emailAlreadyRegistered": "Esiste gi\u00e0 un account con questa email. Prova ad accedere.",
+    "emailAlreadyRegistered": "Esiste già un account con questa email. Prova ad accedere.",
     "backToSignIn": "Torna all'accesso",
     "confirmEmail": "Controlla la tua email per confermare l'account, poi accedi.",
     "setNewPasswordTitle": "Imposta nuova password",
-    "authError": "Qualcosa \u00e8 andato storto. Riprova.",
+    "authError": "Qualcosa è andato storto. Riprova.",
     "legalFooter": "Continuando, accetti i nostri",
     "inviteCodeLabel": "Codice invito",
     "inviteCodePlaceholder": "es. A3F7B2C1",
-    "inviteCodeRequired": "Un codice invito \u00e8 necessario per partecipare alla beta",
+    "inviteCodeRequired": "Un codice invito è necessario per partecipare alla beta",
     "inviteCodeInvalid": "Codice invito non valido o scaduto"
   },
   "notifications": {
@@ -160,7 +160,7 @@
     "unreadCount": "{count} non lette"
   },
   "map": {
-    "searchPlaceholder": "Cerca citt\u00e0, cucina...",
+    "searchPlaceholder": "Cerca città, cucina...",
     "filters": "Filtri",
     "closeFilters": "Chiudi filtri",
     "timeRange": "Periodo",
@@ -182,27 +182,24 @@
   },
   "profile": {
     "settings": "Impostazioni",
-    "leaderboard": "Classifica",
     "editProfile": "Modifica profilo",
     "myMeals": "I miei piatti",
     "saved": "Salvati",
     "noSavedMeals": "Nessun piatto salvato ancora",
     "noMealsUploaded": "Nessun piatto caricato ancora",
     "meals": "Piatti",
-    "avgRating": "Voto medio",
-    "streak": "Serie",
     "unavailable": "Profilo non disponibile",
     "unavailableDesc": "Non siamo riusciti a caricare questo profilo. Riprova.",
     "displayName": "Nome visualizzato",
     "username": "Nome utente",
     "bio": "Bio",
     "bioPlaceholder": "Raccontaci il tuo percorso gastronomico...",
-    "locationCity": "Citt\u00e0",
+    "locationCity": "Città",
     "locationCountry": "Paese",
     "saveProfile": "Salva",
     "profileUpdated": "Profilo aggiornato",
     "profileUpdateFailed": "Impossibile aggiornare il profilo",
-    "usernameTaken": "Il nome utente \u00e8 gi\u00e0 in uso",
+    "usernameTaken": "Il nome utente è già in uso",
     "changeAvatar": "Cambia avatar",
     "avatarUpdated": "Avatar aggiornato",
     "followers": "follower",
@@ -210,15 +207,14 @@
     "follow": "Segui",
     "followingButton": "Seguiti",
     "unfollowConfirm": "Smettere di seguire @{username}?",
-    "unfollow": "Non seguire pi\u00f9",
+    "unfollow": "Non seguire più",
     "ratingsGiven": "Valutazioni date",
     "privacy": "Privacy",
     "showLocation": "Mostra la mia posizione",
-    "showStreak": "Mostra la mia serie",
     "back": "Indietro",
     "reportUser": "Segnala @{username}",
     "blockUser": "Blocca @{username}",
-    "blockConfirm": "Bloccare @{username}? Non potr\u00e0 vedere i tuoi piatti.",
+    "blockConfirm": "Bloccare @{username}? Non potrà vedere i tuoi piatti.",
     "block": "Blocca",
     "userBlocked": "Utente bloccato",
     "userReported": "Segnalazione inviata",
@@ -231,20 +227,6 @@
     "followFailed": "Impossibile seguire",
     "unfollowFailed": "Impossibile smettere di seguire",
     "blockFailed": "Impossibile bloccare l'utente"
-  },
-  "leaderboard": {
-    "title": "Classifica",
-    "global": "Globale",
-    "country": "Paese",
-    "city": "Citt\u00e0",
-    "thisWeek": "Questa settimana",
-    "thisMonth": "Questo mese",
-    "allTime": "Sempre",
-    "allCuisines": "Tutte le cucine",
-    "noUsers": "Nessun utente trovato per questi filtri.",
-    "meals": "{count} piatti",
-    "unavailable": "Classifica non disponibile",
-    "unavailableDesc": "Non siamo riusciti a caricare la classifica. Riprova."
   },
   "upload": {
     "selectPhoto": "Seleziona foto",
@@ -265,13 +247,13 @@
     "tagsOptional": "Tag (facoltativo)",
     "tagsPlaceholder": "#fattoincasa, #arrosto, #domenica",
     "venueOptional": "Dove hai mangiato? (facoltativo)",
-    "venuePlaceholder": "Cerca ristorante, caff\u00e8\u2026",
+    "venuePlaceholder": "Cerca ristorante, caffè…",
     "venueSearching": "Ricerca...",
-    "visibility": "Visibilit\u00e0",
+    "visibility": "Visibilità",
     "public": "Pubblico",
     "private": "Privato",
     "privateHelper": "Solo i membri della tua lista privata possono vedere questo piatto.",
-    "upgradeMultiPhoto": "Passa a un piano superiore per pi\u00f9 foto",
+    "upgradeMultiPhoto": "Passa a un piano superiore per più foto",
     "cuisines": {
       "italian": "Italiana",
       "asian": "Asiatica",
@@ -289,9 +271,9 @@
     "avgRating": "Valutazione media",
     "totalRatings": "valutazioni totali",
     "meals": "piatti",
-    "claimTitle": "\u00c8 il tuo ristorante?",
+    "claimTitle": "È il tuo ristorante?",
     "claimDesc": "Rivendica il tuo profilo per vedere analisi private su ogni piatto, caricare i tuoi piatti per testarli e far crescere il tuo pubblico.",
-    "claimCta": "Rivendica il tuo profilo \u2014 da \u00a329/mese",
+    "claimCta": "Rivendica il tuo profilo — da £29/mese",
     "back": "Indietro",
     "verified": "Ristorante verificato"
   },
@@ -303,7 +285,7 @@
     "detailPlaceholder": "Dettagli aggiuntivi (facoltativo)",
     "disclaimer": "Le segnalazioni vengono esaminate entro 48 ore e sono sempre anonime.",
     "reasons": {
-      "not_food": "Non \u00e8 cibo",
+      "not_food": "Non è cibo",
       "inappropriate": "Contenuto inappropriato",
       "spam": "Spam / promozionale",
       "stolen_photo": "Foto rubata",
@@ -315,25 +297,11 @@
       "other": "Altro"
     }
   },
-  "dispute": {
-    "title": "Contesta tag del locale",
-    "submitButton": "Invia contestazione",
-    "submitting": "Invio...",
-    "successMessage": "Contestazione inviata. La esamineremo entro 48 ore.",
-    "detailPlaceholder": "Dettagli aggiuntivi (facoltativo, max 280 caratteri)",
-    "reasons": {
-      "not_served_here": "Non servito qui",
-      "wrong_location": "Posizione / sede sbagliata",
-      "fake_photo": "Foto falsa / stock",
-      "other": "Altro"
-    }
-  },
   "admin": {
     "title": "Amministrazione",
     "overview": "Panoramica",
     "moderationQueue": "Moderazione",
     "reports": "Segnalazioni",
-    "venueDisputes": "Contestazioni",
     "approve": "Approva",
     "reject": "Rifiuta",
     "action": "Azione",
@@ -347,8 +315,8 @@
   },
   "business": {
     "restaurantTesting": "Test per ristoranti",
-    "heroText": "Testa i tuoi piatti in modo anonimo contro l'opinione pubblica reale. Scopri le valutazioni oneste prima di rivelare l'identit\u00e0 del tuo ristorante.",
-    "mostPopular": "Pi\u00f9 popolare",
+    "heroText": "Testa i tuoi piatti in modo anonimo contro l'opinione pubblica reale. Scopri le valutazioni oneste prima di rivelare l'identità del tuo ristorante.",
+    "mostPopular": "Più popolare",
     "perMonth": "/mese",
     "getStarted": "Inizia ora",
     "redirecting": "Reindirizzamento...",
@@ -360,7 +328,7 @@
     "stepRatings": "Ricevi valutazioni oneste",
     "stepRatingsDesc": "Scopri cosa pensa davvero il pubblico del tuo cibo",
     "stepReveal": "Rivelati",
-    "stepRevealDesc": "Mostra l'identit\u00e0 del tuo ristorante quando sei pronto",
+    "stepRevealDesc": "Mostra l'identità del tuo ristorante quando sei pronto",
     "dashboard": {
       "welcome": "Benvenuto nella dashboard del tuo ristorante!",
       "plan": "Piano {tier}",
@@ -397,13 +365,13 @@
     "managePreferences": "Gestisci preferenze",
     "preferencesTitle": "Preferenze cookie",
     "essential": "Essenziali",
-    "essentialDescription": "Necessari per l'autenticazione e le funzionalit\u00e0 principali. Non possono essere disattivati.",
+    "essentialDescription": "Necessari per l'autenticazione e le funzionalità principali. Non possono essere disattivati.",
     "analytics": "Analisi",
     "analyticsDescription": "Ci aiutano a capire come usi l'app per poterla migliorare.",
     "savePreferences": "Salva preferenze",
     "alwaysOn": "Sempre attivi",
     "policyTitle": "Politica sui cookie",
-    "policyDescription": "Scopri di pi\u00f9 su come utilizziamo i cookie.",
+    "policyDescription": "Scopri di più su come utilizziamo i cookie.",
     "manageCookieSettings": "Gestisci impostazioni cookie"
   },
   "settings": {
@@ -434,7 +402,11 @@
     "themeSystem": "Sistema",
     "businessProfile": "Profilo Aziendale",
     "editBusinessDetails": "Modifica dettagli attività",
-    "managePremises": "Gestisci sedi"
+    "managePremises": "Gestisci sedi",
+    "notifications": "Notifiche",
+    "notificationPreferences": "Preferenze di notifica",
+    "forBusinesses": "Per le Aziende",
+    "becomeABusiness": "Diventa un'azienda"
   },
   "footer": {
     "privacy": "Privacy",
@@ -456,7 +428,7 @@
   "directory": {
     "title": "Directory",
     "comingSoon": "In arrivo",
-    "comingSoonDesc": "Esplora ristoranti e attivit\u00e0 gastronomiche vicino a te."
+    "comingSoonDesc": "Esplora ristoranti e attività gastronomiche vicino a te."
   },
   "recipes": {
     "title": "Ricette",
@@ -466,7 +438,7 @@
   "about": {
     "title": "Chi siamo",
     "comingSoon": "In arrivo",
-    "description": "Scopri di pi\u00f9 su meal.photos e la nostra missione."
+    "description": "Scopri di più su meal.photos e la nostra missione."
   },
   "contact": {
     "title": "Contattaci",
@@ -492,7 +464,7 @@
   },
   "waitlist": {
     "heading": "Stiamo costruendo in pubblico",
-    "message": "I nostri sviluppatori sono al lavoro dietro le quinte, ma siamo troppo entusiasti per aspettare -- quindi benvenuto nell'alpha aperta di meal.photos! Di conseguenza, le cose potrebbero cambiare, rompersi o sembrare un po' grezze. Vuoi essere il primo a sapere quando arrivano nuove funzionalit\u00e0?",
+    "message": "I nostri sviluppatori sono al lavoro dietro le quinte, ma siamo troppo entusiasti per aspettare -- quindi benvenuto nell'alpha aperta di meal.photos! Di conseguenza, le cose potrebbero cambiare, rompersi o sembrare un po' grezze. Vuoi essere il primo a sapere quando arrivano nuove funzionalità?",
     "firstNameLabel": "Nome",
     "firstNamePlaceholder": "Il tuo nome",
     "emailLabel": "Email",
@@ -501,9 +473,9 @@
     "submitting": "Iscrizione...",
     "noThanks": "No grazie, sto solo dando un'occhiata",
     "successHeading": "Sei nella lista!",
-    "successMessage": "Grazie, {name}! Ti faremo sapere quando succeder\u00e0 qualcosa di interessante.",
+    "successMessage": "Grazie, {name}! Ti faremo sapere quando succederà qualcosa di interessante.",
     "successDismiss": "Inizia a esplorare",
-    "errorGeneric": "Qualcosa \u00e8 andato storto. Riprova."
+    "errorGeneric": "Qualcosa è andato storto. Riprova."
   },
   "mealEdit": {
     "title": "Modifica piatto",
@@ -517,8 +489,8 @@
     "removeLocation": "Rimuovi posizione"
   },
   "pricing": {
-    "title": "Ottieni di pi\u00f9 da meal.photos",
-    "subtitle": "Gratis per sempre per gli amanti del cibo. Aggiorna quando vuoi di pi\u00f9.",
+    "title": "Ottieni di più da meal.photos",
+    "subtitle": "Gratis per sempre per gli amanti del cibo. Aggiorna quando vuoi di più.",
     "free": "Free",
     "personal": "Personal",
     "business": "Business",
@@ -526,19 +498,58 @@
     "currentPlan": "Piano attuale",
     "getPersonal": "Passa a Personal",
     "getBusiness": "Passa a Business",
-    "freeFeatures": ["5 caricamenti/giorno", "1 foto per piatto", "5 membri feed privato", "Valuta e richiedi ricette"],
-    "personalFeatures": ["15 caricamenti/giorno", "Fino a 4 foto per piatto", "25 membri feed privato", "Supporto prioritario"],
-    "businessFeatures": ["20 caricamenti/giorno", "Fino a 4 foto per piatto", "100 membri feed privato", "Test anonimi dei piatti", "Analisi ristorante"],
+    "freeFeatures": [
+      "5 caricamenti/giorno",
+      "1 foto per piatto",
+      "5 membri feed privato",
+      "Valuta e richiedi ricette"
+    ],
+    "personalFeatures": [
+      "15 caricamenti/giorno",
+      "Fino a 4 foto per piatto",
+      "25 membri feed privato",
+      "Supporto prioritario"
+    ],
+    "businessFeatures": [
+      "20 caricamenti/giorno",
+      "Fino a 4 foto per piatto",
+      "100 membri feed privato",
+      "Test anonimi dei piatti",
+      "Analisi ristorante"
+    ],
     "freeSubtitle": "Per gli amanti del cibo occasionali",
     "personalSubtitle": "Per i buongustai appassionati",
-    "businessSubtitle": "Per ristoranti e attivit\u00e0 gastronomiche",
-    "freePrice": "\u00a30",
-    "includesFrom": "Tutto di {plan}, pi\u00f9:",
-    "compareAll": "Confronta tutte le funzionalit\u00e0",
+    "businessSubtitle": "Per ristoranti e attività gastronomiche",
+    "freePrice": "£0",
+    "includesFrom": "Tutto di {plan}, più:",
+    "compareAll": "Confronta tutte le funzionalità",
     "faqTitle": "Domande frequenti",
-    "freeDetailFeatures": ["5 caricamenti al giorno", "1 foto per piatto", "5 membri feed privato", "Valuta piatti e richiedi ricette", "Serie di caricamenti e badge", "Piatti visibili sulla mappa globale"],
-    "personalDetailFeatures": ["15 caricamenti al giorno", "Fino a 4 foto per piatto", "25 membri feed privato", "Supporto prioritario"],
-    "businessDetailFeatures": ["Caricamenti illimitati", "Profilo aziendale verificato e badge", "Pin dedicato sulla mappa per il tuo locale", "Promozione nel feed della tua zona", "Dashboard analisi completa", "Test anonimi dei piatti", "Posizionamento prioritario sulla mappa", "Badge \"Pi\u00f9 votato\"", "Post di contenuti sul tuo profilo", "100 membri feed privato"],
+    "freeDetailFeatures": [
+      "5 caricamenti al giorno",
+      "1 foto per piatto",
+      "5 membri feed privato",
+      "Valuta piatti e richiedi ricette",
+      "Serie di caricamenti e badge",
+      "Piatti visibili sulla mappa globale"
+    ],
+    "personalDetailFeatures": [
+      "15 caricamenti al giorno",
+      "Fino a 4 foto per piatto",
+      "25 membri feed privato",
+      "Supporto prioritario"
+    ],
+    "businessDetailFeatures": [
+      "Caricamenti illimitati",
+      "Profilo aziendale verificato e badge",
+      "Pin dedicato sulla mappa per il tuo locale",
+      "Promozione nel feed della tua zona",
+      "Dashboard analisi completa",
+      "Test anonimi dei piatti",
+      "Posizionamento prioritario sulla mappa",
+      "Badge \"Più votato\"",
+      "Post di contenuti sul tuo profilo",
+      "100 membri feed privato"
+    ],
     "comparison": {
       "uploading": "Caricamento",
       "dailyUploads": "Caricamenti giornalieri",
@@ -547,8 +558,7 @@
       "rateMeals": "Valuta piatti",
       "requestRecipes": "Richiedi ricette",
       "privateFeedMembers": "Membri feed privato",
-      "streaksBadges": "Serie e badge",
-      "visibility": "Visibilit\u00e0",
+      "visibility": "Visibilità",
       "mealsOnMap": "Piatti sulla mappa globale",
       "verifiedBadge": "Badge aziendale verificato",
       "dedicatedPin": "Pin dedicato sulla mappa",
@@ -565,19 +575,19 @@
     },
     "faq": {
       "q1": "Posso usare meal.photos gratuitamente?",
-      "a1": "S\u00ec \u2014 meal.photos \u00e8 gratis per sempre. Carica piatti, valuta quelli degli altri e appari sulla mappa globale senza costi. Aggiorna solo quando vuoi di pi\u00f9.",
+      "a1": "Sì — meal.photos è gratis per sempre. Carica piatti, valuta quelli degli altri e appari sulla mappa globale senza costi. Aggiorna solo quando vuoi di più.",
       "q2": "Cosa succede se cancello il mio abbonamento?",
       "a2": "Tutti i tuoi piatti, valutazioni e il profilo restano esattamente come sono. Torni semplicemente ai limiti del piano Free.",
       "q3": "Posso cambiare piano in seguito?",
       "a3": "Certamente. Aggiorna o declassa in qualsiasi momento dalle Impostazioni. Le modifiche hanno effetto immediato.",
-      "q4": "Cos'\u00e8 un feed privato?",
+      "q4": "Cos'è un feed privato?",
       "a4": "Un feed privato ti permette di condividere piatti con un gruppo selezionato di amici o familiari. Solo i membri invitati possono vedere e valutare i tuoi piatti privati.",
       "q5": "Come funziona il test anonimo dei piatti?",
-      "a5": "Gli abbonati Business possono caricare piatti senza il nome del ristorante. La community li valuta onestamente \u2014 poi riveli la tua identit\u00e0 quando sei pronto.",
+      "a5": "Gli abbonati Business possono caricare piatti senza il nome del ristorante. La community li valuta onestamente — poi riveli la tua identità quando sei pronto.",
       "q6": "Ho bisogno del piano Business per apparire sulla mappa?",
-      "a6": "No \u2014 i piatti di ogni utente appaiono sulla mappa globale. Il piano Business ti d\u00e0 un pin dedicato per il locale, cos\u00ec i clienti possono trovare direttamente la tua posizione.",
+      "a6": "No — i piatti di ogni utente appaiono sulla mappa globale. Il piano Business ti dà un pin dedicato per il locale, così i clienti possono trovare direttamente la tua posizione.",
       "q7": "Come cancello il mio abbonamento?",
-      "a7": "Vai su Impostazioni e tocca \"Gestisci abbonamento\". Si aprir\u00e0 il portale clienti di Stripe dove puoi cancellare, aggiornare il pagamento o cambiare piano."
+      "a7": "Vai su Impostazioni e tocca \"Gestisci abbonamento\". Si aprirà il portale clienti di Stripe dove puoi cancellare, aggiornare il pagamento o cambiare piano."
     }
   },
   "privateFeed": {
@@ -606,9 +616,6 @@
   },
   "sidebar": {
     "uploadMeal": "Carica un piatto",
-    "leaderboard": "Classifica",
-    "leaderboardDesc": "Scopri chi cucina i piatti più apprezzati questa settimana.",
-    "viewLeaderboard": "Vedi classifica",
     "trending": "Di tendenza",
     "trendingDesc": "Esplora le cucine di tendenza e i piatti più popolari sulla mappa.",
     "openMap": "Apri mappa",
@@ -640,9 +647,9 @@
   },
   "errors": {
     "somethingWentWrong": "Qualcosa è andato storto",
-    "unexpectedError": "Si \u00e8 verificato un errore imprevisto. Riprova.",
+    "unexpectedError": "Si è verificato un errore imprevisto. Riprova.",
     "pageNotFound": "Pagina non trovata",
-    "pageNotFoundDesc": "La pagina che stai cercando non esiste o \u00e8 stata spostata.",
+    "pageNotFoundDesc": "La pagina che stai cercando non esiste o è stata spostata.",
     "mealUnavailable": "Piatto non disponibile",
     "mealUnavailableDesc": "Non siamo riusciti a caricare questo piatto. Potrebbe essere stato rimosso."
   }

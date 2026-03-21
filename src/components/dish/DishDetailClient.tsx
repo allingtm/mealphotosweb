@@ -245,6 +245,7 @@ export function DishDetailClient({ dish: initialDish, images, userHasReacted, us
               hasReacted={userHasReacted}
               count={dish.reaction_count}
               distanceKm={null}
+              dishTitle={dish.title}
             />
             <SaveButton
               dishId={dish.id}

@@ -52,10 +52,10 @@
     "followPrompt": "Folge @{username}",
     "followPromptRated": "Du hast @{username}s Gericht mit {score} bewertet",
     "suggestionsTitle": "Personen zum Folgen",
-    "suggestionStats": "{count} Gerichte \u00b7 {rating} Durchschnitt",
+    "suggestionStats": "{count} Gerichte · {rating} Durchschnitt",
     "journal": "Journal",
     "emptyJournal": "Dein Journal ist leer",
-    "emptyJournalDesc": "Private Mahlzeiten, die du hochl\u00e4dst, erscheinen hier. Nur du kannst sie sehen.",
+    "emptyJournalDesc": "Private Mahlzeiten, die du hochlädst, erscheinen hier. Nur du kannst sie sehen.",
     "uploadPrivateMeal": "Private Mahlzeit hochladen",
     "endOfJournal": "Das ist alles in deinem Journal"
   },
@@ -147,7 +147,7 @@
     "authError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "legalFooter": "Indem du fortfährst, stimmst du unseren zu",
     "inviteCodeLabel": "Einladungscode",
-    "inviteCodePlaceholder": "z.\u00a0B. A3F7B2C1",
+    "inviteCodePlaceholder": "z. B. A3F7B2C1",
     "inviteCodeRequired": "Ein Einladungscode ist erforderlich, um an der Beta teilzunehmen",
     "inviteCodeInvalid": "Ungültiger oder abgelaufener Einladungscode"
   },
@@ -182,15 +182,12 @@
   },
   "profile": {
     "settings": "Einstellungen",
-    "leaderboard": "Bestenliste",
     "editProfile": "Profil bearbeiten",
     "myMeals": "Meine Gerichte",
     "saved": "Gespeichert",
     "noSavedMeals": "Noch keine gespeicherten Gerichte",
     "noMealsUploaded": "Noch keine Gerichte hochgeladen",
     "meals": "Gerichte",
-    "avgRating": "Durchschnitt",
-    "streak": "Serie",
     "unavailable": "Profil nicht verfügbar",
     "unavailableDesc": "Dieses Profil konnte nicht geladen werden. Bitte versuche es erneut.",
     "displayName": "Anzeigename",
@@ -214,7 +211,6 @@
     "ratingsGiven": "Abgegebene Bewertungen",
     "privacy": "Privatsphäre",
     "showLocation": "Meinen Standort anzeigen",
-    "showStreak": "Meine Serie anzeigen",
     "back": "Zurück",
     "reportUser": "@{username} melden",
     "blockUser": "@{username} blockieren",
@@ -232,20 +228,6 @@
     "unfollowFailed": "Entfolgen fehlgeschlagen",
     "blockFailed": "Blockieren fehlgeschlagen"
   },
-  "leaderboard": {
-    "title": "Bestenliste",
-    "global": "Global",
-    "country": "Land",
-    "city": "Stadt",
-    "thisWeek": "Diese Woche",
-    "thisMonth": "Diesen Monat",
-    "allTime": "Alle Zeit",
-    "allCuisines": "Alle Küchen",
-    "noUsers": "Keine qualifizierten Nutzer für diese Filter gefunden.",
-    "meals": "{count} Gerichte",
-    "unavailable": "Bestenliste nicht verfügbar",
-    "unavailableDesc": "Die Bestenliste konnte nicht geladen werden. Bitte versuche es erneut."
-  },
   "upload": {
     "selectPhoto": "Foto auswählen",
     "takePhoto": "Foto aufnehmen",
@@ -255,7 +237,7 @@
     "dragToReposition": "Ziehen zum Neupositionieren, Pinch oder Scrollen zum Zoomen",
     "addDetails": "Details hinzufügen",
     "mealTitle": "Gerichtname *",
-    "mealTitlePlaceholder": "z.\u00a0B. Sonntagsbraten",
+    "mealTitlePlaceholder": "z. B. Sonntagsbraten",
     "cuisine": "Küche",
     "cuisineOptional": "Küche (optional)",
     "selectCuisine": "Küche auswählen",
@@ -265,7 +247,7 @@
     "tagsOptional": "Tags (optional)",
     "tagsPlaceholder": "#selbstgemacht, #braten, #sonntag",
     "venueOptional": "Wo hast du gegessen? (optional)",
-    "venuePlaceholder": "Restaurant, Caf\u00e9 suchen\u2026",
+    "venuePlaceholder": "Restaurant, Café suchen…",
     "venueSearching": "Suche...",
     "visibility": "Sichtbarkeit",
     "public": "Öffentlich",
@@ -291,7 +273,7 @@
     "meals": "Gerichte",
     "claimTitle": "Ist das dein Restaurant?",
     "claimDesc": "Beanspruche dein Profil, um private Analysen zu jedem Gericht zu sehen, eigene Gerichte zum Testen hochzuladen und deine Reichweite zu vergrößern.",
-    "claimCta": "Profil beanspruchen \u2014 ab \u00a329/Monat",
+    "claimCta": "Profil beanspruchen — ab £29/Monat",
     "back": "Zurück",
     "verified": "Verifiziertes Restaurant"
   },
@@ -315,25 +297,11 @@
       "other": "Sonstiges"
     }
   },
-  "dispute": {
-    "title": "Venue-Markierung anfechten",
-    "submitButton": "Anfechtung einreichen",
-    "submitting": "Wird gesendet...",
-    "successMessage": "Anfechtung eingereicht. Wir prüfen dies innerhalb von 48 Stunden.",
-    "detailPlaceholder": "Zusätzliche Details (optional, max. 280 Zeichen)",
-    "reasons": {
-      "not_served_here": "Wird hier nicht serviert",
-      "wrong_location": "Falscher Standort / Filiale",
-      "fake_photo": "Gefälschtes / Stock-Foto",
-      "other": "Sonstiges"
-    }
-  },
   "admin": {
     "title": "Admin",
     "overview": "Übersicht",
     "moderationQueue": "Moderation",
     "reports": "Meldungen",
-    "venueDisputes": "Anfechtungen",
     "approve": "Genehmigen",
     "reject": "Ablehnen",
     "action": "Aktion",
@@ -434,7 +402,11 @@
     "themeSystem": "System",
     "businessProfile": "Geschäftsprofil",
     "editBusinessDetails": "Geschäftsdetails bearbeiten",
-    "managePremises": "Standorte verwalten"
+    "managePremises": "Standorte verwalten",
+    "notifications": "Benachrichtigungen",
+    "notificationPreferences": "Benachrichtigungseinstellungen",
+    "forBusinesses": "Für Unternehmen",
+    "becomeABusiness": "Unternehmen werden"
   },
   "footer": {
     "privacy": "Datenschutz",
@@ -526,9 +498,25 @@
     "currentPlan": "Aktueller Plan",
     "getPersonal": "Personal holen",
     "getBusiness": "Business holen",
-    "freeFeatures": ["5 Uploads/Tag", "1 Foto pro Gericht", "5 private Feed-Mitglieder", "Bewerten & Rezepte anfragen"],
-    "personalFeatures": ["15 Uploads/Tag", "Bis zu 4 Fotos pro Gericht", "25 private Feed-Mitglieder", "Bevorzugter Support"],
-    "businessFeatures": ["20 Uploads/Tag", "Bis zu 4 Fotos pro Gericht", "100 private Feed-Mitglieder", "Anonymes Gericht-Testen", "Restaurant-Analysen"],
+    "freeFeatures": [
+      "5 Uploads/Tag",
+      "1 Foto pro Gericht",
+      "5 private Feed-Mitglieder",
+      "Bewerten & Rezepte anfragen"
+    ],
+    "personalFeatures": [
+      "15 Uploads/Tag",
+      "Bis zu 4 Fotos pro Gericht",
+      "25 private Feed-Mitglieder",
+      "Bevorzugter Support"
+    ],
+    "businessFeatures": [
+      "20 Uploads/Tag",
+      "Bis zu 4 Fotos pro Gericht",
+      "100 private Feed-Mitglieder",
+      "Anonymes Gericht-Testen",
+      "Restaurant-Analysen"
+    ],
     "freeSubtitle": "Für gelegentliche Essensliebhaber",
     "personalSubtitle": "Für leidenschaftliche Foodies",
     "businessSubtitle": "Für Restaurants & Gastronomiebetriebe",
@@ -536,9 +524,32 @@
     "includesFrom": "Alles aus {plan}, plus:",
     "compareAll": "Alle Features vergleichen",
     "faqTitle": "Häufig gestellte Fragen",
-    "freeDetailFeatures": ["5 Uploads pro Tag", "1 Foto pro Gericht", "5 private Feed-Mitglieder", "Gerichte bewerten & Rezepte anfragen", "Upload-Serien & Abzeichen", "Gerichte auf der Weltkarte"],
-    "personalDetailFeatures": ["15 Uploads pro Tag", "Bis zu 4 Fotos pro Gericht", "25 private Feed-Mitglieder", "Bevorzugter Support"],
-    "businessDetailFeatures": ["Unbegrenzte Gericht-Uploads", "Verifiziertes Geschäftsprofil & Abzeichen", "Eigener Kartenpin für dein Lokal", "Feed-Promotion in deiner Region", "Vollständiges Analyse-Dashboard", "Anonymes Gericht-Testen", "Bevorzugte Kartenplatzierung", "\u201ETop Bewertet\u201C-Abzeichen", "Inhalts-Beiträge auf deinem Profil", "100 private Feed-Mitglieder"],
+    "freeDetailFeatures": [
+      "5 Uploads pro Tag",
+      "1 Foto pro Gericht",
+      "5 private Feed-Mitglieder",
+      "Gerichte bewerten & Rezepte anfragen",
+      "Upload-Serien & Abzeichen",
+      "Gerichte auf der Weltkarte"
+    ],
+    "personalDetailFeatures": [
+      "15 Uploads pro Tag",
+      "Bis zu 4 Fotos pro Gericht",
+      "25 private Feed-Mitglieder",
+      "Bevorzugter Support"
+    ],
+    "businessDetailFeatures": [
+      "Unbegrenzte Gericht-Uploads",
+      "Verifiziertes Geschäftsprofil & Abzeichen",
+      "Eigener Kartenpin für dein Lokal",
+      "Feed-Promotion in deiner Region",
+      "Vollständiges Analyse-Dashboard",
+      "Anonymes Gericht-Testen",
+      "Bevorzugte Kartenplatzierung",
+      "„Top Bewertet“-Abzeichen",
+      "Inhalts-Beiträge auf deinem Profil",
+      "100 private Feed-Mitglieder"
+    ],
     "comparison": {
       "uploading": "Hochladen",
       "dailyUploads": "Tägliche Uploads",
@@ -547,7 +558,6 @@
       "rateMeals": "Gerichte bewerten",
       "requestRecipes": "Rezepte anfragen",
       "privateFeedMembers": "Private Feed-Mitglieder",
-      "streaksBadges": "Serien & Abzeichen",
       "visibility": "Sichtbarkeit",
       "mealsOnMap": "Gerichte auf der Weltkarte",
       "verifiedBadge": "Verifiziertes Business-Abzeichen",
@@ -577,7 +587,7 @@
       "q6": "Brauche ich einen Business-Plan, um auf der Karte zu erscheinen?",
       "a6": "Nein — die Gerichte jedes Nutzers erscheinen auf der Weltkarte. Der Business-Plan gibt dir einen eigenen Venue-Pin, damit Kunden deinen Standort direkt finden können.",
       "q7": "Wie kündige ich mein Abonnement?",
-      "a7": "Gehe zu den Einstellungen und tippe auf \u201EAbonnement verwalten\u201C. Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
+      "a7": "Gehe zu den Einstellungen und tippe auf „Abonnement verwalten“. Es öffnet sich das Stripe-Kundenportal, wo du kündigen, die Zahlungsmethode ändern oder den Plan wechseln kannst."
     }
   },
   "privateFeed": {
@@ -606,9 +616,6 @@
   },
   "sidebar": {
     "uploadMeal": "Gericht hochladen",
-    "leaderboard": "Bestenliste",
-    "leaderboardDesc": "Sieh, wer diese Woche die bestbewerteten Gerichte kocht.",
-    "viewLeaderboard": "Bestenliste ansehen",
     "trending": "Im Trend",
     "trendingDesc": "Entdecke angesagte Küchen und beliebte Gerichte auf der Karte.",
     "openMap": "Karte öffnen",

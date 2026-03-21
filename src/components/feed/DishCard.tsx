@@ -143,6 +143,7 @@ export const DishCard = memo(function DishCard({ dish, index, onReact, onSave }:
             hasReacted={dish.user_has_reacted}
             count={dish.reaction_count}
             distanceKm={dish.distance_km}
+            dishTitle={dish.title}
             onReacted={() => onReact?.(dish.id)}
           />
           <SaveButton

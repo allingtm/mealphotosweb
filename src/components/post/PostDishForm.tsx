@@ -13,6 +13,17 @@ import { useAppStore } from '@/lib/store';
 import { PremiseSwitcher } from '@/components/business/PremiseSwitcher';
 import type { BusinessPremise } from '@/types/database';
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: HTMLElement, options: Record<string, unknown>) => string;
+      getResponse: (widgetId: string) => string | undefined;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -82,6 +93,29 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Turnstile
+  const turnstileRef = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!turnstileContainerRef.current || !window.turnstile) return;
+      clearInterval(interval);
+      const widgetId = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+        size: 'invisible',
+        callback: () => {},
+      });
+      turnstileRef.current = widgetId;
+    }, 200);
+    return () => {
+      clearInterval(interval);
+      if (turnstileRef.current && window.turnstile) {
+        window.turnstile.remove(turnstileRef.current);
+      }
+    };
+  }, []);
+
   const removeImage = (index: number) => {
     URL.revokeObjectURL(previews[index]);
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -104,6 +138,11 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
       }));
 
       images.forEach((img) => formData.append('images', img));
+
+      const turnstileToken = turnstileRef.current
+        ? window.turnstile?.getResponse(turnstileRef.current)
+        : (process.env.NODE_ENV === 'development' ? 'dev-bypass' : undefined);
+      if (turnstileToken) formData.set('turnstile_token', turnstileToken);
 
       const res = await fetch('/api/dishes', {
         method: 'POST',
@@ -329,6 +368,7 @@ export function PostDishForm({ plan, menuItems }: PostDishFormProps) {
           </div>
         </div>
       </div>
+      <div ref={turnstileContainerRef} />
     </div>
   );
 }

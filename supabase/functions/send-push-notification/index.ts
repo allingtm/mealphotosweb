@@ -14,6 +14,39 @@ interface PushRequest {
   body: string;
   url?: string;
   data?: Record<string, unknown>;
+  notification_type?: string;
+}
+
+const TYPE_TO_PREF: Record<string, string> = {
+  new_comment: "new_comment",
+  new_follower: "new_follower",
+  reaction_milestone: "reaction_milestone",
+  new_dish: "new_dish",
+  dish_request_nearby: "dish_request_nearby",
+};
+
+async function checkPreferences(
+  userId: string,
+  notificationType?: string
+): Promise<boolean> {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const { data } = await supabase
+    .from("profiles")
+    .select("notification_preferences")
+    .eq("id", userId)
+    .single();
+
+  const prefs = data?.notification_preferences;
+  if (!prefs) return true; // No preferences set, allow all
+
+  if (prefs.push_enabled === false) return false;
+
+  if (notificationType) {
+    const prefKey = TYPE_TO_PREF[notificationType];
+    if (prefKey && prefs[prefKey] === false) return false;
+  }
+
+  return true;
 }
 
 async function checkFrequencyCap(userId: string): Promise<boolean> {
@@ -39,6 +72,12 @@ async function logPush(userId: string): Promise<void> {
 async function sendPush(req: PushRequest): Promise<boolean> {
   if (!ONESIGNAL_APP_ID || !ONESIGNAL_REST_API_KEY) {
     console.log("OneSignal not configured, skipping push");
+    return false;
+  }
+
+  const allowed = await checkPreferences(req.user_id, req.notification_type);
+  if (!allowed) {
+    console.log(`Push blocked by user preferences for ${req.user_id}`);
     return false;
   }
 

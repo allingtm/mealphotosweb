@@ -19,7 +19,6 @@ interface EditProfileModalProps {
     location_city: string | null;
     location_country: string | null;
     show_location?: boolean;
-    show_streak?: boolean;
   };
 }
 
@@ -37,7 +36,6 @@ export function EditProfileModal({
   const [locationCity, setLocationCity] = useState(profile.location_city ?? '');
   const [locationCountry, setLocationCountry] = useState(profile.location_country ?? '');
   const [showLocation, setShowLocation] = useState(profile.show_location ?? true);
-  const [showStreak, setShowStreak] = useState(profile.show_streak ?? true);
   const [saving, setSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -50,7 +48,6 @@ export function EditProfileModal({
       setLocationCity(profile.location_city ?? '');
       setLocationCountry(profile.location_country ?? '');
       setShowLocation(profile.show_location ?? true);
-      setShowStreak(profile.show_streak ?? true);
       setFieldErrors({});
     }
   }, [isOpen, profile]);
@@ -83,8 +80,6 @@ export function EditProfileModal({
         payload.location_country = locationCountry || undefined;
       if (showLocation !== (profile.show_location ?? true))
         payload.show_location = showLocation;
-      if (showStreak !== (profile.show_streak ?? true))
-        payload.show_streak = showStreak;
 
       // Nothing changed
       if (Object.keys(payload).length === 0) {
@@ -133,12 +128,6 @@ export function EditProfileModal({
             new_value: payload.show_location,
           });
         }
-        if (payload.show_streak !== undefined) {
-          posthog.capture(ANALYTICS_EVENTS.PROFILE_PRIVACY_CHANGED, {
-            toggle: 'show_streak',
-            new_value: payload.show_streak,
-          });
-        }
 
         showToast(t('profileUpdated'), 'success');
         onSaved();
@@ -149,7 +138,7 @@ export function EditProfileModal({
         setSaving(false);
       }
     },
-    [displayName, username, bio, locationCity, locationCountry, showLocation, showStreak, profile, onClose, onSaved, t]
+    [displayName, username, bio, locationCity, locationCountry, showLocation, profile, onClose, onSaved, t]
   );
 
   if (!isOpen) return null;
@@ -393,47 +382,6 @@ export function EditProfileModal({
             </div>
 
             {/* Show streak toggle */}
-            <div className="flex items-center justify-between">
-              <span
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 15,
-                  color: 'var(--text-primary)',
-                }}
-              >
-                {t('showStreak')}
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowStreak(!showStreak)}
-                style={{
-                  width: 48,
-                  height: 28,
-                  borderRadius: 14,
-                  backgroundColor: showStreak ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  transition: 'background-color 0.2s',
-                }}
-                role="switch"
-                aria-checked={showStreak ? 'true' : 'false'}
-                aria-label={t('showStreak')}
-              >
-                <span
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: '50%',
-                    backgroundColor: 'white',
-                    position: 'absolute',
-                    top: 3,
-                    left: showStreak ? 23 : 3,
-                    transition: 'left 0.2s',
-                  }}
-                />
-              </button>
-            </div>
           </div>
 
           {/* Save button */}

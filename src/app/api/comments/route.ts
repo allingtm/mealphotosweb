@@ -18,7 +18,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid data', details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { dish_id, text } = parsed.data;
+  const { dish_id, text, turnstile_token } = parsed.data;
+
+  // Turnstile verification
+  const isDevBypass = process.env.NODE_ENV === 'development' && turnstile_token === 'dev-bypass';
+  if (process.env.TURNSTILE_SECRET_KEY && !isDevBypass) {
+    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: turnstile_token ?? '',
+      }),
+    });
+    const turnstileData = await turnstileRes.json();
+    if (!turnstileData.success) {
+      return NextResponse.json({ error: 'Bot verification failed' }, { status: 403 });
+    }
+  }
 
   // Check comments_enabled
   const { data: dish } = await supabase

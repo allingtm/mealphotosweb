@@ -23,7 +23,7 @@ interface MemberData {
   location_city: string | null;
   location_country: string | null;
   is_admin: boolean;
-  is_restaurant: boolean;
+  is_business: boolean;
   banned_at: string | null;
   suspended_until: string | null;
   ban_reason: string | null;
@@ -31,20 +31,18 @@ interface MemberData {
   updated_at: string;
 }
 
-interface MealData {
+interface DishData {
   id: string;
   title: string;
   photo_url: string;
-  avg_rating: number;
-  rating_count: number;
-  cuisine: string | null;
-  tags: string[];
+  reaction_count: number;
+  save_count: number;
   created_at: string;
 }
 
 interface MemberDetailProps {
   member: MemberData;
-  stats: { meal_count: number; avg_rating: number };
+  stats: { dish_count: number };
   currentAdminId: string;
 }
 
@@ -70,7 +68,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Meals state
-  const [meals, setMeals] = useState<MealData[]>([]);
+  const [meals, setMeals] = useState<DishData[]>([]);
   const [mealsTotal, setMealsTotal] = useState(0);
   const [mealsPage, setMealsPage] = useState(1);
   const [mealsLoading, setMealsLoading] = useState(true);
@@ -285,28 +283,20 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
   };
 
   // Meal edit
-  const startEditMeal = (meal: MealData) => {
+  const startEditMeal = (meal: DishData) => {
     setEditingMealId(meal.id);
     setEditMealTitle(meal.title);
-    setEditMealCuisine(meal.cuisine);
-    setEditMealTags(meal.tags.join(', '));
   };
 
   const handleSaveMeal = async () => {
     if (!editingMealId) return;
     setMealSaving(true);
     try {
-      const tags = editMealTags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean);
-      const res = await fetch(`/api/admin/meals/${editingMealId}`, {
+      const res = await fetch(`/api/dishes/${editingMealId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: editMealTitle,
-          cuisine: editMealCuisine,
-          tags,
         }),
       });
       if (res.ok) {
@@ -330,7 +320,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
     if (!deleteMealId) return;
     setMealSaving(true);
     try {
-      const res = await fetch(`/api/admin/meals/${deleteMealId}`, { method: 'DELETE' });
+      const res = await fetch(`/api/dishes/${deleteMealId}`, { method: 'DELETE' });
       if (res.ok) {
         setMeals((prev) => prev.filter((m) => m.id !== deleteMealId));
         setMealsTotal((t) => t - 1);
@@ -400,7 +390,7 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                   <Shield size={10} /> Admin
                 </span>
               )}
-              {member.is_restaurant && (
+              {member.is_business && (
                 <span style={{ padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-elevated)' }}>
                   Restaurant
                 </span>
@@ -412,14 +402,10 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
 
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-4" style={{ maxWidth: 400 }}>
+        <div className="grid grid-cols-2 gap-4" style={{ maxWidth: 300 }}>
           <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'var(--bg-surface)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>Meals</p>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)' }}>{stats.meal_count}</p>
-          </div>
-          <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'var(--bg-surface)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>Avg Rating</p>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--accent-primary)' }}>{stats.avg_rating || '—'}</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>Dishes</p>
+            <p style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--text-primary)' }}>{stats.dish_count}</p>
           </div>
           <div style={{ padding: 12, borderRadius: 12, backgroundColor: 'var(--bg-surface)' }}>
             <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>Joined</p>
@@ -686,17 +672,9 @@ export function MemberDetail({ member: initialMember, stats, currentAdminId }: M
                           {meal.title}
                         </p>
                         <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
-                          <span style={{ fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--accent-primary)' }}>
-                            {meal.avg_rating > 0 ? meal.avg_rating.toFixed(1) : '—'}
-                          </span>
                           <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                            ({meal.rating_count} ratings)
+                            {meal.reaction_count} reactions · {meal.save_count} saves
                           </span>
-                          {meal.cuisine && (
-                            <span style={{ padding: '1px 6px', borderRadius: 4, fontSize: 11, fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', backgroundColor: 'var(--bg-elevated)' }}>
-                              {CUISINE_LABELS[meal.cuisine as keyof typeof CUISINE_LABELS] ?? meal.cuisine}
-                            </span>
-                          )}
                         </div>
                         <div className="flex gap-2" style={{ marginTop: 8 }}>
                           <button

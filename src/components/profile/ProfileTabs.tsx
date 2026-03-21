@@ -11,8 +11,7 @@ import { getBusinessTypeGroup, type BusinessType } from '@/types/database';
 interface MealGridItem {
   id: string;
   photo_url: string;
-  avg_rating: number;
-  rating_count: number;
+  reaction_count: number;
   visibility?: string;
 }
 
@@ -146,7 +145,7 @@ export function ProfileTabs({
         ['allMeals', 'ourDishes', 'dinerPosts'].includes(activeTab) && (
         <MealGrid
           meals={activeTab === 'allMeals' ? meals : []}
-          fetchUrl={username ? `/api/profiles/${username}/meals?tab=${RESTAURANT_TAB_PARAMS[activeTab]}` : undefined}
+          fetchUrl={username ? `/api/businesses/dishes` : undefined}
         />
       )}
       {activeTab === 'updates' && username && (

@@ -56,6 +56,25 @@ export async function POST(req: NextRequest) {
 
   // Parse form data
   const formData = await req.formData();
+
+  // Turnstile verification
+  const turnstileToken = formData.get('turnstile_token') as string | null;
+  const isDevBypass = process.env.NODE_ENV === 'development' && turnstileToken === 'dev-bypass';
+  if (process.env.TURNSTILE_SECRET_KEY && !isDevBypass) {
+    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: turnstileToken ?? '',
+      }),
+    });
+    const turnstileData = await turnstileRes.json();
+    if (!turnstileData.success) {
+      return NextResponse.json({ error: 'Bot verification failed' }, { status: 403 });
+    }
+  }
+
   const metadataRaw = formData.get('metadata');
   if (!metadataRaw) {
     return NextResponse.json({ error: 'Missing metadata' }, { status: 400 });

@@ -278,6 +278,15 @@ export interface CommentWithProfile {
   };
 }
 
+export interface NotificationPreferences {
+  new_comment: boolean;
+  new_follower: boolean;
+  reaction_milestone: boolean;
+  new_dish: boolean;
+  dish_request_nearby: boolean;
+  push_enabled: boolean;
+}
+
 export interface InboxComment {
   id: string;
   dish_id: string;

@@ -182,15 +182,12 @@
   },
   "profile": {
     "settings": "Settings",
-    "leaderboard": "Leaderboard",
     "editProfile": "Edit Profile",
     "myMeals": "My Meals",
     "saved": "Saved",
     "noSavedMeals": "No saved meals yet",
     "noMealsUploaded": "No meals uploaded yet",
     "meals": "Meals",
-    "avgRating": "Avg Rating",
-    "streak": "Streak",
     "unavailable": "Profile unavailable",
     "unavailableDesc": "We couldn't load this profile. Please try again.",
     "displayName": "Display Name",
@@ -214,7 +211,6 @@
     "ratingsGiven": "Ratings Given",
     "privacy": "Privacy",
     "showLocation": "Show my location",
-    "showStreak": "Show my streak",
     "back": "Back",
     "reportUser": "Report @{username}",
     "blockUser": "Block @{username}",
@@ -231,20 +227,6 @@
     "followFailed": "Failed to follow",
     "unfollowFailed": "Failed to unfollow",
     "blockFailed": "Failed to block user"
-  },
-  "leaderboard": {
-    "title": "Leaderboard",
-    "global": "Global",
-    "country": "Country",
-    "city": "City",
-    "thisWeek": "This Week",
-    "thisMonth": "This Month",
-    "allTime": "All Time",
-    "allCuisines": "All Cuisines",
-    "noUsers": "No qualifying users found for these filters.",
-    "meals": "{count} meals",
-    "unavailable": "Leaderboard unavailable",
-    "unavailableDesc": "We couldn't load the leaderboard. Please try again."
   },
   "upload": {
     "selectPhoto": "Select Photo",
@@ -315,25 +297,11 @@
       "other": "Other"
     }
   },
-  "dispute": {
-    "title": "Dispute venue tag",
-    "submitButton": "Submit Dispute",
-    "submitting": "Submitting...",
-    "successMessage": "Dispute submitted. We'll review this within 48 hours.",
-    "detailPlaceholder": "Additional detail (optional, max 280 chars)",
-    "reasons": {
-      "not_served_here": "Not served here",
-      "wrong_location": "Wrong location / branch",
-      "fake_photo": "Fake / stock photo",
-      "other": "Other"
-    }
-  },
   "admin": {
     "title": "Admin",
     "overview": "Overview",
     "moderationQueue": "Moderation",
     "reports": "Reports",
-    "venueDisputes": "Disputes",
     "approve": "Approve",
     "reject": "Reject",
     "action": "Action",
@@ -434,7 +402,11 @@
     "themeSystem": "System",
     "businessProfile": "Business Profile",
     "editBusinessDetails": "Edit business details",
-    "managePremises": "Manage premises"
+    "managePremises": "Manage premises",
+    "notifications": "Notifications",
+    "notificationPreferences": "Notification preferences",
+    "forBusinesses": "For Businesses",
+    "becomeABusiness": "Become a business"
   },
   "footer": {
     "privacy": "Privacy",
@@ -619,7 +591,6 @@
       "rateMeals": "Rate meals",
       "requestRecipes": "Request recipes",
       "privateFeedMembers": "Private feed members",
-      "streaksBadges": "Streaks & badges",
       "visibility": "Visibility",
       "mealsOnMap": "Meals on global map",
       "verifiedBadge": "Verified business badge",
@@ -678,9 +649,6 @@
   },
   "sidebar": {
     "uploadMeal": "Upload a meal",
-    "leaderboard": "Leaderboard",
-    "leaderboardDesc": "See who is cooking the highest-rated meals this week.",
-    "viewLeaderboard": "View leaderboard",
     "trending": "Trending",
     "trendingDesc": "Explore trending cuisines and popular meals on the map.",
     "openMap": "Open map",

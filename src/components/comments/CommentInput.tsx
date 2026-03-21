@@ -9,6 +9,17 @@ import { createCommentSchema } from '@/lib/validations';
 import { showToast } from '@/components/ui/Toast';
 import type { CommentWithProfile } from '@/types/database';
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: HTMLElement, options: Record<string, unknown>) => string;
+      getResponse: (widgetId: string) => string | undefined;
+      reset: (widgetId: string) => void;
+      remove: (widgetId: string) => void;
+    };
+  }
+}
+
 interface CommentInputProps {
   dishId: string;
   businessId: string;
@@ -21,6 +32,29 @@ export function CommentInput({ dishId, businessId, onCommentPosted }: CommentInp
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const user = useAppStore((s) => s.user);
   const openAuthModal = useAppStore((s) => s.openAuthModal);
+
+  // Turnstile
+  const turnstileRef = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!turnstileContainerRef.current || !window.turnstile) return;
+      clearInterval(interval);
+      const widgetId = window.turnstile.render(turnstileContainerRef.current, {
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+        size: 'invisible',
+        callback: () => {},
+      });
+      turnstileRef.current = widgetId;
+    }, 200);
+    return () => {
+      clearInterval(interval);
+      if (turnstileRef.current && window.turnstile) {
+        window.turnstile.remove(turnstileRef.current);
+      }
+    };
+  }, []);
 
   // Auto-grow textarea
   const adjustHeight = useCallback(() => {
@@ -75,10 +109,14 @@ export function CommentInput({ dishId, businessId, onCommentPosted }: CommentInp
     setText('');
 
     try {
+      const turnstileToken = turnstileRef.current
+        ? window.turnstile?.getResponse(turnstileRef.current)
+        : (process.env.NODE_ENV === 'development' ? 'dev-bypass' : undefined);
+
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dish_id: dishId, text: trimmed }),
+        body: JSON.stringify({ dish_id: dishId, text: trimmed, turnstile_token: turnstileToken }),
       });
 
       if (!res.ok) {
@@ -101,6 +139,7 @@ export function CommentInput({ dishId, businessId, onCommentPosted }: CommentInp
   const avatarUrl = user?.user_metadata?.avatar_url;
 
   return (
+    <>
     <div className="flex items-end gap-2" style={{ padding: '8px 0' }}>
       {avatarUrl ? (
         <Image src={avatarUrl} alt="You" width={28} height={28} className="rounded-full object-cover flex-shrink-0" style={{ width: 28, height: 28 }} />
@@ -167,5 +206,7 @@ export function CommentInput({ dishId, businessId, onCommentPosted }: CommentInp
         />
       </button>
     </div>
+    <div ref={turnstileContainerRef} />
+    </>
   );
 }

@@ -11,10 +11,11 @@ interface ReactionButtonProps {
   hasReacted: boolean;
   count: number;
   distanceKm: number | null;
+  dishTitle?: string;
   onReacted?: () => void;
 }
 
-export function ReactionButton({ dishId, businessId, hasReacted: initialHasReacted, count: initialCount, distanceKm, onReacted }: ReactionButtonProps) {
+export function ReactionButton({ dishId, businessId, hasReacted: initialHasReacted, count: initialCount, distanceKm, dishTitle, onReacted }: ReactionButtonProps) {
   const [hasReacted, setHasReacted] = useState(initialHasReacted);
   const [count, setCount] = useState(initialCount);
   const user = useAppStore((s) => s.user);
@@ -64,7 +65,7 @@ export function ReactionButton({ dishId, businessId, hasReacted: initialHasReact
         fontWeight: hasReacted ? 600 : 400,
         opacity: hasReacted ? 1 : undefined,
       }}
-      aria-label={hasReacted ? `Reacted to dish` : `React to dish`}
+      aria-label={hasReacted ? `Reacted to ${dishTitle ?? 'dish'}` : `React to ${dishTitle ?? 'dish'}`}
     >
       <UtensilsCrossed size={16} strokeWidth={1.5} />
       <span>{hasReacted ? 'Reacted' : "I'd eat that"}</span>

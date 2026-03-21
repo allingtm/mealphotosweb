@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import posthog from 'posthog-js';
+import { ANALYTICS_EVENTS } from '@/lib/analytics';
 import type { Notification } from '@/types/database';
 
 import { timeAgo } from '@/lib/utils/timeAgo';
@@ -152,6 +153,15 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
       } catch {
         // Continue navigation even if mark-read fails
       }
+    }
+
+    // Analytics
+    if (notification.type === 'proximity') {
+      posthog.capture(ANALYTICS_EVENTS.PROXIMITY_NOTIFICATION_TAPPED, {
+        notification_type: notification.type,
+        dish_id: notification.data?.dish_id,
+        business_id: notification.data?.business_id,
+      });
     }
 
     // Navigate

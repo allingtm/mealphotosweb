@@ -33,25 +33,19 @@ export default async function AdminMemberDetailPage({
   // Fetch member via service role
   const serviceClient = createServiceRoleClient();
 
-  const [profileResult, mealStatsResult] = await Promise.all([
+  const [profileResult, dishCountResult] = await Promise.all([
     serviceClient
       .from('profiles')
-      .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_restaurant, banned_at, suspended_until, ban_reason, created_at, updated_at')
+      .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_business, banned_at, suspended_until, ban_reason, created_at, updated_at')
       .eq('id', id)
       .single(),
     serviceClient
-      .from('meals')
-      .select('avg_rating', { count: 'exact' })
-      .eq('user_id', id),
+      .from('dishes')
+      .select('id', { count: 'exact', head: true })
+      .eq('business_id', id),
   ]);
 
   if (profileResult.error || !profileResult.data) notFound();
-
-  const meals = mealStatsResult.data ?? [];
-  const mealCount = mealStatsResult.count ?? 0;
-  const avgRating = mealCount > 0
-    ? meals.reduce((sum, m) => sum + (m.avg_rating ?? 0), 0) / mealCount
-    : 0;
 
   const member = profileResult.data as {
     id: string;
@@ -62,7 +56,7 @@ export default async function AdminMemberDetailPage({
     location_city: string | null;
     location_country: string | null;
     is_admin: boolean;
-    is_restaurant: boolean;
+    is_business: boolean;
     banned_at: string | null;
     suspended_until: string | null;
     ban_reason: string | null;
@@ -79,7 +73,7 @@ export default async function AdminMemberDetailPage({
     >
       <MemberDetail
         member={member}
-        stats={{ meal_count: mealCount, avg_rating: Math.round(avgRating * 10) / 10 }}
+        stats={{ dish_count: dishCountResult.count ?? 0 }}
         currentAdminId={user.id}
       />
     </div>

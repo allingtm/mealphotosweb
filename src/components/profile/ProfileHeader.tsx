@@ -31,7 +31,6 @@ interface ProfileHeaderProps {
     plan?: string;
     subscription_status?: string;
     show_location?: boolean;
-    show_streak?: boolean;
     follower_count?: number;
     following_count?: number;
   };

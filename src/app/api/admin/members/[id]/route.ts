@@ -35,31 +35,25 @@ export async function GET(
 
     const serviceClient = createServiceRoleClient();
 
-    const [profileResult, mealStatsResult] = await Promise.all([
+    const [profileResult, dishCountResult] = await Promise.all([
       serviceClient
         .from('profiles')
-        .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_restaurant, moderation_tier, banned_at, suspended_until, ban_reason, created_at, updated_at')
+        .select('id, username, display_name, bio, avatar_url, location_city, location_country, is_admin, is_business, banned_at, suspended_until, ban_reason, created_at, updated_at')
         .eq('id', parsed.data.id)
         .single(),
       serviceClient
-        .from('meals')
-        .select('avg_rating', { count: 'exact' })
-        .eq('user_id', parsed.data.id),
+        .from('dishes')
+        .select('id', { count: 'exact', head: true })
+        .eq('business_id', parsed.data.id),
     ]);
 
     if (profileResult.error || !profileResult.data) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
 
-    const meals = mealStatsResult.data ?? [];
-    const mealCount = mealStatsResult.count ?? 0;
-    const avgRating = mealCount > 0
-      ? meals.reduce((sum, m) => sum + (m.avg_rating ?? 0), 0) / mealCount
-      : 0;
-
     return NextResponse.json({
       member: profileResult.data,
-      stats: { meal_count: mealCount, avg_rating: Math.round(avgRating * 10) / 10 },
+      stats: { dish_count: dishCountResult.count ?? 0 },
     });
   } catch (err) {
     console.error('Admin member detail error:', err);
@@ -125,7 +119,7 @@ export async function PATCH(
       .from('profiles')
       .update(updates)
       .eq('id', parsedParams.data.id)
-      .select('id, username, display_name, bio, avatar_url, is_admin, is_restaurant, moderation_tier, banned_at, suspended_until, ban_reason, created_at, updated_at')
+      .select('id, username, display_name, bio, avatar_url, is_admin, is_business, banned_at, suspended_until, ban_reason, created_at, updated_at')
       .single();
 
     if (error) {
@@ -179,9 +173,9 @@ export async function DELETE(
 
     // Fetch member's meals for Cloudflare cleanup
     const { data: meals } = await serviceClient
-      .from('meals')
+      .from('dishes')
       .select('cloudflare_image_id')
-      .eq('user_id', parsedParams.data.id);
+      .eq('business_id', parsedParams.data.id);
 
     // Best-effort Cloudflare image deletion
     if (meals && CF_ACCOUNT_ID && CF_API_TOKEN) {

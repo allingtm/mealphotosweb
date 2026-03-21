@@ -11,16 +11,14 @@ import { BlogTab } from './BlogTab';
 
 interface ModerationItem {
   id: string;
-  meal_id: string;
+  dish_id: string;
   status: string;
   moderation_labels: Record<string, unknown>;
-  cloud_vision_checked: boolean;
   created_at: string;
-  meals: {
+  dishes: {
     title: string;
     photo_url: string;
-    user_id: string;
-    profiles: { username: string; moderation_tier: string } | null;
+    business_id: string;
   } | null;
 }
 
@@ -41,36 +39,13 @@ interface ReportItem {
   } | null;
 }
 
-interface DisputeItem {
-  id: string;
-  meal_id: string;
-  venue_mapbox_id: string;
-  reason: string;
-  detail: string | null;
-  status: string;
-  created_at: string;
-  meals: {
-    title: string;
-    photo_url: string;
-    venue_name: string | null;
-  } | null;
-  restaurant_username: string | null;
-  dispute_stats: {
-    total: number;
-    upheld: number;
-    dismissed: number;
-  } | null;
-}
-
 interface AdminTabsProps {
   initialTab: string;
   moderationQueue: ModerationItem[];
   reports: ReportItem[];
-  disputes: DisputeItem[];
   counts: {
     moderation: number;
     reports: number;
-    disputes: number;
     urgentReports: number;
     members: number;
     contact: number;
@@ -85,7 +60,6 @@ const TABS = [
   { key: 'invites', label: 'Invite Codes' },
   { key: 'moderation', label: 'Moderation' },
   { key: 'reports', label: 'Reports' },
-  { key: 'disputes', label: 'Disputes' },
   { key: 'contact', label: 'Contact' },
   { key: 'blog', label: 'Blog' },
 ] as const;
@@ -116,37 +90,11 @@ export function AdminTabs({
   initialTab,
   moderationQueue,
   reports,
-  disputes,
   counts,
 }: AdminTabsProps) {
   const [activeTab, setActiveTab] = useState(initialTab || 'overview');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const router = useRouter();
-
-  const handleDemoteUser = useCallback(
-    async (userId: string) => {
-      setActionLoading(`${userId}-demote`);
-      try {
-        const res = await fetch(`/api/admin/members/${userId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ moderation_tier: 'flagged' }),
-        });
-        if (res.ok) {
-          showToast('User demoted to flagged', 'success');
-          router.refresh();
-        } else {
-          const data = await res.json();
-          showToast(data.error ?? 'Demotion failed', 'error');
-        }
-      } catch {
-        showToast('Demotion failed', 'error');
-      } finally {
-        setActionLoading(null);
-      }
-    },
-    [router]
-  );
 
   const handleAction = useCallback(
     async (endpoint: string, id: string, action: string, adminNotes?: string) => {
@@ -218,7 +166,6 @@ export function AdminTabs({
               <StatCard label="Pending Moderation" value={counts.moderation} />
               <StatCard label="Pending Reports" value={counts.reports} />
               <StatCard label="Urgent Reports" value={counts.urgentReports} color="var(--status-error)" />
-              <StatCard label="Pending Disputes" value={counts.disputes} />
               <StatCard label="Total Members" value={counts.members} />
               <StatCard label="Active Invite Codes" value={counts.inviteCodes} />
               <StatCard label="New Contact" value={counts.contact} />
@@ -254,10 +201,10 @@ export function AdminTabs({
                 }}
               >
                 <div className="flex items-center gap-4">
-                  {item.meals?.photo_url && (
+                  {item.dishes?.photo_url && (
                     <Image
-                      src={item.meals.photo_url}
-                      alt={item.meals.title ?? 'Meal'}
+                      src={item.dishes.photo_url}
+                      alt={item.dishes.title ?? 'Dish'}
                       width={64}
                       height={64}
                       className="rounded-lg object-cover"
@@ -266,41 +213,25 @@ export function AdminTabs({
                   )}
                   <div className="flex-1">
                     <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
-                      {item.meals?.title ?? 'Unknown meal'}
+                      {item.dishes?.title ?? 'Unknown dish'}
                     </p>
-                    <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
-                      <TierBadge tier={item.meals?.profiles?.moderation_tier} />
-                      <span style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)' }}>
-                        CV: {item.cloud_vision_checked ? 'Checked' : 'Skipped'}
-                      </span>
-                    </div>
                     <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                      {item.meals?.profiles?.username ? `@${item.meals.profiles.username}` : ''} · {new Date(item.created_at).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <ActionButton
-                        label="Approve"
-                        variant="success"
-                        loading={actionLoading === `${item.id}-approve`}
-                        onClick={() => handleAction('moderation', item.id, 'approve')}
-                      />
-                      <ActionButton
-                        label="Reject"
-                        variant="danger"
-                        loading={actionLoading === `${item.id}-reject`}
-                        onClick={() => handleAction('moderation', item.id, 'reject')}
-                      />
-                    </div>
-                    {item.meals?.user_id && (
-                      <ActionButton
-                        label="Demote to Flagged"
-                        variant="danger"
-                        loading={actionLoading === `${item.meals.user_id}-demote`}
-                        onClick={() => handleDemoteUser(item.meals!.user_id)}
-                      />
-                    )}
+                  <div className="flex gap-2">
+                    <ActionButton
+                      label="Approve"
+                      variant="success"
+                      loading={actionLoading === `${item.id}-approve`}
+                      onClick={() => handleAction('moderation', item.id, 'approve')}
+                    />
+                    <ActionButton
+                      label="Reject"
+                      variant="danger"
+                      loading={actionLoading === `${item.id}-reject`}
+                      onClick={() => handleAction('moderation', item.id, 'reject')}
+                    />
                   </div>
                 </div>
               </div>
@@ -372,7 +303,7 @@ export function AdminTabs({
                 <div className="flex items-center justify-between">
                   <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
                     {new Date(item.created_at).toLocaleDateString()}
-                    {item.reported_comment_id ? ' · Comment report' : item.reported_meal_id ? ' · Meal report' : ' · User report'}
+                    {item.reported_comment_id ? ' · Comment report' : item.reported_meal_id ? ' · Dish report' : ' · User report'}
                   </span>
                   <div className="flex gap-2">
                     <ActionButton
@@ -386,89 +317,6 @@ export function AdminTabs({
                       variant="neutral"
                       loading={actionLoading === `${item.id}-dismiss`}
                       onClick={() => handleAction('reports', item.id, 'dismiss')}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Disputes tab */}
-        {activeTab === 'disputes' && (
-          <div className="flex flex-col gap-3">
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--text-primary)' }}>
-              Venue Disputes ({disputes.length})
-            </h2>
-            {disputes.length === 0 && (
-              <p style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)', fontSize: 14 }}>
-                No pending disputes.
-              </p>
-            )}
-            {disputes.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  padding: 16,
-                  borderRadius: 12,
-                  backgroundColor: 'var(--bg-surface)',
-                }}
-              >
-                <div className="flex items-center gap-3" style={{ marginBottom: 8 }}>
-                  {item.meals?.photo_url && (
-                    <Image
-                      src={item.meals.photo_url}
-                      alt={item.meals.title ?? 'Meal'}
-                      width={48}
-                      height={48}
-                      className="rounded-lg object-cover"
-                      style={{ width: 48, height: 48 }}
-                    />
-                  )}
-                  <div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>
-                      {item.meals?.title ?? 'Unknown meal'}
-                    </p>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--accent-primary)' }}>
-                      {item.meals?.venue_name ?? item.venue_mapbox_id}
-                    </p>
-                  </div>
-                </div>
-                <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-primary)', marginBottom: 4 }}>
-                  Reason: {REASON_LABELS[item.reason] ?? item.reason}
-                </p>
-                {item.detail && (
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 4 }}>
-                    {item.detail}
-                  </p>
-                )}
-                {item.restaurant_username && (
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>
-                    By: @{item.restaurant_username}
-                  </p>
-                )}
-                {item.dispute_stats && (
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                    History: {item.dispute_stats.total} disputes
-                    ({item.dispute_stats.upheld} upheld, {item.dispute_stats.dismissed} dismissed)
-                  </p>
-                )}
-                <div className="flex items-center justify-between">
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                  <div className="flex gap-2">
-                    <ActionButton
-                      label="Uphold"
-                      variant="danger"
-                      loading={actionLoading === `${item.id}-uphold`}
-                      onClick={() => handleAction('disputes', item.id, 'uphold')}
-                    />
-                    <ActionButton
-                      label="Dismiss"
-                      variant="neutral"
-                      loading={actionLoading === `${item.id}-dismiss`}
-                      onClick={() => handleAction('disputes', item.id, 'dismiss')}
                     />
                   </div>
                 </div>
@@ -517,33 +365,6 @@ function StatCard({
         {value}
       </p>
     </div>
-  );
-}
-
-const TIER_STYLES: Record<string, { bg: string; text: string }> = {
-  new: { bg: 'var(--accent-primary)', text: '#121212' },
-  trusted: { bg: 'var(--status-success)', text: '#121212' },
-  flagged: { bg: 'var(--status-error)', text: '#FFFFFF' },
-};
-
-function TierBadge({ tier }: { tier?: string }) {
-  const t = tier ?? 'new';
-  const style = TIER_STYLES[t] ?? TIER_STYLES.new;
-  return (
-    <span
-      style={{
-        padding: '2px 6px',
-        borderRadius: 6,
-        fontSize: 10,
-        fontWeight: 600,
-        fontFamily: 'var(--font-body)',
-        color: style.text,
-        backgroundColor: style.bg,
-        textTransform: 'uppercase',
-      }}
-    >
-      {t}
-    </span>
   );
 }
 

@@ -52,11 +52,11 @@
     "followPrompt": "Suivre @{username}",
     "followPromptRated": "Vous avez noté le repas de @{username} {score}",
     "suggestionsTitle": "Personnes à suivre",
-    "suggestionStats": "{count} repas \u00b7 {rating} moy.",
+    "suggestionStats": "{count} repas · {rating} moy.",
     "journal": "Journal",
     "emptyJournal": "Votre journal est vide",
-    "emptyJournalDesc": "Les repas priv\u00e9s que vous publiez appara\u00eetront ici. Vous seul pouvez les voir.",
-    "uploadPrivateMeal": "Publier un repas priv\u00e9",
+    "emptyJournalDesc": "Les repas privés que vous publiez apparaîtront ici. Vous seul pouvez les voir.",
+    "uploadPrivateMeal": "Publier un repas privé",
     "endOfJournal": "Vous avez tout vu dans votre journal"
   },
   "rating": {
@@ -182,15 +182,12 @@
   },
   "profile": {
     "settings": "Paramètres",
-    "leaderboard": "Classement",
     "editProfile": "Modifier le profil",
     "myMeals": "Mes repas",
     "saved": "Enregistrés",
     "noSavedMeals": "Aucun repas enregistré",
     "noMealsUploaded": "Aucun repas publié",
     "meals": "Repas",
-    "avgRating": "Note moy.",
-    "streak": "Série",
     "unavailable": "Profil indisponible",
     "unavailableDesc": "Nous n'avons pas pu charger ce profil. Veuillez réessayer.",
     "displayName": "Nom affiché",
@@ -214,7 +211,6 @@
     "ratingsGiven": "Notes données",
     "privacy": "Confidentialité",
     "showLocation": "Afficher ma localisation",
-    "showStreak": "Afficher ma série",
     "back": "Retour",
     "reportUser": "Signaler @{username}",
     "blockUser": "Bloquer @{username}",
@@ -231,20 +227,6 @@
     "followFailed": "Impossible de suivre",
     "unfollowFailed": "Impossible de se désabonner",
     "blockFailed": "Impossible de bloquer l'utilisateur"
-  },
-  "leaderboard": {
-    "title": "Classement",
-    "global": "Mondial",
-    "country": "Pays",
-    "city": "Ville",
-    "thisWeek": "Cette semaine",
-    "thisMonth": "Ce mois-ci",
-    "allTime": "Depuis toujours",
-    "allCuisines": "Toutes les cuisines",
-    "noUsers": "Aucun utilisateur éligible pour ces filtres.",
-    "meals": "{count} repas",
-    "unavailable": "Classement indisponible",
-    "unavailableDesc": "Nous n'avons pas pu charger le classement. Veuillez réessayer."
   },
   "upload": {
     "selectPhoto": "Choisir une photo",
@@ -265,7 +247,7 @@
     "tagsOptional": "Tags (facultatif)",
     "tagsPlaceholder": "#faitmaison, #rôti, #dimanche",
     "venueOptional": "Où avez-vous mangé ? (facultatif)",
-    "venuePlaceholder": "Rechercher un restaurant, caf\u00e9\u2026",
+    "venuePlaceholder": "Rechercher un restaurant, café…",
     "venueSearching": "Recherche...",
     "visibility": "Visibilité",
     "public": "Public",
@@ -291,7 +273,7 @@
     "meals": "repas",
     "claimTitle": "C'est votre restaurant ?",
     "claimDesc": "Revendiquez votre profil pour accéder à des statistiques détaillées sur chaque plat, publier vos propres créations pour les faire goûter, et développer votre audience.",
-    "claimCta": "Revendiquez votre profil \u2014 à partir de 29\u00a3/mois",
+    "claimCta": "Revendiquez votre profil — à partir de 29£/mois",
     "back": "Retour",
     "verified": "Restaurant vérifié"
   },
@@ -315,25 +297,11 @@
       "other": "Autre"
     }
   },
-  "dispute": {
-    "title": "Contester l'identification du lieu",
-    "submitButton": "Envoyer la contestation",
-    "submitting": "Envoi...",
-    "successMessage": "Contestation envoyée. Nous l'examinerons sous 48 heures.",
-    "detailPlaceholder": "Détails supplémentaires (facultatif, 280 caractères max.)",
-    "reasons": {
-      "not_served_here": "Non servi ici",
-      "wrong_location": "Mauvaise adresse / succursale",
-      "fake_photo": "Photo fausse / photo de stock",
-      "other": "Autre"
-    }
-  },
   "admin": {
     "title": "Administration",
     "overview": "Vue d'ensemble",
     "moderationQueue": "Modération",
     "reports": "Signalements",
-    "venueDisputes": "Contestations",
     "approve": "Approuver",
     "reject": "Rejeter",
     "action": "Action",
@@ -434,7 +402,11 @@
     "themeSystem": "Système",
     "businessProfile": "Profil Entreprise",
     "editBusinessDetails": "Modifier les détails de l'entreprise",
-    "managePremises": "Gérer les établissements"
+    "managePremises": "Gérer les établissements",
+    "notifications": "Notifications",
+    "notificationPreferences": "Préférences de notifications",
+    "forBusinesses": "Pour les Entreprises",
+    "becomeABusiness": "Devenir une entreprise"
   },
   "footer": {
     "privacy": "Confidentialité",
@@ -526,19 +498,58 @@
     "currentPlan": "Offre actuelle",
     "getPersonal": "Passer à Personnel",
     "getBusiness": "Passer à Business",
-    "freeFeatures": ["5 publications/jour", "1 photo par repas", "5 membres en fil privé", "Noter et demander des recettes"],
-    "personalFeatures": ["15 publications/jour", "Jusqu'à 4 photos par repas", "25 membres en fil privé", "Support prioritaire"],
-    "businessFeatures": ["20 publications/jour", "Jusqu'à 4 photos par repas", "100 membres en fil privé", "Test anonyme de plats", "Statistiques restaurant"],
+    "freeFeatures": [
+      "5 publications/jour",
+      "1 photo par repas",
+      "5 membres en fil privé",
+      "Noter et demander des recettes"
+    ],
+    "personalFeatures": [
+      "15 publications/jour",
+      "Jusqu'à 4 photos par repas",
+      "25 membres en fil privé",
+      "Support prioritaire"
+    ],
+    "businessFeatures": [
+      "20 publications/jour",
+      "Jusqu'à 4 photos par repas",
+      "100 membres en fil privé",
+      "Test anonyme de plats",
+      "Statistiques restaurant"
+    ],
     "freeSubtitle": "Pour les amateurs de cuisine",
     "personalSubtitle": "Pour les passionnés de gastronomie",
     "businessSubtitle": "Pour les restaurants et commerces alimentaires",
-    "freePrice": "0\u00a3",
+    "freePrice": "0£",
     "includesFrom": "Tout de l'offre {plan}, plus :",
     "compareAll": "Comparer toutes les fonctionnalités",
     "faqTitle": "Questions fréquentes",
-    "freeDetailFeatures": ["5 publications par jour", "1 photo par repas", "5 membres en fil privé", "Noter les repas et demander des recettes", "Séries de publications et badges", "Repas affichés sur la carte mondiale"],
-    "personalDetailFeatures": ["15 publications par jour", "Jusqu'à 4 photos par repas", "25 membres en fil privé", "Support prioritaire"],
-    "businessDetailFeatures": ["Publications de plats illimitées", "Profil professionnel vérifié et badge", "Épingle dédiée sur la carte pour votre établissement", "Promotion dans le fil de votre zone locale", "Tableau de bord statistiques complet", "Test anonyme de plats", "Placement prioritaire sur la carte", "Badges « Les mieux notés »", "Publications de contenu sur votre profil", "100 membres en fil privé"],
+    "freeDetailFeatures": [
+      "5 publications par jour",
+      "1 photo par repas",
+      "5 membres en fil privé",
+      "Noter les repas et demander des recettes",
+      "Séries de publications et badges",
+      "Repas affichés sur la carte mondiale"
+    ],
+    "personalDetailFeatures": [
+      "15 publications par jour",
+      "Jusqu'à 4 photos par repas",
+      "25 membres en fil privé",
+      "Support prioritaire"
+    ],
+    "businessDetailFeatures": [
+      "Publications de plats illimitées",
+      "Profil professionnel vérifié et badge",
+      "Épingle dédiée sur la carte pour votre établissement",
+      "Promotion dans le fil de votre zone locale",
+      "Tableau de bord statistiques complet",
+      "Test anonyme de plats",
+      "Placement prioritaire sur la carte",
+      "Badges « Les mieux notés »",
+      "Publications de contenu sur votre profil",
+      "100 membres en fil privé"
+    ],
     "comparison": {
       "uploading": "Publications",
       "dailyUploads": "Publications quotidiennes",
@@ -547,7 +558,6 @@
       "rateMeals": "Noter les repas",
       "requestRecipes": "Demander des recettes",
       "privateFeedMembers": "Membres en fil privé",
-      "streaksBadges": "Séries et badges",
       "visibility": "Visibilité",
       "mealsOnMap": "Repas sur la carte mondiale",
       "verifiedBadge": "Badge professionnel vérifié",
@@ -606,9 +616,6 @@
   },
   "sidebar": {
     "uploadMeal": "Publier un repas",
-    "leaderboard": "Classement",
-    "leaderboardDesc": "Découvrez qui cuisine les repas les mieux notés cette semaine.",
-    "viewLeaderboard": "Voir le classement",
     "trending": "Tendances",
     "trendingDesc": "Explorez les cuisines tendance et les repas populaires sur la carte.",
     "openMap": "Ouvrir la carte",

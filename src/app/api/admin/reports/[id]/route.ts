@@ -74,27 +74,14 @@ export async function PATCH(
           userId = comment?.user_id ?? null;
         }
 
-        // If no direct user, look up via meal
+        // If no direct user, look up via dish
         if (!userId && report.reported_meal_id) {
-          const { data: meal } = await serviceClient
-            .from('meals')
-            .select('user_id')
+          const { data: dish } = await serviceClient
+            .from('dishes')
+            .select('business_id')
             .eq('id', report.reported_meal_id)
             .single();
-          userId = meal?.user_id ?? null;
-        }
-
-        if (userId) {
-          await serviceClient
-            .from('profiles')
-            .update({ moderation_tier: 'flagged' })
-            .eq('id', userId);
-
-          console.log(JSON.stringify({
-            event: 'user_demoted_to_flagged',
-            user_id: userId,
-            reason: `report_${id}`,
-          }));
+          userId = dish?.business_id ?? null;
         }
       }
     }
