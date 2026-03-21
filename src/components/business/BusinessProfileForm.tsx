@@ -212,48 +212,52 @@ export default function BusinessProfileForm({
         />
       </Field>
 
-      <Field label="Phone" error={errors.phone}>
-        <input
-          type="tel"
-          value={data.phone}
-          onChange={(e) => onChange({ phone: e.target.value })}
-          maxLength={20}
-          placeholder="+44 1234 567890"
-          style={inputStyle}
-        />
-      </Field>
-
-      <Field label="Email" error={errors.email}>
-        <input
-          type="email"
-          value={data.email}
-          onChange={(e) => onChange({ email: e.target.value })}
-          placeholder="hello@business.com"
-          style={inputStyle}
-        />
-      </Field>
-
-      <Field label="Website" error={errors.website_url}>
-        <input
-          type="url"
-          value={data.website_url}
-          onChange={(e) => onChange({ website_url: e.target.value })}
-          placeholder="https://www.example.com"
-          style={inputStyle}
-        />
-      </Field>
-
-      {(isFoodService || isChefsExperiences) && (
-        <Field label="Booking URL" error={errors.booking_url}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Phone" error={errors.phone}>
           <input
-            type="url"
-            value={data.booking_url}
-            onChange={(e) => onChange({ booking_url: e.target.value })}
-            placeholder="https://booking.example.com"
+            type="tel"
+            value={data.phone}
+            onChange={(e) => onChange({ phone: e.target.value })}
+            maxLength={20}
+            placeholder="+44 1234 567890"
             style={inputStyle}
           />
         </Field>
-      )}
+
+        <Field label="Email" error={errors.email}>
+          <input
+            type="email"
+            value={data.email}
+            onChange={(e) => onChange({ email: e.target.value })}
+            placeholder="hello@business.com"
+            style={inputStyle}
+          />
+        </Field>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Website" error={errors.website_url}>
+          <input
+            type="url"
+            value={data.website_url}
+            onChange={(e) => onChange({ website_url: e.target.value })}
+            placeholder="https://www.example.com"
+            style={inputStyle}
+          />
+        </Field>
+
+        {(isFoodService || isChefsExperiences) ? (
+          <Field label="Booking URL" error={errors.booking_url}>
+            <input
+              type="url"
+              value={data.booking_url}
+              onChange={(e) => onChange({ booking_url: e.target.value })}
+              placeholder="https://booking.example.com"
+              style={inputStyle}
+            />
+          </Field>
+        ) : <div />}
+      </div>
 
       {/* Address fields */}
       {showAddress && (
