@@ -157,7 +157,7 @@ export default function MapView() {
       south: bounds.getSouth().toString(),
       east: bounds.getEast().toString(),
       west: bounds.getWest().toString(),
-      limit: '200',
+      limit: '500',
     });
 
     if (typeFilter) params.set('type_filter', typeFilter);
@@ -209,15 +209,65 @@ export default function MapView() {
         map.addSource('businesses', {
           type: 'geojson',
           data: pinsToGeoJSON([]),
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50,
         });
       }
 
-      // Main pin layer
-      if (!map.getLayer('business-pins')) {
+      // Cluster circles — sized and shaded by point count
+      if (!map.getLayer('clusters')) {
         map.addLayer({
-          id: 'business-pins',
+          id: 'clusters',
           type: 'circle',
           source: 'businesses',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': [
+              'step', ['get', 'point_count'],
+              '#E8A838',    // small clusters (< 25)
+              25, '#D4943A', // medium (25–99)
+              100, '#C47F2C', // large (100+)
+            ],
+            'circle-radius': [
+              'step', ['get', 'point_count'],
+              16,           // small
+              25, 22,       // medium
+              100, 30,      // large
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': PIN_STROKE[t],
+            'circle-opacity': 0.9,
+          },
+        });
+      }
+
+      // Cluster count labels
+      if (!map.getLayer('cluster-count')) {
+        map.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'businesses',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': ['get', 'point_count_abbreviated'],
+            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 13,
+            'text-allow-overlap': true,
+          },
+          paint: {
+            'text-color': '#121212',
+          },
+        });
+      }
+
+      // Individual (unclustered) pins
+      if (!map.getLayer('unclustered-point')) {
+        map.addLayer({
+          id: 'unclustered-point',
+          type: 'circle',
+          source: 'businesses',
+          filter: ['!', ['has', 'point_count']],
           paint: {
             'circle-color': ['get', 'color'],
             'circle-radius': 5,
@@ -228,13 +278,13 @@ export default function MapView() {
         });
       }
 
-      // Pulse layer for recently active businesses
-      if (!map.getLayer('business-pins-pulse')) {
+      // Pulse layer for recently active businesses (unclustered only)
+      if (!map.getLayer('unclustered-point-pulse')) {
         map.addLayer({
-          id: 'business-pins-pulse',
+          id: 'unclustered-point-pulse',
           type: 'circle',
           source: 'businesses',
-          filter: ['==', ['get', 'is_recent'], true],
+          filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'is_recent'], true]],
           paint: {
             'circle-color': ['get', 'color'],
             'circle-radius': 10,
@@ -246,8 +296,32 @@ export default function MapView() {
       fetchPins(map, filterRef.current);
     });
 
+    // Cluster click — zoom to expand
+    map.on('click', 'clusters', (e) => {
+      const feature = e.features?.[0];
+      if (!feature?.properties) return;
+      const clusterId = feature.properties.cluster_id as number;
+      const source = map.getSource('businesses') as mapboxgl.GeoJSONSource;
+      source.getClusterExpansionZoom(clusterId).then((zoom) => {
+        const coords = (feature.geometry as GeoJSON.Point).coordinates;
+        map.flyTo({
+          center: [coords[0], coords[1]] as [number, number],
+          zoom: zoom ?? 14,
+          duration: 500,
+        });
+      });
+
+      posthog.capture('map_cluster_tapped', {
+        point_count: feature.properties.point_count,
+        zoom_level: map.getZoom(),
+      });
+    });
+
+    map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
+
     // Pin click
-    map.on('click', 'business-pins', (e) => {
+    map.on('click', 'unclustered-point', (e) => {
       const feature = e.features?.[0];
       if (!feature?.properties) return;
       const p = feature.properties;
@@ -272,8 +346,8 @@ export default function MapView() {
       });
     });
 
-    map.on('mouseenter', 'business-pins', () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', 'business-pins', () => { map.getCanvas().style.cursor = ''; });
+    map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
 
     map.on('moveend', () => {
       const center = map.getCenter();

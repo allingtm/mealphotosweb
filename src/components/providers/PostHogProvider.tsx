@@ -8,20 +8,19 @@ import { getConsent, hasConsentBeenRecorded } from '@/lib/cookies';
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return;
+    if (posthog.__loaded) return;
+
+    const shouldCapture =
+      process.env.NODE_ENV !== 'development' &&
+      hasConsentBeenRecorded() &&
+      getConsent().analytics;
 
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com',
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
       capture_pageview: true,
       capture_pageleave: true,
-      loaded: (ph) => {
-        if (process.env.NODE_ENV === 'development') {
-          ph.opt_out_capturing();
-          return;
-        }
-        if (!hasConsentBeenRecorded() || !getConsent().analytics) {
-          ph.opt_out_capturing();
-        }
-      },
+      persistence: 'localStorage+cookie',
+      opt_out_capturing_by_default: !shouldCapture,
     });
   }, []);
 

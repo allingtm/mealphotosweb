@@ -6,7 +6,7 @@ export const mapPinsSchema = z.object({
   east: z.coerce.number().min(-180).max(180),
   west: z.coerce.number().min(-180).max(180),
   type_filter: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(500).default(200),
+  limit: z.coerce.number().int().min(1).max(1000).default(500),
 });
 
 export type MapPinsInput = z.infer<typeof mapPinsSchema>;
