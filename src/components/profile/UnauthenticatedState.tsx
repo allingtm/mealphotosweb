@@ -221,15 +221,8 @@ export function UnauthenticatedState() {
           <button
             type="button"
             onClick={() => openAuthModal('signup')}
-            className="w-full py-3 rounded-full transition-opacity hover:opacity-90"
-            style={{
-              backgroundColor: 'transparent',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--bg-elevated)',
-              fontFamily: 'var(--font-body)',
-              fontSize: 15,
-              fontWeight: 600,
-            }}
+            className="w-full py-3 rounded-full transition-all bg-transparent text-[#121212] border-2 border-[#E8A838] hover:bg-[rgba(232,168,56,0.1)] hover:scale-[1.02] text-[15px] font-semibold"
+            style={{ fontFamily: 'var(--font-body)' }}
           >
             {t('businessCTA')}
           </button>

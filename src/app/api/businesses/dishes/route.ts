@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/rate-limit';
+import { resolveBusinessContext } from '@/lib/team';
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -11,14 +12,17 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(ip, 'read');
   if (rateLimited) return rateLimited;
 
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx) return NextResponse.json({ error: 'Business access required' }, { status: 403 });
+
   const url = req.nextUrl;
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20'), 50);
   const cursor = url.searchParams.get('cursor');
 
   let query = supabase
     .from('dishes')
-    .select('id, title, description, price_pence, photo_url, photo_blur_hash, image_count, reaction_count, save_count, comment_count, comments_enabled, created_at, premise_id')
-    .eq('business_id', user.id)
+    .select('id, title, description, price_pence, photo_url, photo_blur_hash, image_count, reaction_count, save_count, comment_count, comments_enabled, created_at, premise_id, posted_by')
+    .eq('business_id', ctx.businessId)
     .order('created_at', { ascending: false })
     .limit(limit);
 

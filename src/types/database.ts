@@ -221,6 +221,7 @@ export interface Dish {
   comment_count: number;
   comments_enabled: boolean;
   ingredients: string[];
+  posted_by: string | null;
   created_at: string;
 }
 
@@ -377,6 +378,32 @@ export interface Report {
   reason: 'inappropriate' | 'spam' | 'harassment' | 'misleading' | 'other';
   detail: string | null;
   status: 'pending' | 'reviewed' | 'actioned' | 'dismissed';
+  created_at: string;
+}
+
+export interface BusinessTeamMember {
+  id: string;
+  business_id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  permissions: {
+    can_post_dishes: boolean;
+    can_manage_menu: boolean;
+  };
+  invited_by: string | null;
+  terms_accepted_at: string;
+  created_at: string;
+}
+
+export interface BusinessTeamInvite {
+  id: string;
+  business_id: string;
+  email: string;
+  token: string;
+  role: 'member';
+  invited_by: string;
+  status: 'pending' | 'accepted' | 'revoked';
+  expires_at: string;
   created_at: string;
 }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/rate-limit';
 import { updateDishSchema } from '@/lib/validations/dish';
+import { resolveBusinessContext } from '@/lib/team';
 
 export async function GET(
   req: NextRequest,
@@ -66,14 +67,19 @@ export async function PATCH(
     );
   }
 
-  // Verify ownership
+  // Verify ownership (supports team members)
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx || !ctx.permissions.can_post_dishes) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   const { data: dish } = await supabase
     .from('dishes')
     .select('business_id')
     .eq('id', id)
     .single();
 
-  if (!dish || dish.business_id !== user.id) {
+  if (!dish || dish.business_id !== ctx.businessId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
@@ -102,14 +108,19 @@ export async function DELETE(
 
   const { id } = await params;
 
-  // Verify ownership
+  // Verify ownership (supports team members)
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx || !ctx.permissions.can_post_dishes) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   const { data: dish } = await supabase
     .from('dishes')
     .select('business_id, cloudflare_image_id')
     .eq('id', id)
     .single();
 
-  if (!dish || dish.business_id !== user.id) {
+  if (!dish || dish.business_id !== ctx.businessId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 

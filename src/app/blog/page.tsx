@@ -208,6 +208,7 @@ export default async function BlogPage({ searchParams }: Props) {
         initialCursor={nextCursor}
         initialHasMore={hasMore}
         tag={tag}
+        hasFeaturedPost={!!featuredPost && !tag}
       />
     </div>
   );

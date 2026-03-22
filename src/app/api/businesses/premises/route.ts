@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { premiseCreateSchema } from '@/lib/validations';
 import { applyRateLimit } from '@/lib/rate-limit';
 import { slugify, countrySlug, generateUniqueSlug } from '@/lib/utils/slugify';
+import { resolveBusinessContext } from '@/lib/team';
 
 async function geocodeAddress(
   addressLine1: string | null | undefined,
@@ -40,12 +41,15 @@ export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(user.id, 'read');
   if (rateLimited) return rateLimited;
 
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx) return NextResponse.json({ error: 'Business access required' }, { status: 403 });
+
   const includeInactive = req.nextUrl.searchParams.get('include_inactive') === 'true';
 
   let query = supabase
     .from('business_premises')
     .select('*')
-    .eq('owner_id', user.id)
+    .eq('owner_id', ctx.businessId)
     .order('created_at', { ascending: true });
 
   if (!includeInactive) {

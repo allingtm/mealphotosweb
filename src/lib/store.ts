@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
 import type { BusinessType, BusinessTypeGroup, BusinessPremise } from '@/types/database';
+import type { TeamPermissions } from '@/lib/team';
 
 export type FeedTab = 'following' | 'nearby' | 'trending';
 
@@ -22,6 +23,12 @@ interface AppState {
   setIsAdmin: (isAdmin: boolean) => void;
   profileAvatarUrl: string | null;
   setProfileAvatarUrl: (url: string | null) => void;
+
+  // Team context (for team members acting on behalf of a business)
+  teamBusinessId: string | null;
+  teamRole: 'owner' | 'member' | null;
+  teamPermissions: TeamPermissions | null;
+  setTeamContext: (businessId: string | null, role: 'owner' | 'member' | null, permissions: TeamPermissions | null) => void;
 
   // Feed
   feedTab: FeedTab;
@@ -65,6 +72,11 @@ export const useAppStore = create<AppState>((set) => ({
   setIsAdmin: (isAdmin) => set({ isAdmin }),
   profileAvatarUrl: null,
   setProfileAvatarUrl: (url) => set({ profileAvatarUrl: url }),
+
+  teamBusinessId: null,
+  teamRole: null,
+  teamPermissions: null,
+  setTeamContext: (businessId, role, permissions) => set({ teamBusinessId: businessId, teamRole: role, teamPermissions: permissions }),
 
   premises: [],
   activePremiseId: null,

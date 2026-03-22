@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/rate-limit';
+import { resolveBusinessContext } from '@/lib/team';
 import Anthropic from '@anthropic-ai/sdk';
 
 export async function POST(req: NextRequest) {
@@ -10,6 +11,11 @@ export async function POST(req: NextRequest) {
 
   const rateLimited = await applyRateLimit(user.id, 'upload');
   if (rateLimited) return rateLimited;
+
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx || !ctx.permissions.can_manage_menu) {
+    return NextResponse.json({ error: 'Permission denied' }, { status: 403 });
+  }
 
   const formData = await req.formData();
   const image = formData.get('image') as File;

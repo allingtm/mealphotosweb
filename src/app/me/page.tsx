@@ -24,6 +24,26 @@ export default async function MePage() {
     return <BusinessDashboard userId={user.id} username={profile.username} />;
   }
 
+  // Check if user is a team member of a business
+  const { data: membership } = await supabase
+    .from('business_team_members')
+    .select('business_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (membership) {
+    // Load the owner's profile to check subscription + get username
+    const { data: ownerProfile } = await supabase
+      .from('profiles')
+      .select('username, subscription_status')
+      .eq('id', membership.business_id)
+      .single();
+
+    if (ownerProfile?.subscription_status === 'active') {
+      return <BusinessDashboard userId={user.id} username={ownerProfile.username} />;
+    }
+  }
+
   return (
     <ConsumerProfile
       userId={user.id}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check, BookOpen, User, Settings } from 'lucide-react';
+import { PlusCircle, Camera, UtensilsCrossed, Bookmark, MessageCircle, Users, Check, BookOpen, User, Settings, UserPlus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/lib/store';
@@ -42,6 +42,7 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({ userId, username }: BusinessDashboardProps) {
   const userPlan = useAppStore((s) => s.userPlan);
+  const teamRole = useAppStore((s) => s.teamRole);
   const premises = useAppStore((s) => s.premises);
   const setPremises = useAppStore((s) => s.setPremises);
   const activePremiseId = useAppStore((s) => s.activePremiseId);
@@ -212,9 +213,10 @@ export function BusinessDashboard({ userId, username }: BusinessDashboardProps) 
         </Link>
 
         {/* Quick action links */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className={`grid gap-3 mb-6 ${teamRole === 'owner' ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <QuickLink href="/business/menu" icon={BookOpen} label="Menu" />
           <QuickLink href={`/business/${username}`} icon={User} label="Profile" />
+          {teamRole === 'owner' && <QuickLink href="/business/team" icon={UserPlus} label="Team" />}
           <QuickLink href="/settings" icon={Settings} label="Settings" />
         </div>
 

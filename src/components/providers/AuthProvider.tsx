@@ -12,6 +12,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setIsBusiness = useAppStore((s) => s.setIsBusiness);
   const setUserPlan = useAppStore((s) => s.setUserPlan);
   const setProfileAvatarUrl = useAppStore((s) => s.setProfileAvatarUrl);
+  const setTeamContext = useAppStore((s) => s.setTeamContext);
 
   useEffect(() => {
     const supabase = createClient();
@@ -23,9 +24,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single();
       setIsAdmin(data?.is_admin ?? false);
-      setIsBusiness(data?.is_business ?? false);
-      setUserPlan((data?.plan as 'free' | 'business') ?? 'free');
       setProfileAvatarUrl(data?.avatar_url ?? null);
+
+      if (data?.is_business) {
+        // User is a business owner
+        setIsBusiness(true);
+        setUserPlan((data.plan as 'free' | 'business') ?? 'free');
+        setTeamContext(userId, 'owner', { can_post_dishes: true, can_manage_menu: true });
+      } else {
+        // Check if user is a team member of a business
+        const { data: membership } = await supabase
+          .from('business_team_members')
+          .select('business_id, role, permissions')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (membership) {
+          // Load the owner's plan to show business UI
+          const { data: ownerProfile } = await supabase
+            .from('profiles')
+            .select('plan, subscription_status')
+            .eq('id', membership.business_id)
+            .single();
+
+          if (ownerProfile?.subscription_status === 'active') {
+            setIsBusiness(true);
+            setUserPlan((ownerProfile.plan as 'free' | 'business') ?? 'free');
+            const perms = membership.permissions as { can_post_dishes: boolean; can_manage_menu: boolean };
+            setTeamContext(membership.business_id, membership.role as 'owner' | 'member', {
+              can_post_dishes: perms?.can_post_dishes ?? true,
+              can_manage_menu: perms?.can_manage_menu ?? false,
+            });
+          } else {
+            setIsBusiness(false);
+            setUserPlan('free');
+            setTeamContext(null, null, null);
+          }
+        } else {
+          setIsBusiness(false);
+          setUserPlan((data?.plan as 'free' | 'business') ?? 'free');
+          setTeamContext(null, null, null);
+        }
+      }
     }
 
     // Hydrate the current session on mount
@@ -81,13 +121,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsBusiness(false);
         setUserPlan('free');
         setProfileAvatarUrl(null);
+        setTeamContext(null, null, null);
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [setUser, setIsAdmin, setIsBusiness, setUserPlan, setProfileAvatarUrl]);
+  }, [setUser, setIsAdmin, setIsBusiness, setUserPlan, setProfileAvatarUrl, setTeamContext]);
 
   return <>{children}</>;
 }

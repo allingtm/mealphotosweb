@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createDishSchema } from '@/lib/validations/dish';
 import { getPostLimit } from '@/lib/subscription';
 import { applyRateLimit } from '@/lib/rate-limit';
+import { resolveBusinessContext } from '@/lib/team';
 import { encode } from 'blurhash';
 import sharp from 'sharp';
 
@@ -24,26 +25,24 @@ export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(user.id, 'upload');
   if (rateLimited) return rateLimited;
 
-  // Check business status
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_business, plan, subscription_status')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile?.is_business || profile.subscription_status !== 'active') {
+  // Check business status (supports team members)
+  const ctx = await resolveBusinessContext(supabase, user.id);
+  if (!ctx) {
     return NextResponse.json({ error: 'Business subscription required' }, { status: 403 });
   }
+  if (!ctx.permissions.can_post_dishes) {
+    return NextResponse.json({ error: 'You do not have permission to post dishes' }, { status: 403 });
+  }
 
-  // Check post limit
-  const limit = getPostLimit(profile.plan);
+  // Check post limit (shared across all team members)
+  const limit = getPostLimit(ctx.plan);
   if (limit !== Infinity) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const { count } = await supabase
       .from('dishes')
       .select('id', { count: 'exact' })
-      .eq('business_id', user.id)
+      .eq('business_id', ctx.businessId)
       .gte('created_at', todayStart.toISOString());
 
     if ((count ?? 0) >= limit) {
@@ -145,7 +144,7 @@ export async function POST(req: NextRequest) {
       .from('business_premises')
       .select('id')
       .eq('id', parsed.data.premise_id)
-      .eq('owner_id', user.id)
+      .eq('owner_id', ctx.businessId)
       .eq('is_active', true)
       .single();
     if (!premise) {
@@ -157,7 +156,7 @@ export async function POST(req: NextRequest) {
     const { data: premises } = await supabase
       .from('business_premises')
       .select('id')
-      .eq('owner_id', user.id)
+      .eq('owner_id', ctx.businessId)
       .eq('is_active', true);
     if (premises?.length === 1) {
       premiseId = premises[0].id;
@@ -168,7 +167,7 @@ export async function POST(req: NextRequest) {
   const { data: dish, error: dishError } = await supabase
     .from('dishes')
     .insert({
-      business_id: user.id,
+      business_id: ctx.businessId,
       premise_id: premiseId,
       title: parsed.data.title,
       description: parsed.data.description ?? null,
@@ -180,6 +179,7 @@ export async function POST(req: NextRequest) {
       menu_item_id: parsed.data.menu_item_id ?? null,
       ingredients: parsed.data.ingredients ?? [],
       comments_enabled: parsed.data.comments_enabled,
+      posted_by: ctx.role === 'member' ? user.id : null,
     })
     .select()
     .single();
@@ -241,7 +241,7 @@ export async function POST(req: NextRequest) {
         const { data: bizProfile } = await supabase
           .from('business_profiles')
           .select('business_name')
-          .eq('id', user.id)
+          .eq('id', ctx.businessId)
           .single();
         businessName = bizProfile?.business_name ?? null;
       }
@@ -249,7 +249,7 @@ export async function POST(req: NextRequest) {
       const { data: followers } = await supabase
         .from('follows')
         .select('follower_id')
-        .eq('following_id', user.id);
+        .eq('following_id', ctx.businessId);
 
       if (followers?.length && businessName) {
         const pushRequests = followers.map((f) => ({

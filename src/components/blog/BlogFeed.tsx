@@ -20,9 +20,10 @@ interface BlogFeedProps {
   initialCursor: string | null;
   initialHasMore: boolean;
   tag?: string;
+  hasFeaturedPost?: boolean;
 }
 
-export function BlogFeed({ initialPosts, initialCursor, initialHasMore, tag }: BlogFeedProps) {
+export function BlogFeed({ initialPosts, initialCursor, initialHasMore, tag, hasFeaturedPost }: BlogFeedProps) {
   const [posts, setPosts] = useState(initialPosts);
   const [cursor, setCursor] = useState(initialCursor);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -74,6 +75,7 @@ export function BlogFeed({ initialPosts, initialCursor, initialHasMore, tag }: B
   }, [initialPosts, initialCursor, initialHasMore]);
 
   if (posts.length === 0 && !loading) {
+    if (hasFeaturedPost) return null;
     return (
       <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-secondary)', textAlign: 'center', padding: 32 }}>
         No posts yet.
